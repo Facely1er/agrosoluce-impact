@@ -16,6 +16,7 @@ export interface Translations {
     partners: string;
     about: string;
     more: string;
+    workforceHealth?: string;
     main: string;
     theme: string;
     language: string;
@@ -878,6 +879,7 @@ export const translations: Record<Language, Translations> = {
       buyers: 'Buyers',
       cooperativeSpace: 'Cooperative Space',
       compliance: 'Monitoring',
+      workforceHealth: 'Workforce Health',
       partners: 'Partners & NGOs',
       about: 'About',
       more: 'More',
@@ -1752,6 +1754,7 @@ export const translations: Record<Language, Translations> = {
       buyers: 'Acheteurs',
       cooperativeSpace: 'Espace Coopérative',
       compliance: 'Suivi',
+      workforceHealth: 'Santé des Travailleurs',
       partners: 'Partenaires & ONG',
       about: 'À Propos',
       more: 'Plus',

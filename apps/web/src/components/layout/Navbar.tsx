@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { Home, UsersRound, Briefcase, User, Shield, Menu, X, Globe, Info, Handshake, Sun, Moon } from 'lucide-react';
+import { Home, UsersRound, Briefcase, User, Shield, Menu, X, Globe, Info, Handshake, Sun, Moon, Activity } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 import type { Language } from '@/lib/i18n/translations';
@@ -34,6 +34,7 @@ export default function Navbar() {
     { to: '/cooperatives', icon: UsersRound, label: t.nav.cooperatives, exact: true, secondary: true },
     { to: '/cooperative', icon: User, label: t.nav.cooperativeSpace, exact: false, secondary: true },
     { to: '/monitoring', icon: Shield, label: t.nav.compliance, exact: false, secondary: true },
+    { to: '/vrac', icon: Activity, label: t.nav.workforceHealth || 'Workforce Health', exact: false, secondary: true },
   ];
 
   return (

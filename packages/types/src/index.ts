@@ -8,4 +8,5 @@ export * from './assessment';
 export * from './coverage';
 export * from './readiness';
 export * from './commodity';
+export * from './vrac';
 

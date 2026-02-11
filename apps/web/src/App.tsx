@@ -32,6 +32,7 @@ const ChildLaborDashboard = lazy(() => import('./components/compliance').then(m 
 const AssessmentForm = lazy(() => import('./components/compliance').then(m => ({ default: m.AssessmentForm })));
 const AssessmentPage = lazy(() => import('./pages/assessment'));
 const MonitoringPage = lazy(() => import('./pages/monitoring/MonitoringPage'));
+const VracAnalysisPage = lazy(() => import('./pages/vrac/VracAnalysisPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // Loading component
@@ -92,6 +93,14 @@ function App() {
               element={
                 <ErrorBoundary>
                   <MonitoringPage />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/vrac"
+              element={
+                <ErrorBoundary>
+                  <VracAnalysisPage />
                 </ErrorBoundary>
               }
             />

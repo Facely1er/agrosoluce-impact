@@ -1,0 +1,884 @@
+{
+  "periods": [
+    {
+      "pharmacyId": "prolife",
+      "periodLabel": "Aug–Dec 2025",
+      "year": 2025,
+      "periodStart": "2025-08-01",
+      "periodEnd": "2025-12-10",
+      "products": [
+        {
+          "code": "8163121D",
+          "designation": "PARACETAMOL CRE 500 B/12X100  (DETAIL)",
+          "quantitySold": 2561
+        },
+        {
+          "code": "2296105D",
+          "designation": "AMOXICIL CREACIL 500 GEL100X12  (DETAIL)",
+          "quantitySold": 1528
+        },
+        {
+          "code": "8081802D",
+          "designation": "LITACOLD CP B/20X4  (DETAIL)",
+          "quantitySold": 1498
+        },
+        {
+          "code": "1656731D",
+          "designation": "PARACETAMOL CRE 500 BL/100X10  (DETAIL)",
+          "quantitySold": 1258
+        },
+        {
+          "code": "1208121D",
+          "designation": "SERINGUE 5CC /100 PEN  (DETAIL)",
+          "quantitySold": 1163
+        },
+        {
+          "code": "1280261",
+          "designation": "PARAMED 500MG CP B/20",
+          "quantitySold": 1117
+        },
+        {
+          "code": "489051D",
+          "designation": "GANT EXAMEN MEDIUM B/100  (DETAIL)",
+          "quantitySold": 984
+        },
+        {
+          "code": "8110900D",
+          "designation": "FEBRILEX CP B/4 PRES/50  (DETAIL)",
+          "quantitySold": 750
+        },
+        {
+          "code": "8076190",
+          "designation": "ARTEFAN 80/480 CP ETUI B/6",
+          "quantitySold": 728
+        },
+        {
+          "code": "3545504D",
+          "designation": "MAALOX ME CIT SUSP4.3MLSAC/20  (DETAIL)",
+          "quantitySold": 707
+        },
+        {
+          "code": "3413257",
+          "designation": "NOVALGINE 500MG CP B/20",
+          "quantitySold": 606
+        },
+        {
+          "code": "8151313",
+          "designation": "SANIVER 400MG CP B/1",
+          "quantitySold": 570
+        },
+        {
+          "code": "1530601D",
+          "designation": "FINIFAT 500MG CP B/100  (DETAIL)",
+          "quantitySold": 567
+        },
+        {
+          "code": "8141390",
+          "designation": "PLUFENTRINE 80/480MG CP B/6",
+          "quantitySold": 562
+        },
+        {
+          "code": "2297033",
+          "designation": "MAG 2 AMP BUV SS 10ML B/30 AFR",
+          "quantitySold": 535
+        },
+        {
+          "code": "2292136D",
+          "designation": "METRONIDAZ QT 500 CP BL/50X10  (DETAIL)",
+          "quantitySold": 504
+        },
+        {
+          "code": "8090445",
+          "designation": "ANTALGEX T GEL B/20",
+          "quantitySold": 476
+        },
+        {
+          "code": "2264447D",
+          "designation": "DICLO DENK 100 RETARD BL/10X10  (DETAIL)",
+          "quantitySold": 472
+        },
+        {
+          "code": "2255678",
+          "designation": "IBEX 200/235/30MG GELU B/24",
+          "quantitySold": 471
+        },
+        {
+          "code": "2256146",
+          "designation": "PREGNON CP B/1",
+          "quantitySold": 441
+        }
+      ],
+      "totalQuantity": 17498
+    },
+    {
+      "pharmacyId": "prolife",
+      "periodLabel": "Aug–Dec 2024",
+      "year": 2024,
+      "periodStart": "2024-08-01",
+      "periodEnd": "2024-12-10",
+      "products": [
+        {
+          "code": "1656731D",
+          "designation": "PARACETAMOL CRE 500 BL/100X10  (DETAIL)",
+          "quantitySold": 1392
+        },
+        {
+          "code": "8081802D",
+          "designation": "LITACOLD CP B/20X4  (DETAIL)",
+          "quantitySold": 871
+        },
+        {
+          "code": "2296105D",
+          "designation": "AMOXICIL CREACIL 500 GEL100X12  (DETAIL)",
+          "quantitySold": 780
+        },
+        {
+          "code": "8163121D",
+          "designation": "PARACETAMOL CRE 500 B/12X100  (DETAIL)",
+          "quantitySold": 696
+        },
+        {
+          "code": "1208121D",
+          "designation": "SERINGUE 5CC /100 PEN  (DETAIL)",
+          "quantitySold": 537
+        },
+        {
+          "code": "1280261",
+          "designation": "PARAMED 500MG CP B/20",
+          "quantitySold": 524
+        },
+        {
+          "code": "1530601D",
+          "designation": "FINIFAT 500MG CP B/100  (DETAIL)",
+          "quantitySold": 523
+        },
+        {
+          "code": "489051D",
+          "designation": "GANT EXAMEN MEDIUM B/100  (DETAIL)",
+          "quantitySold": 494
+        },
+        {
+          "code": "3545504D",
+          "designation": "MAALOX ME CIT SUSP4.3MLSAC/20  (DETAIL)",
+          "quantitySold": 410
+        },
+        {
+          "code": "3413257",
+          "designation": "NOVALGINE 500MG CP B/20",
+          "quantitySold": 323
+        },
+        {
+          "code": "2256146",
+          "designation": "PREGNON CP B/1",
+          "quantitySold": 319
+        },
+        {
+          "code": "2297033",
+          "designation": "MAG 2 AMP BUV SS 10ML B/30 AFR",
+          "quantitySold": 290
+        },
+        {
+          "code": "2255678",
+          "designation": "IBEX 200/235/30MG GELU B/24",
+          "quantitySold": 282
+        },
+        {
+          "code": "8594720D",
+          "designation": "AFINE 500MG CP B/20X4  (DETAIL)",
+          "quantitySold": 271
+        },
+        {
+          "code": "8076190",
+          "designation": "ARTEFAN 80/480 CP ETUI B/6",
+          "quantitySold": 271
+        },
+        {
+          "code": "8110900D",
+          "designation": "FEBRILEX CP B/4 PRES/50  (DETAIL)",
+          "quantitySold": 269
+        },
+        {
+          "code": "2264447D",
+          "designation": "DICLO DENK 100 RETARD BL/10X10  (DETAIL)",
+          "quantitySold": 260
+        },
+        {
+          "code": "8090445",
+          "designation": "ANTALGEX T GEL B/20",
+          "quantitySold": 245
+        },
+        {
+          "code": "8151313",
+          "designation": "SANIVER 400MG CP B/1",
+          "quantitySold": 237
+        },
+        {
+          "code": "8054047D",
+          "designation": "IBUPROFENE UBI 400MG CP/10X10  (DETAIL)",
+          "quantitySold": 223
+        }
+      ],
+      "totalQuantity": 9217
+    },
+    {
+      "pharmacyId": "prolife",
+      "periodLabel": "Aug–Dec 2023",
+      "year": 2023,
+      "periodStart": "2023-08-01",
+      "periodEnd": "2023-12-10",
+      "products": [
+        {
+          "code": "8163121D",
+          "designation": "PARACETAMOL CRE 500 B/12X100  (DETAIL)",
+          "quantitySold": 2851
+        },
+        {
+          "code": "1208121D",
+          "designation": "SERINGUE 5CC /100 PEN  (DETAIL)",
+          "quantitySold": 743
+        },
+        {
+          "code": "8081802D",
+          "designation": "LITACOLD CP B/20X4  (DETAIL)",
+          "quantitySold": 644
+        },
+        {
+          "code": "489051D",
+          "designation": "GANT EXAMEN MEDIUM B/100  (DETAIL)",
+          "quantitySold": 511
+        },
+        {
+          "code": "2296105D",
+          "designation": "AMOXICIL CREACIL 500 GEL100X12  (DETAIL)",
+          "quantitySold": 498
+        },
+        {
+          "code": "2270181",
+          "designation": "CONFIANCE COMP PLAQ/3X28",
+          "quantitySold": 469
+        },
+        {
+          "code": "1530601D",
+          "designation": "FINIFAT 500MG CP B/100  (DETAIL)",
+          "quantitySold": 451
+        },
+        {
+          "code": "2256146",
+          "designation": "PREGNON CP B/1",
+          "quantitySold": 357
+        },
+        {
+          "code": "1280261",
+          "designation": "PARAMED 500MG CP B/20",
+          "quantitySold": 347
+        },
+        {
+          "code": "2297033",
+          "designation": "MAG 2 AMP BUV SS 10ML B/30 AFR",
+          "quantitySold": 312
+        },
+        {
+          "code": "8076190",
+          "designation": "ARTEFAN 80/480 CP ETUI B/6",
+          "quantitySold": 305
+        },
+        {
+          "code": "1437911D",
+          "designation": "LITAMOL 100MG EFF CP B/80  (DETAIL)",
+          "quantitySold": 301
+        },
+        {
+          "code": "3545504D",
+          "designation": "MAALOX ME CIT SUSP4.3MLSAC/20  (DETAIL)",
+          "quantitySold": 289
+        },
+        {
+          "code": "2277421",
+          "designation": "EFFERALGAN PED S.BUV 90ML AFR",
+          "quantitySold": 283
+        },
+        {
+          "code": "8130920D",
+          "designation": "ALMAX FORTE SACH PDRE B/30  (DETAIL)",
+          "quantitySold": 282
+        },
+        {
+          "code": "8024081",
+          "designation": "LITACOLD SP FL/100ML",
+          "quantitySold": 253
+        },
+        {
+          "code": "2255678",
+          "designation": "IBEX 200/235/30MG GELU B/24",
+          "quantitySold": 247
+        },
+        {
+          "code": "3016450",
+          "designation": "CA C 1000 COMP EFF T/10",
+          "quantitySold": 241
+        },
+        {
+          "code": "2296312D",
+          "designation": "CIPHACET 500 CP BLIST B/300  (DETAIL)",
+          "quantitySold": 240
+        },
+        {
+          "code": "8143360D",
+          "designation": "SERINGUE 10ML B/100   PEN  (DETAIL)",
+          "quantitySold": 215
+        }
+      ],
+      "totalQuantity": 9839
+    },
+    {
+      "pharmacyId": "prolife",
+      "periodLabel": "Aug–Dec 2022",
+      "year": 2022,
+      "periodStart": "2022-08-01",
+      "periodEnd": "2022-12-10",
+      "products": [
+        {
+          "code": "1656731D",
+          "designation": "PARACETAMOL CRE 500 BL/100X10  (DETAIL)",
+          "quantitySold": 47
+        },
+        {
+          "code": "8130920D",
+          "designation": "ALMAX FORTE SACH PDRE B/30  (DETAIL)",
+          "quantitySold": 20
+        },
+        {
+          "code": "2270181",
+          "designation": "CONFIANCE COMP PLAQ/3X28",
+          "quantitySold": 18
+        },
+        {
+          "code": "8081802D",
+          "designation": "LITACOLD CP B/20X4  (DETAIL)",
+          "quantitySold": 17
+        },
+        {
+          "code": "2297033",
+          "designation": "MAG 2 AMP BUV SS 10ML B/30 AFR",
+          "quantitySold": 16
+        },
+        {
+          "code": "3545504D",
+          "designation": "MAALOX ME CIT SUSP4.3MLSAC/20  (DETAIL)",
+          "quantitySold": 14
+        },
+        {
+          "code": "2296312D",
+          "designation": "CIPHACET 500 CP BLIST B/300  (DETAIL)",
+          "quantitySold": 14
+        },
+        {
+          "code": "1004441",
+          "designation": "TRADOLAN 50MG CP B/20",
+          "quantitySold": 12
+        },
+        {
+          "code": "8076190",
+          "designation": "ARTEFAN 80/480 CP ETUI B/6",
+          "quantitySold": 9
+        },
+        {
+          "code": "2287603",
+          "designation": "FERAMALT SP F/100ML",
+          "quantitySold": 8
+        },
+        {
+          "code": "2279070D",
+          "designation": "CERELAC BLE 50G P/10  (DETAIL)",
+          "quantitySold": 7
+        },
+        {
+          "code": "8054024D",
+          "designation": "AMOXICIL UBI 500MG GEL BL10X12  (DETAIL)",
+          "quantitySold": 6
+        },
+        {
+          "code": "2264447D",
+          "designation": "DICLO DENK 100 RETARD BL/10X10  (DETAIL)",
+          "quantitySold": 6
+        },
+        {
+          "code": "3036101",
+          "designation": "EFFERALGAN 500MG CP EFF/16",
+          "quantitySold": 6
+        },
+        {
+          "code": "2007880",
+          "designation": "UPSA VIT C 1G CP EFF B/10",
+          "quantitySold": 5
+        },
+        {
+          "code": "8137282",
+          "designation": "DOXY 200MG CP B/8",
+          "quantitySold": 5
+        },
+        {
+          "code": "1437911D",
+          "designation": "LITAMOL 100MG EFF CP B/80  (DETAIL)",
+          "quantitySold": 4
+        },
+        {
+          "code": "2295809D",
+          "designation": "VIT B DENK CP B/10X10 B1+B6  (DETAIL)",
+          "quantitySold": 4
+        },
+        {
+          "code": "8110900D",
+          "designation": "FEBRILEX CP B/4 PRES/50  (DETAIL)",
+          "quantitySold": 4
+        },
+        {
+          "code": "3112975",
+          "designation": "VISCERALGINE 20MG SUPPO B/20",
+          "quantitySold": 4
+        }
+      ],
+      "totalQuantity": 226
+    },
+    {
+      "pharmacyId": "tanda",
+      "periodLabel": "Aug–Dec 2025",
+      "year": 2025,
+      "periodStart": "2025-08-01",
+      "periodEnd": "2025-12-10",
+      "products": [
+        {
+          "code": "980818",
+          "designation": "LITACOLD CPR DETAIL PL/4",
+          "quantitySold": 3688
+        },
+        {
+          "code": "2296105D",
+          "designation": "AMOXICILLINE CREACIL 500MG B/100X12 GEL  (DETAIL)",
+          "quantitySold": 2391
+        },
+        {
+          "code": "8163121D",
+          "designation": "PARACETAMOL CREAT 500MG CP B/12X100  (DETAIL)",
+          "quantitySold": 2206
+        },
+        {
+          "code": "8342303",
+          "designation": "PANOL 250MG SP F/60ML",
+          "quantitySold": 2137
+        },
+        {
+          "code": "3413257",
+          "designation": "NOVALGIN 500MG CP B/20",
+          "quantitySold": 1998
+        },
+        {
+          "code": "1445061D",
+          "designation": "SERINGUE 5CC/100 PEN  (DETAIL)",
+          "quantitySold": 1686
+        },
+        {
+          "code": "1327191",
+          "designation": "PARAMED 0.3% SIROP F/100ML",
+          "quantitySold": 1647
+        },
+        {
+          "code": "8008722",
+          "designation": "SANIVER 400MG CP B/1",
+          "quantitySold": 1562
+        },
+        {
+          "code": "2264298",
+          "designation": "BRUSTAN SIROP F/100ML",
+          "quantitySold": 1456
+        },
+        {
+          "code": "8076190",
+          "designation": "ARTEFAN 80/480 CP B/6",
+          "quantitySold": 1215
+        },
+        {
+          "code": "8141390",
+          "designation": "PLUFENTRINE 80/480MG CP B/6",
+          "quantitySold": 1210
+        },
+        {
+          "code": "1544021D",
+          "designation": "PARAMED 500MG CP B/1000  (DETAIL)",
+          "quantitySold": 1140
+        },
+        {
+          "code": "8024081",
+          "designation": "LITACOLD SP F/100ML",
+          "quantitySold": 1134
+        },
+        {
+          "code": "8054082D",
+          "designation": "PARACETAMOL UBI 500MG CP (DETAIL)",
+          "quantitySold": 1096
+        },
+        {
+          "code": "1280261",
+          "designation": "PARAMED 500MG CP B/20",
+          "quantitySold": 1082
+        },
+        {
+          "code": "489051D",
+          "designation": "GANT EXAM MAXPRO LATEX MED B/100  (DETAIL)",
+          "quantitySold": 1008
+        },
+        {
+          "code": "9545504",
+          "designation": "MAALOX STICK SACH (DETAIL)",
+          "quantitySold": 994
+        },
+        {
+          "code": "8054231",
+          "designation": "AMOXICILLINE UBI 250MG PDR SUSP F/60ML",
+          "quantitySold": 971
+        },
+        {
+          "code": "2279058D",
+          "designation": "DICLOFENAC UBI 75MG INJ 10*10  (DETAIL)",
+          "quantitySold": 963
+        },
+        {
+          "code": "2256146",
+          "designation": "PREGNON 1.5MG CP B/1",
+          "quantitySold": 908
+        }
+      ],
+      "totalQuantity": 30492
+    },
+    {
+      "pharmacyId": "tanda",
+      "periodLabel": "Aug–Dec 2024",
+      "year": 2024,
+      "periodStart": "2024-08-01",
+      "periodEnd": "2024-12-10",
+      "products": [
+        {
+          "code": "980818",
+          "designation": "LITACOLD CPR DETAIL PL/4",
+          "quantitySold": 3017
+        },
+        {
+          "code": "8163121D",
+          "designation": "PARACETAMOL CREAT 500MG CP B/12X100  (DETAIL)",
+          "quantitySold": 1829
+        },
+        {
+          "code": "2296105D",
+          "designation": "AMOXICILLINE CREACIL 500MG B/100X12 GEL  (DETAIL)",
+          "quantitySold": 1612
+        },
+        {
+          "code": "1445061D",
+          "designation": "SERINGUE 5CC/100 PEN  (DETAIL)",
+          "quantitySold": 1509
+        },
+        {
+          "code": "8342303",
+          "designation": "PANOL 250MG SP F/60ML",
+          "quantitySold": 1431
+        },
+        {
+          "code": "3413257",
+          "designation": "NOVALGIN 500MG CP B/20",
+          "quantitySold": 1382
+        },
+        {
+          "code": "1327191",
+          "designation": "PARAMED 0.3% SIROP F/100ML",
+          "quantitySold": 1299
+        },
+        {
+          "code": "489051D",
+          "designation": "GANT EXAM MAXPRO LATEX MED B/100  (DETAIL)",
+          "quantitySold": 1069
+        },
+        {
+          "code": "8008722",
+          "designation": "SANIVER 400MG CP B/1",
+          "quantitySold": 1054
+        },
+        {
+          "code": "8054082D",
+          "designation": "PARACETAMOL UBI 500MG CP (DETAIL)",
+          "quantitySold": 1004
+        },
+        {
+          "code": "1280261",
+          "designation": "PARAMED 500MG CP B/20",
+          "quantitySold": 943
+        },
+        {
+          "code": "9996019D",
+          "designation": "SERINGUE 10CC/100 PEN  (DETAIL)",
+          "quantitySold": 903
+        },
+        {
+          "code": "1530601D",
+          "designation": "FINIFAT 500MG CP B/100  (DETAIL)",
+          "quantitySold": 829
+        },
+        {
+          "code": "1544021D",
+          "designation": "PARAMED 500MG CP B/1000  (DETAIL)",
+          "quantitySold": 818
+        },
+        {
+          "code": "1426051D",
+          "designation": "ALOZOL 400MG CP B/100  (DETAIL)",
+          "quantitySold": 728
+        },
+        {
+          "code": "2264298",
+          "designation": "BRUSTAN SIROP F/100ML",
+          "quantitySold": 707
+        },
+        {
+          "code": "8024081",
+          "designation": "LITACOLD SP F/100ML",
+          "quantitySold": 683
+        },
+        {
+          "code": "9545504",
+          "designation": "MAALOX STICK SACH (DETAIL)",
+          "quantitySold": 652
+        },
+        {
+          "code": "8076190",
+          "designation": "ARTEFAN 80/480 CP B/6",
+          "quantitySold": 649
+        },
+        {
+          "code": "8110900D",
+          "designation": "FEBRILEX PLUS CP BLIST X 4    (DETAIL)",
+          "quantitySold": 635
+        }
+      ],
+      "totalQuantity": 22753
+    },
+    {
+      "pharmacyId": "tanda",
+      "periodLabel": "Aug–Dec 2023",
+      "year": 2023,
+      "periodStart": "2023-08-01",
+      "periodEnd": "2023-12-10",
+      "products": [
+        {
+          "code": "1215771",
+          "designation": "FERROFIT SP F/200ML",
+          "quantitySold": 3243
+        },
+        {
+          "code": "8163121D",
+          "designation": "PARACETAMOL CREAT 500MG CP B/12X100  (DETAIL)",
+          "quantitySold": 2982
+        },
+        {
+          "code": "8342303",
+          "designation": "PANOL 250MG SP F/60ML",
+          "quantitySold": 2977
+        },
+        {
+          "code": "8054231",
+          "designation": "AMOXICILLINE UBI 250MG PDR SUSP F/60ML",
+          "quantitySold": 2561
+        },
+        {
+          "code": "980818",
+          "designation": "LITACOLD CPR DETAIL PL/4",
+          "quantitySold": 1954
+        },
+        {
+          "code": "1327191",
+          "designation": "PARAMED 0.3% SIROP F/100ML",
+          "quantitySold": 1746
+        },
+        {
+          "code": "1445061D",
+          "designation": "SERINGUE 5CC/100 PEN  (DETAIL)",
+          "quantitySold": 1698
+        },
+        {
+          "code": "2296105D",
+          "designation": "AMOXICILLINE CREACIL 500MG B/100X12 GEL  (DETAIL)",
+          "quantitySold": 1405
+        },
+        {
+          "code": "2272754D",
+          "designation": "PARACETAMOL CRE 500BL/100X10  (DETAIL)",
+          "quantitySold": 1128
+        },
+        {
+          "code": "1530601D",
+          "designation": "FINIFAT 500MG CP B/100  (DETAIL)",
+          "quantitySold": 970
+        },
+        {
+          "code": "3417350",
+          "designation": "PANADOL 2% SUSP BUV ENF/NOUR FL/90",
+          "quantitySold": 951
+        },
+        {
+          "code": "2255388",
+          "designation": "PEDIFEN 100MG/5ML PED SP FL/100ML",
+          "quantitySold": 913
+        },
+        {
+          "code": "1280261",
+          "designation": "PARAMED 500MG CP B/20",
+          "quantitySold": 860
+        },
+        {
+          "code": "1426051D",
+          "designation": "ALOZOL 400MG CP B/100  (DETAIL)",
+          "quantitySold": 832
+        },
+        {
+          "code": "1345011",
+          "designation": "VITA CAC SUSP ORALE B10",
+          "quantitySold": 824
+        },
+        {
+          "code": "2285627",
+          "designation": "METRONIDAZOLE 500MG QT CP DETAIL",
+          "quantitySold": 699
+        },
+        {
+          "code": "3413257",
+          "designation": "NOVALGIN 500MG CP B/20",
+          "quantitySold": 674
+        },
+        {
+          "code": "8024081",
+          "designation": "LITACOLD SP F/100ML",
+          "quantitySold": 660
+        },
+        {
+          "code": "905404",
+          "designation": "IBUPROFENE UBI 400MG CPR DETAIL",
+          "quantitySold": 618
+        },
+        {
+          "code": "1293551",
+          "designation": "TRIMOL 240MG/5ML S.BUV 100ML",
+          "quantitySold": 615
+        }
+      ],
+      "totalQuantity": 28310
+    },
+    {
+      "pharmacyId": "tanda",
+      "periodLabel": "Aug–Dec 2022",
+      "year": 2022,
+      "periodStart": "2022-08-01",
+      "periodEnd": "2022-12-10",
+      "products": [
+        {
+          "code": "8163121D",
+          "designation": "PARACETAMOL CREAT 500MG CP B/12X100  (DETAIL)",
+          "quantitySold": 2158
+        },
+        {
+          "code": "2272754D",
+          "designation": "PARACETAMOL CRE 500BL/100X10  (DETAIL)",
+          "quantitySold": 1688
+        },
+        {
+          "code": "1327191",
+          "designation": "PARAMED 0.3% SIROP F/100ML",
+          "quantitySold": 1434
+        },
+        {
+          "code": "980818",
+          "designation": "LITACOLD CPR DETAIL PL/4",
+          "quantitySold": 1120
+        },
+        {
+          "code": "2296105D",
+          "designation": "AMOXICILLINE CREACIL 500MG B/100X12 GEL  (DETAIL)",
+          "quantitySold": 986
+        },
+        {
+          "code": "1445061D",
+          "designation": "SERINGUE 5CC/100 PEN  (DETAIL)",
+          "quantitySold": 819
+        },
+        {
+          "code": "1215831",
+          "designation": "PARABUDOL 125/100/5ML SP F/100ML",
+          "quantitySold": 727
+        },
+        {
+          "code": "1530601D",
+          "designation": "FINIFAT 500MG CP B/100  (DETAIL)",
+          "quantitySold": 705
+        },
+        {
+          "code": "8342303",
+          "designation": "PANOL 250MG SP F/60ML",
+          "quantitySold": 702
+        },
+        {
+          "code": "3417350",
+          "designation": "PANADOL 2% SUSP BUV ENF/NOUR FL/90",
+          "quantitySold": 667
+        },
+        {
+          "code": "1215771",
+          "designation": "FERROFIT SP F/200ML",
+          "quantitySold": 533
+        },
+        {
+          "code": "1345011",
+          "designation": "VITA CAC SUSP ORALE B10",
+          "quantitySold": 488
+        },
+        {
+          "code": "2255678",
+          "designation": "IBEX 200/235/30MG GEL B/24",
+          "quantitySold": 444
+        },
+        {
+          "code": "0128111",
+          "designation": "EFFERALGAN 1G COMP EFF B/8",
+          "quantitySold": 436
+        },
+        {
+          "code": "1426051D",
+          "designation": "ALOZOL 400MG CP B/100  (DETAIL)",
+          "quantitySold": 435
+        },
+        {
+          "code": "905404",
+          "designation": "IBUPROFENE UBI 400MG CPR DETAIL",
+          "quantitySold": 412
+        },
+        {
+          "code": "8008722",
+          "designation": "SANIVER 400MG CP B/1",
+          "quantitySold": 409
+        },
+        {
+          "code": "8110900D",
+          "designation": "FEBRILEX PLUS CP BLIST X 4    (DETAIL)",
+          "quantitySold": 406
+        },
+        {
+          "code": "9996019D",
+          "designation": "SERINGUE 10CC/100 PEN  (DETAIL)",
+          "quantitySold": 385
+        },
+        {
+          "code": "8054231",
+          "designation": "AMOXICILLINE UBI 250MG PDR SUSP F/60ML",
+          "quantitySold": 375
+        }
+      ],
+      "totalQuantity": 15329
+    }
+  ]
+}
