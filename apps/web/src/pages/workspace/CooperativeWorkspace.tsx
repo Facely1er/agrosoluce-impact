@@ -3,9 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import { 
   LayoutDashboard, 
-  FileText, 
-  BarChart3, 
-  AlertCircle,
+  Activity,
+  Users,
+  TrendingUp,
+  MapPin,
   Info,
   Upload,
   X,
@@ -14,13 +15,10 @@ import {
   CheckCircle,
   XCircle,
   FileDown,
-  Zap,
   Globe,
   ChevronDown,
   ChevronUp,
-  ExternalLink,
-  Sprout,
-  ClipboardList
+  ExternalLink
 } from 'lucide-react';
 import { getCurrentUser } from '@/lib/supabase/client';
 import { 
@@ -71,7 +69,7 @@ import CooperativeLandingPage from './CooperativeLandingPage';
 export default function CooperativeWorkspace() {
   const { coop_id } = useParams<{ coop_id: string }>();
   const { t } = useI18n();
-  const [activeTab, setActiveTab] = useState<'overview' | 'evidence' | 'coverage' | 'gaps' | 'enablement' | 'farmers-first' | 'assessment'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'health-data' | 'farmers' | 'production-metrics' | 'regional-insights'>('overview');
   const [hasData, setHasData] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -128,34 +126,24 @@ export default function CooperativeWorkspace() {
       icon: LayoutDashboard 
     },
     { 
-      id: 'evidence' as const, 
-      label: t.workspace.tabs.evidence, 
-      icon: FileText 
+      id: 'health-data' as const, 
+      label: t.workspace.tabs.healthData, 
+      icon: Activity 
     },
     { 
-      id: 'coverage' as const, 
-      label: t.workspace.tabs.coverage, 
-      icon: BarChart3 
+      id: 'farmers' as const, 
+      label: t.workspace.tabs.farmers, 
+      icon: Users 
     },
     { 
-      id: 'gaps' as const, 
-      label: t.workspace.tabs.gaps, 
-      icon: AlertCircle 
+      id: 'production-metrics' as const, 
+      label: t.workspace.tabs.productionMetrics, 
+      icon: TrendingUp 
     },
     { 
-      id: 'enablement' as const, 
-      label: t.workspace.tabs.enablement, 
-      icon: Zap 
-    },
-    { 
-      id: 'farmers-first' as const, 
-      label: t.workspace.tabs.farmersFirst, 
-      icon: Sprout 
-    },
-    { 
-      id: 'assessment' as const, 
-      label: t.workspace.tabs.assessment, 
-      icon: ClipboardList 
+      id: 'regional-insights' as const, 
+      label: t.workspace.tabs.regionalInsights, 
+      icon: MapPin 
     },
   ];
 
@@ -339,12 +327,10 @@ export default function CooperativeWorkspace() {
 
           <div className="p-6">
             {activeTab === 'overview' && <OverviewTab cooperativeId={coop_id} onSwitchTab={setActiveTab} />}
-            {activeTab === 'evidence' && <EvidenceTab cooperativeId={coop_id} />}
-            {activeTab === 'coverage' && <CoverageTab cooperativeId={coop_id} />}
-            {activeTab === 'gaps' && <GapsTab cooperativeId={coop_id} />}
-            {activeTab === 'enablement' && <EnablementTab cooperativeId={coop_id} />}
-            {activeTab === 'farmers-first' && <FarmersFirstTab cooperativeId={coop_id} />}
-            {activeTab === 'assessment' && <AssessmentTab cooperativeId={coop_id} onComplete={() => setActiveTab('overview')} />}
+            {activeTab === 'health-data' && <HealthDataTab cooperativeId={coop_id} />}
+            {activeTab === 'farmers' && <FarmersTab cooperativeId={coop_id} />}
+            {activeTab === 'production-metrics' && <ProductionMetricsTab cooperativeId={coop_id} />}
+            {activeTab === 'regional-insights' && <RegionalInsightsTab cooperativeId={coop_id} />}
           </div>
         </div>
       </div>
@@ -2337,6 +2323,161 @@ function EnablementTab({ cooperativeId }: { cooperativeId: string }) {
         >
           {t.workspace.enablementTab.viewFarmerProtectionPrinciples}
         </Link>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * ============================================================================
+ * NEW TAB COMPONENTS FOR HEALTH-AGRICULTURE PLATFORM
+ * ============================================================================
+ * 
+ * These components implement the transformed workspace tabs that focus on
+ * health-agriculture correlation rather than EUDR compliance. Phase 1
+ * provides placeholder components with informational messaging. Phase 2
+ * will add data visualization connecting to VRAC pharmacy surveillance data.
+ * 
+ * Tab Structure:
+ * - HealthDataTab: VRAC pharmacy surveillance & antimalarial trends
+ * - FarmersTab: Preserved farmer management (FarmersFirstDashboard)
+ * - ProductionMetricsTab: Harvest efficiency & productivity tracking
+ * - RegionalInsightsTab: Time-lag correlation & academic research
+ */
+
+function HealthDataTab({ cooperativeId }: { cooperativeId: string }) {
+  const { t } = useI18n();
+  
+  return (
+    <div className="space-y-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="flex items-start gap-3">
+          <Info className="h-6 w-6 text-blue-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <h3 className="text-lg font-semibold text-blue-900 mb-2">
+              VRAC Pharmacy Surveillance Data
+            </h3>
+            <p className="text-blue-800 leading-relaxed">
+              This tab displays regional health metrics derived from pharmacy surveillance data (2020-2024). 
+              Antimalarial sales serve as a proxy for malaria burden, revealing health patterns that affect 
+              agricultural productivity.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">Regional Health Index</h3>
+        <p className="text-gray-600 mb-4">
+          Antimalarial share trends by region (Gontougo, La Mé, Abidjan) - Coming soon
+        </p>
+        <div className="bg-gray-50 rounded-lg p-8 text-center">
+          <Activity className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500">Health data visualization in development</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * FarmersTab - Preserves existing farmer management functionality
+ * 
+ * This tab wraps the FarmersFirstDashboard component to maintain all
+ * farmer onboarding, training, and welfare tracking features within
+ * the new health-focused workspace structure. The farmer management
+ * tools align with the "Farmers First" philosophy where workforce
+ * health directly impacts farmer welfare.
+ */
+function FarmersTab({ cooperativeId }: { cooperativeId: string }) {
+  const { t } = useI18n();
+  
+  return (
+    <div>
+      <FarmersFirstDashboard cooperativeId={cooperativeId} />
+    </div>
+  );
+}
+
+function ProductionMetricsTab({ cooperativeId }: { cooperativeId: string }) {
+  const { t } = useI18n();
+  
+  return (
+    <div className="space-y-6">
+      <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+        <div className="flex items-start gap-3">
+          <Info className="h-6 w-6 text-green-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <h3 className="text-lg font-semibold text-green-900 mb-2">
+              Agricultural Productivity Metrics
+            </h3>
+            <p className="text-green-800 leading-relaxed">
+              Track harvest efficiency, production volumes, and cocoa Marketing Year (MY) data. 
+              Understand how productivity correlates with regional health trends.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">Production Data</h3>
+        <p className="text-gray-600 mb-4">
+          Harvest efficiency and production volume tracking - Coming soon
+        </p>
+        <div className="bg-gray-50 rounded-lg p-8 text-center">
+          <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500">Production metrics visualization in development</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RegionalInsightsTab({ cooperativeId }: { cooperativeId: string }) {
+  const { t } = useI18n();
+  
+  return (
+    <div className="space-y-6">
+      <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+        <div className="flex items-start gap-3">
+          <Info className="h-6 w-6 text-purple-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <h3 className="text-lg font-semibold text-purple-900 mb-2">
+              Health-Agriculture Correlation Analysis
+            </h3>
+            <p className="text-purple-800 leading-relaxed">
+              Academic research shows malaria reduces harvest efficiency by 40-60%. This tab displays 
+              time-lag correlations between health surges (Aug-Dec) and production impacts (Oct-Mar harvest).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">Regional Insights</h3>
+        
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <div className="bg-blue-50 rounded-lg p-4">
+            <h4 className="font-semibold text-blue-900 mb-2">Academic Foundation</h4>
+            <p className="text-sm text-blue-800">
+              Research demonstrates that malaria episodes cause 5-10 lost workdays per incident, 
+              with peak transmission overlapping critical pre-harvest periods.
+            </p>
+          </div>
+          
+          <div className="bg-green-50 rounded-lg p-4">
+            <h4 className="font-semibold text-green-900 mb-2">Unique Value</h4>
+            <p className="text-sm text-green-800">
+              Human health signal that satellite data misses. Pharmacy surveillance provides 
+              monthly resolution for early warning of productivity challenges.
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 rounded-lg p-8 text-center">
+          <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500">Correlation visualization in development</p>
+        </div>
       </div>
     </div>
   );

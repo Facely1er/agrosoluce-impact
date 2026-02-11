@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Building2, ArrowRight, CheckCircle, FileText, BarChart3, Shield, Users, Sprout } from 'lucide-react';
+import { Building2, ArrowRight, CheckCircle, Activity, TrendingUp, MapPin, Users } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 interface CooperativeLandingPageProps {
@@ -32,7 +32,7 @@ export default function CooperativeLandingPage({ cooperativeId }: CooperativeLan
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-500">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
-                <FileText className="h-8 w-8 text-primary-600" />
+                <Activity className="h-8 w-8 text-primary-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{t.cooperativeWorkspaceLanding.features.evidence.title}</h3>
@@ -46,7 +46,7 @@ export default function CooperativeLandingPage({ cooperativeId }: CooperativeLan
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-secondary-500">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
-                <BarChart3 className="h-8 w-8 text-secondary-600" />
+                <TrendingUp className="h-8 w-8 text-secondary-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{t.cooperativeWorkspaceLanding.features.coverage.title}</h3>
@@ -60,7 +60,7 @@ export default function CooperativeLandingPage({ cooperativeId }: CooperativeLan
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
-                <Shield className="h-8 w-8 text-green-600" />
+                <MapPin className="h-8 w-8 text-green-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{t.cooperativeWorkspaceLanding.features.compliance.title}</h3>
@@ -74,7 +74,7 @@ export default function CooperativeLandingPage({ cooperativeId }: CooperativeLan
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
-                <Sprout className="h-8 w-8 text-blue-600" />
+                <Users className="h-8 w-8 text-blue-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{t.cooperativeWorkspaceLanding.features.farmersFirst.title}</h3>

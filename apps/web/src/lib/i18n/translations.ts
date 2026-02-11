@@ -592,12 +592,10 @@ export interface Translations {
     workspaceNoteDetail2: string;
     tabs: {
       overview: string;
-      evidence: string;
-      coverage: string;
-      gaps: string;
-      enablement: string;
-      farmersFirst: string;
-      assessment: string;
+      healthData: string;
+      farmers: string;
+      productionMetrics: string;
+      regionalInsights: string;
     };
     overview: {
       pilot: string;
@@ -1530,9 +1528,9 @@ export const translations: Record<Language, Translations> = {
       cooperativeIdRequired: 'Cooperative ID is required',
       loadingWorkspace: 'Loading workspace...',
       cooperativeWorkspace: 'Cooperative Workspace',
-      manageComplianceJourney: 'Manage Your Cooperative\'s Compliance Journey',
-      documentationEvidenceEnablement: 'Documentation, Evidence, and Enablement Management',
-      workspaceDescription: 'This workspace provides cooperatives with tools to manage documentation coverage, track compliance readiness, upload evidence, identify gaps, and access enablement resources. Make your progress visible to buyers and partners while maintaining transparency about your current state.',
+      manageComplianceJourney: 'Understand Workforce Health Impact on Agricultural Productivity',
+      documentationEvidenceEnablement: 'Health Data, Farmer Management, and Regional Analytics',
+      workspaceDescription: 'This workspace provides cooperatives with tools to understand how regional health conditions affect agricultural productivity. Explore pharmacy surveillance data, manage farmer information, and discover insights from health-agriculture correlation research.',
       publicAccess: 'Public Access',
       evidenceManagement: 'Evidence Management',
       evidenceManagementDesc: 'Upload and organize compliance documentation',
@@ -1555,17 +1553,15 @@ export const translations: Record<Language, Translations> = {
       enablementResourcesDesc: 'Access toolkits, templates, and guidance materials to help improve your documentation and compliance practices.',
       farmerEngagement: 'Farmer Engagement',
       farmerEngagementDesc: 'Track and manage farmer registrations, training programs, and engagement initiatives through the Farmers First dashboard.',
-      workspaceNote: 'This workspace is designed to help cooperatives make their documentation and compliance efforts visible and transparent. By uploading evidence and tracking coverage, you enable buyers and partners to understand your current state and progress.',
-      workspaceNoteDetail: 'This platform does not replace audits or certifications.',
-      workspaceNoteDetail2: 'Instead, it provides a transparent view of what exists, what\'s missing, and where to focus improvement efforts. We start from the farmer, structure reality at the cooperative level, and support credible EUDR-aligned due diligence.',
+      workspaceNote: 'This workspace integrates VRAC pharmacy surveillance data to reveal how workforce health affects agricultural productivity. By tracking antimalarial sales trends as a proxy for malaria burden, we provide unique insights that complement traditional agricultural monitoring.',
+      workspaceNoteDetail: 'Health data reveals patterns that satellite monitoring misses.',
+      workspaceNoteDetail2: 'Research shows malaria reduces harvest efficiency by 40-60%. We start from the farmer, connect regional health signals to productivity data, and provide actionable intelligence for supply chain management.',
       tabs: {
         overview: 'Overview',
-        evidence: 'Evidence',
-        coverage: 'Coverage',
-        gaps: 'Gaps & Guidance',
-        enablement: 'Enablement',
-        farmersFirst: 'Farmers First',
-        assessment: 'Assessment',
+        healthData: 'Health Data',
+        farmers: 'Farmers',
+        productionMetrics: 'Production Metrics',
+        regionalInsights: 'Regional Insights',
       },
       overview: {
         pilot: 'Pilot:',
@@ -1724,53 +1720,53 @@ export const translations: Record<Language, Translations> = {
     },
     cooperativeWorkspaceLanding: {
       hero: {
-        title: 'Welcome to the Cooperative Space',
-        subtitle: 'Your cooperative workspace is ready, but we need to register your cooperative first.',
-        description: 'Register your cooperative to access documentation management, compliance tracking, and farmer engagement tools.',
+        title: 'Welcome to the Cooperative Health & Productivity Workspace',
+        subtitle: 'Understand how workforce health impacts agricultural productivity in your region.',
+        description: 'Access health data analytics, farmer management tools, and insights from pharmacy surveillance research.',
       },
       features: {
         evidence: {
-          title: 'Evidence Management',
-          description: 'Upload and organize compliance documentation, including land rights, farmer registrations, and certificates.',
+          title: 'Health Data Analytics',
+          description: 'Explore VRAC pharmacy surveillance data showing regional health trends and malaria burden indicators.',
         },
         coverage: {
-          title: 'Coverage Tracking',
-          description: 'Monitor your documentation coverage metrics and see how complete your evidence collection is.',
+          title: 'Production Insights',
+          description: 'Track harvest efficiency metrics and understand health-productivity correlations.',
         },
         compliance: {
-          title: 'Compliance Readiness',
-          description: 'View readiness scores and maturity levels for EUDR, CMMC, and other regulatory frameworks.',
+          title: 'Regional Analysis',
+          description: 'Access time-lag correlation analysis and academic research on health-agriculture relationships.',
         },
         farmersFirst: {
-          title: 'Farmers First',
-          description: 'Track and manage farmer registrations, training programs, and engagement initiatives.',
+          title: 'Farmer Management',
+          description: 'Manage farmer registrations, training programs, and welfare initiatives.',
         },
       },
       benefits: {
         title: 'What You\'ll Have Access To',
         documentation: {
-          title: 'Documentation Management',
-          description: 'Upload, organize, and manage proof documents for compliance and due diligence.',
+          title: 'Health Intelligence',
+          description: 'Access pharmacy surveillance data revealing workforce health patterns that affect productivity.',
         },
         gapAnalysis: {
-          title: 'Gap Analysis',
-          description: 'Identify missing documentation with specific guidance on what\'s needed.',
+          title: 'Correlation Analysis',
+          description: 'Understand how malaria burden impacts harvest efficiency with time-lag research insights.',
         },
         enablement: {
-          title: 'Enablement Resources',
-          description: 'Access toolkits, templates, and guidance documents to improve your practices.',
+          title: 'Academic Foundation',
+          description: 'Research-backed analytics showing malaria reduces farmer productivity by 40-60%.',
         },
         transparency: {
-          title: 'Transparency and Visibility',
-          description: 'Make your progress visible to buyers and partners while maintaining transparency.',
+          title: 'Supply Chain Intelligence',
+          description: 'Human health signals that satellite monitoring misses, for proactive supply chain management.',
         },
       },
       cta: {
-        title: 'Ready to Get Started?',
-        subtitle: 'Register your cooperative to unlock the full power of AgroSoluce™ workspace tools.',
+        title: 'Ready to Explore Health-Productivity Insights?',
+        subtitle: 'Register your cooperative to unlock workforce health analytics and regional insights.',
         register: 'Register Your Cooperative',
         learnMore: 'Learn More',
-        freeNote: 'Free for cooperatives • Transparent • Progress-focused',
+        freeNote: 'Free for cooperatives • Research-backed • Farmer-focused',
       },
       additional: {
         alreadyRegistered: 'Already registered? Make sure you\'re using the correct cooperative ID.',
@@ -2421,9 +2417,9 @@ export const translations: Record<Language, Translations> = {
       cooperativeIdRequired: 'L\'ID de la coopérative est requis',
       loadingWorkspace: 'Chargement de l\'espace de travail...',
       cooperativeWorkspace: 'Espace de Travail Coopératif',
-      manageComplianceJourney: 'Gérez le Parcours de Conformité de Votre Coopérative',
-      documentationEvidenceEnablement: 'Gestion de la Documentation, des Preuves et de l\'Autonomisation',
-      workspaceDescription: 'Cet espace de travail fournit aux coopératives des outils pour gérer la couverture de la documentation, suivre l\'état de préparation à la conformité, télécharger des preuves, identifier les lacunes et accéder aux ressources d\'autonomisation. Rendez votre progression visible aux acheteurs et aux partenaires tout en maintenant la transparence sur votre état actuel.',
+      manageComplianceJourney: 'Comprendre l\'Impact de la Santé de la Main-d\'Œuvre sur la Productivité Agricole',
+      documentationEvidenceEnablement: 'Données de Santé, Gestion des Agriculteurs et Analyses Régionales',
+      workspaceDescription: 'Cet espace de travail fournit aux coopératives des outils pour comprendre comment les conditions de santé régionales affectent la productivité agricole. Explorez les données de surveillance pharmaceutique, gérez les informations des agriculteurs et découvrez les insights de la recherche sur la corrélation santé-agriculture.',
       publicAccess: 'Accès Public',
       evidenceManagement: 'Gestion des Preuves',
       evidenceManagementDesc: 'Télécharger et organiser la documentation de conformité',
@@ -2446,17 +2442,15 @@ export const translations: Record<Language, Translations> = {
       enablementResourcesDesc: 'Accédez aux trousses d\'outils, modèles et documents d\'orientation pour aider à améliorer vos pratiques de documentation et de conformité.',
       farmerEngagement: 'Engagement des Agriculteurs',
       farmerEngagementDesc: 'Suivez et gérez les inscriptions des agriculteurs, les programmes de formation et les initiatives d\'engagement via le tableau de bord Farmers First.',
-      workspaceNote: 'Cet espace de travail est conçu pour aider les coopératives à rendre leurs efforts de documentation et de conformité visibles et transparents. En téléchargeant des preuves et en suivant la couverture, vous permettez aux acheteurs et aux partenaires de comprendre votre état actuel et votre progression.',
-      workspaceNoteDetail: 'Cette plateforme ne remplace pas les audits ou les certifications.',
-      workspaceNoteDetail2: 'Au lieu de cela, elle fournit une vue transparente de ce qui existe, de ce qui manque et où concentrer les efforts d\'amélioration. Nous commençons par l\'agriculteur, structurons la réalité au niveau de la coopérative et soutenons une diligence raisonnable crédible alignée sur l\'EUDR.',
+      workspaceNote: 'Cet espace de travail intègre les données de surveillance pharmaceutique VRAC pour révéler comment la santé de la main-d\'œuvre affecte la productivité agricole. En suivant les tendances des ventes d\'antipaludéens comme indicateur du fardeau du paludisme, nous fournissons des insights uniques qui complètent la surveillance agricole traditionnelle.',
+      workspaceNoteDetail: 'Les données de santé révèlent des modèles que la surveillance par satellite manque.',
+      workspaceNoteDetail2: 'La recherche montre que le paludisme réduit l\'efficacité de la récolte de 40 à 60 %. Nous partons de l\'agriculteur, relions les signaux de santé régionaux aux données de productivité et fournissons des renseignements exploitables pour la gestion de la chaîne d\'approvisionnement.',
       tabs: {
         overview: 'Vue d\'ensemble',
-        evidence: 'Preuves',
-        coverage: 'Couverture',
-        gaps: 'Lacunes et Orientation',
-        enablement: 'Autonomisation',
-        farmersFirst: 'Farmers First',
-        assessment: 'Évaluation',
+        healthData: 'Données de Santé',
+        farmers: 'Agriculteurs',
+        productionMetrics: 'Métriques de Production',
+        regionalInsights: 'Perspectives Régionales',
       },
       overview: {
         pilot: 'Pilote:',
@@ -2615,53 +2609,53 @@ export const translations: Record<Language, Translations> = {
     },
     cooperativeWorkspaceLanding: {
       hero: {
-        title: 'Bienvenue dans l\'Espace Coopérative',
-        subtitle: 'Votre espace de travail coopératif est prêt, mais nous devons d\'abord enregistrer votre coopérative.',
-        description: 'Enregistrez votre coopérative pour accéder à la gestion de la documentation, au suivi de la conformité et aux outils d\'engagement des agriculteurs.',
+        title: 'Bienvenue dans l\'Espace Santé & Productivité Coopérative',
+        subtitle: 'Comprendre comment la santé de la main-d\'œuvre impacte la productivité agricole dans votre région.',
+        description: 'Accédez aux analyses de données de santé, outils de gestion des agriculteurs et insights de la recherche de surveillance pharmaceutique.',
       },
       features: {
         evidence: {
-          title: 'Gestion des Preuves',
-          description: 'Téléchargez et organisez la documentation de conformité, y compris les droits fonciers, les enregistrements d\'agriculteurs et les certificats.',
+          title: 'Analyses de Données de Santé',
+          description: 'Explorez les données de surveillance pharmaceutique VRAC montrant les tendances de santé régionales et indicateurs du fardeau du paludisme.',
         },
         coverage: {
-          title: 'Suivi de la Couverture',
-          description: 'Surveillez vos métriques de couverture de documentation et voyez à quel point votre collection de preuves est complète.',
+          title: 'Insights de Production',
+          description: 'Suivez les métriques d\'efficacité de récolte et comprenez les corrélations santé-productivité.',
         },
         compliance: {
-          title: 'Préparation à la Conformité',
-          description: 'Consultez les scores de préparation et les niveaux de maturité pour EUDR, CMMC et autres cadres réglementaires.',
+          title: 'Analyse Régionale',
+          description: 'Accédez à l\'analyse de corrélation temporelle et recherches académiques sur les relations santé-agriculture.',
         },
         farmersFirst: {
-          title: 'Agriculteurs en Premier',
-          description: 'Suivez et gérez les enregistrements d\'agriculteurs, les programmes de formation et les initiatives d\'engagement.',
+          title: 'Gestion des Agriculteurs',
+          description: 'Gérez les enregistrements d\'agriculteurs, programmes de formation et initiatives de bien-être.',
         },
       },
       benefits: {
         title: 'À Quoi Vous Aurez Accès',
         documentation: {
-          title: 'Gestion de la Documentation',
-          description: 'Téléchargez, organisez et gérez les documents de preuve pour la conformité et la diligence raisonnable.',
+          title: 'Intelligence Santé',
+          description: 'Accédez aux données de surveillance pharmaceutique révélant les modèles de santé qui affectent la productivité.',
         },
         gapAnalysis: {
-          title: 'Analyse des Lacunes',
-          description: 'Identifiez la documentation manquante avec des conseils spécifiques sur ce qui est nécessaire.',
+          title: 'Analyse de Corrélation',
+          description: 'Comprenez comment le fardeau du paludisme impacte l\'efficacité de récolte avec insights de recherche temporelle.',
         },
         enablement: {
-          title: 'Ressources d\'Autonomisation',
-          description: 'Accédez à des boîtes à outils, modèles et documents d\'orientation pour améliorer vos pratiques.',
+          title: 'Fondation Académique',
+          description: 'Analyses soutenues par la recherche montrant que le paludisme réduit la productivité de 40 à 60 %.',
         },
         transparency: {
-          title: 'Transparence et Visibilité',
-          description: 'Rendez vos progrès visibles aux acheteurs et partenaires tout en maintenant la transparence.',
+          title: 'Intelligence Chaîne d\'Approvisionnement',
+          description: 'Signaux de santé humaine que la surveillance satellite manque, pour gestion proactive de la chaîne.',
         },
       },
       cta: {
-        title: 'Prêt à Commencer?',
-        subtitle: 'Enregistrez votre coopérative pour débloquer toute la puissance des outils d\'espace de travail AgroSoluce™.',
+        title: 'Prêt à Explorer les Insights Santé-Productivité?',
+        subtitle: 'Enregistrez votre coopérative pour débloquer les analyses de santé de la main-d\'œuvre et insights régionaux.',
         register: 'Enregistrer Votre Coopérative',
         learnMore: 'En Savoir Plus',
-        freeNote: 'Gratuit pour les coopératives • Transparent • Axé sur le progrès',
+        freeNote: 'Gratuit pour les coopératives • Soutenu par la recherche • Axé sur les agriculteurs',
       },
       additional: {
         alreadyRegistered: 'Déjà enregistré? Assurez-vous d\'utiliser le bon identifiant de coopérative.',
