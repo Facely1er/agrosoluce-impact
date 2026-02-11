@@ -6,7 +6,8 @@ import {
   Users,
   TrendingUp,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  Activity
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
@@ -79,6 +80,20 @@ export default function WhatWeDoPage() {
       cta: t.whatWeDo.features.progress.cta,
       ctaLink: '/assessment',
     },
+    {
+      id: 'workforceHealth',
+      icon: Activity,
+      iconColor: 'teal',
+      title: t.whatWeDo.features.workforceHealth.title,
+      description: t.whatWeDo.features.workforceHealth.description,
+      points: [
+        t.whatWeDo.features.workforceHealth.point1,
+        t.whatWeDo.features.workforceHealth.point2,
+        t.whatWeDo.features.workforceHealth.point3,
+      ],
+      cta: t.whatWeDo.features.workforceHealth.cta,
+      ctaLink: '/vrac',
+    },
   ];
 
   const getIconBgColor = (color: string) => {
@@ -86,7 +101,7 @@ export default function WhatWeDoPage() {
       primary: 'bg-primary-100',
       blue: 'bg-blue-100',
       green: 'bg-green-100',
-      teal: 'bg-teal-100',
+      teal: 'bg-teal-100 dark:bg-teal-900/30',
       purple: 'bg-purple-100',
     };
     return colors[color] || 'bg-gray-100';
@@ -97,7 +112,7 @@ export default function WhatWeDoPage() {
       primary: 'text-primary-600',
       blue: 'text-blue-600',
       green: 'text-green-600',
-      teal: 'text-teal-600',
+      teal: 'text-teal-600 dark:text-teal-400',
       purple: 'text-purple-600',
     };
     return colors[color] || 'text-gray-600';

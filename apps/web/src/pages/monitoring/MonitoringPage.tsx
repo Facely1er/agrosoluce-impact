@@ -14,7 +14,8 @@ import {
   Info,
   Award,
   Clock,
-  MapPin
+  MapPin,
+  Activity
 } from 'lucide-react';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 
@@ -64,6 +65,14 @@ export default function MonitoringPage() {
               >
                 <FileCheck className="h-5 w-5" />
                 New Assessment
+              </Link>
+              <Link
+                to="/vrac"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all border border-white/20 font-medium"
+              >
+                <Activity className="h-5 w-5" />
+                Workforce Health
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -136,6 +145,22 @@ export default function MonitoringPage() {
               identify areas requiring focused support.
             </p>
           </div>
+
+          <Link
+            to="/vrac"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow hover:border-primary-500 dark:hover:border-primary-500 group"
+          >
+            <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900/30 rounded-lg flex items-center justify-center mb-4">
+              <Activity className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+              Workforce Health
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+              Monitor pharmacy sales as a proxy for community health in cocoa regions. Antimalarial 
+              trends correlate with workforce productivity and supply chain risk.
+            </p>
+          </Link>
         </div>
 
         {/* What You Can Monitor */}
@@ -320,13 +345,21 @@ export default function MonitoringPage() {
               </ul>
             </div>
           </div>
-          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-4">
             <Link
               to="/compliance/child-labor"
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
             >
               <Eye className="h-5 w-5" />
               View Monitoring Dashboard
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/vrac"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
+            >
+              <Activity className="h-5 w-5" />
+              Workforce Health Analysis
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

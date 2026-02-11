@@ -15,7 +15,8 @@ import {
   AlertTriangle,
   Leaf,
   Scale,
-  Heart
+  Heart,
+  Activity
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { EUDR_COMMODITIES_IN_SCOPE } from '@/types';
@@ -155,6 +156,20 @@ export default function HomePage() {
         t.landing.outcomes.gaps.outcome3,
       ],
     },
+    {
+      id: 'workforceHealth',
+      icon: Activity,
+      iconColor: 'teal',
+      title: t.landing.outcomes.workforceHealth.title,
+      feature: t.landing.outcomes.workforceHealth.feature,
+      outcomes: [
+        t.landing.outcomes.workforceHealth.outcome1,
+        t.landing.outcomes.workforceHealth.outcome2,
+        t.landing.outcomes.workforceHealth.outcome3,
+      ],
+      cta: t.landing.outcomes.workforceHealth.cta,
+      ctaLink: '/vrac',
+    },
   ];
 
   const getIconBgColor = (color: string) => {
@@ -165,7 +180,7 @@ export default function HomePage() {
       purple: 'bg-purple-100',
       orange: 'bg-orange-100',
       red: 'bg-red-100',
-      teal: 'bg-teal-100',
+      teal: 'bg-teal-100 dark:bg-teal-900/30',
       indigo: 'bg-indigo-100',
       yellow: 'bg-yellow-100',
     };
@@ -180,7 +195,7 @@ export default function HomePage() {
       purple: 'text-purple-600',
       orange: 'text-orange-600',
       red: 'text-red-600',
-      teal: 'text-teal-600',
+      teal: 'text-teal-600 dark:text-teal-400',
       indigo: 'text-indigo-600',
       yellow: 'text-yellow-600',
     };

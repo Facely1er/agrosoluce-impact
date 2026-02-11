@@ -211,6 +211,14 @@ export interface Translations {
         outcome2: string;
         outcome3: string;
       };
+      workforceHealth: {
+        title: string;
+        feature: string;
+        outcome1: string;
+        outcome2: string;
+        outcome3: string;
+        cta: string;
+      };
     };
     cta: {
       title: string;
@@ -338,6 +346,14 @@ export interface Translations {
         point3: string;
       };
       progress: {
+        title: string;
+        description: string;
+        point1: string;
+        point2: string;
+        point3: string;
+        cta: string;
+      };
+      workforceHealth: {
         title: string;
         description: string;
         point1: string;
@@ -1067,6 +1083,14 @@ export const translations: Record<Language, Translations> = {
           outcome2: 'Receive step-by-step guidance tailored to your specific documentation gaps and regulatory requirements',
           outcome3: 'Access resources and tools that support building required documentation and processes',
         },
+        workforceHealth: {
+          title: 'Workforce Health Surveillance',
+          feature: 'Monitor community health in cocoa regions via pharmacy sales as a proxy for workforce productivity and supply chain risk',
+          outcome1: 'Track antimalarial sales trends across Gontougo, La Mé, and urban regions to detect health surges',
+          outcome2: 'Use regional health signals to inform supply chain intelligence and ESG monitoring',
+          outcome3: 'Academic research shows malaria reduces harvest efficiency by 40–60%; our surveillance provides early regional signals',
+          cta: 'View analysis',
+        },
       },
       cta: {
         title: 'Join the Mission',
@@ -1201,6 +1225,14 @@ export const translations: Record<Language, Translations> = {
           point2: 'Enable buyers to demonstrate ongoing oversight, not one-off checks',
           point3: 'Support evidence-aware reporting, not inflated claims',
           cta: 'Start Assessment',
+        },
+        workforceHealth: {
+          title: '6. Workforce Health Surveillance',
+          description: 'Monitor community health in cocoa regions via pharmacy sales as a proxy for workforce productivity and supply chain risk. Academic research shows malaria reduces harvest efficiency by 40–60%.',
+          point1: 'Pharmacy sales data provides regional health signals for Gontougo, La Mé, and urban zones',
+          point2: 'Antimalarial trends correlate with workforce productivity and supply chain disruption risk',
+          point3: 'Support supply chain intelligence and ESG monitoring with complementary health data',
+          cta: 'View analysis',
         },
       },
       footer: 'AgroSoluce™ provides the operational foundation required to perform due diligence responsibly — without false compliance claims.',
@@ -1935,6 +1967,14 @@ export const translations: Record<Language, Translations> = {
           outcome2: 'Fournissez aux acheteurs une cartographie d\'origine prouvant un approvisionnement sans déforestation',
           outcome3: 'Créez une piste d\'audit qui satisfait les exigences de diligence raisonnable réglementaire',
         },
+        workforceHealth: {
+          title: 'Surveillance Santé des Travailleurs',
+          feature: 'Surveillez la santé des communautés dans les régions cacaoyères via les ventes en pharmacie comme indicateur de productivité et de risque',
+          outcome1: 'Suivez les tendances des ventes d\'antipaludéens dans le Gontougo, La Mé et les zones urbaines',
+          outcome2: 'Utilisez les signaux de santé régionaux pour l\'intelligence de la chaîne d\'approvisionnement et le suivi ESG',
+          outcome3: 'La recherche montre que le paludisme réduit l\'efficacité des récoltes de 40–60%; notre surveillance fournit des signaux régionaux précoces',
+          cta: 'Voir l\'analyse',
+        },
         gaps: {
           title: 'Guidance d\'Amélioration Ciblée',
           feature: 'Obtenez des conseils spécifiques et actionnables pour combler efficacement les gaps de conformité',
@@ -2076,6 +2116,14 @@ export const translations: Record<Language, Translations> = {
           point2: 'Permettre aux acheteurs de démontrer une surveillance continue, pas des contrôles ponctuels',
           point3: 'Soutenir un reporting basé sur des preuves, pas des déclarations exagérées',
           cta: 'Commencer l\'Évaluation',
+        },
+        workforceHealth: {
+          title: '6. Surveillance Santé des Travailleurs',
+          description: 'Surveillez la santé des communautés dans les régions cacaoyères via les ventes en pharmacie comme indicateur de productivité et de risque. La recherche montre que le paludisme réduit l\'efficacité des récoltes de 40–60%.',
+          point1: 'Les ventes en pharmacie fournissent des signaux de santé régionaux pour Gontougo, La Mé et les zones urbaines',
+          point2: 'Les tendances antipaludéennes corrèlent avec la productivité et le risque de perturbation de la chaîne',
+          point3: 'Intelligence de la chaîne d\'approvisionnement et suivi ESG avec données de santé complémentaires',
+          cta: 'Voir l\'analyse',
         },
       },
       footer: 'AgroSoluce™ fournit la base opérationnelle requise pour effectuer la diligence raisonnable de manière responsable — sans fausses déclarations de conformité.',
