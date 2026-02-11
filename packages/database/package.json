@@ -7,10 +7,11 @@
     "migrate:generate": "tsx ../../scripts/run-migrations.ts --generate",
     "migrate:check": "tsx ../../scripts/run-migrations.ts --check",
     "migrate:run": "powershell -ExecutionPolicy Bypass -File ../../scripts/run-migrations.ps1",
-    "migrate:data": "tsx ../../scripts/migrate-cooperatives-to-db.ts"
+    "migrate:data": "tsx ../../scripts/migrate-cooperatives-to-db.ts",
+    "fix:rls": "tsx ../../scripts/run-fix-rls.ts"
   },
   "devDependencies": {
+    "pg": "^8.13.0",
     "tsx": "^4.8.1"
   }
 }
-
