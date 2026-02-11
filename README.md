@@ -1,8 +1,8 @@
 # AgroSoluce®
 
-**Agricultural Security & Sustainability Platform**
+**Health-Agriculture Impact Analytics Platform**
 
-AgroSoluce is a comprehensive platform for managing agricultural cooperatives, tracking compliance, and ensuring sustainable practices across West Africa.
+AgroSoluce leverages workforce health data to provide insights on how health conditions affect agricultural productivity in cocoa-growing regions of West Africa. By integrating pharmacy surveillance data (VRAC) with cooperative management tools, the platform reveals the human health signal that satellite data misses.
 
 ---
 
@@ -114,18 +114,17 @@ agrosoluce/
 
 ### Core Functionality
 - **Cooperative Directory** - Browse and search 3,797+ cooperatives in Côte d'Ivoire
-- **Workspace Management** - Comprehensive workspace for each cooperative
-- **Evidence Tracking** - Document upload and management system
-- **Coverage Metrics** - Real-time documentation coverage tracking
-- **Gap Analysis** - Identify missing documentation with guidance
-- **Assessment System** - Cocoa-specific due-diligence assessments
-- **Pilot Management** - Assign and track cooperatives in pilot programs
+- **Health Data Integration** - VRAC pharmacy surveillance data (2020-2024) tracking malaria burden
+- **Regional Health Metrics** - Antimalarial share as proxy for workforce health
+- **Production Correlation Analysis** - Visualize health-productivity relationships
+- **Farmers First Tools** - Onboarding, training, and farmer welfare management
+- **Time-Lag Analysis** - Surface correlation between health surges and harvest efficiency
 
-### Compliance & Monitoring
-- **Child Labor Monitoring** - Comprehensive compliance tracking
-- **Certification Management** - Track Fair Trade & Rainforest Alliance certifications
-- **EUDR Compliance** - European Union Deforestation Regulation compliance tools
-- **Documentation Readiness** - Self-reported documentation status tracking
+### Health-Agriculture Analytics
+- **Workforce Health Monitoring** - Track regional malaria burden through pharmacy data
+- **Productivity Insights** - Understand how health affects agricultural output
+- **Academic Foundation** - Built on research showing malaria reduces harvest efficiency by 40-60%
+- **Supply Chain Intelligence** - Health signals complement satellite crop monitoring
 
 ---
 
