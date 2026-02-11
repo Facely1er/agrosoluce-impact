@@ -12,6 +12,6 @@
     "./enrichment": "./src/enrichment/index.ts"
   },
   "dependencies": {
-    "@agrosoluce/types": "workspace:*"
+    "@agrosoluce/types": "file:../types"
   }
 }
