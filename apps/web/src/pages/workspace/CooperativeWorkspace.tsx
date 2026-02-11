@@ -2328,7 +2328,22 @@ function EnablementTab({ cooperativeId }: { cooperativeId: string }) {
   );
 }
 
-// New Tab Components for Health-Agriculture Platform
+/**
+ * ============================================================================
+ * NEW TAB COMPONENTS FOR HEALTH-AGRICULTURE PLATFORM
+ * ============================================================================
+ * 
+ * These components implement the transformed workspace tabs that focus on
+ * health-agriculture correlation rather than EUDR compliance. Phase 1
+ * provides placeholder components with informational messaging. Phase 2
+ * will add data visualization connecting to VRAC pharmacy surveillance data.
+ * 
+ * Tab Structure:
+ * - HealthDataTab: VRAC pharmacy surveillance & antimalarial trends
+ * - FarmersTab: Preserved farmer management (FarmersFirstDashboard)
+ * - ProductionMetricsTab: Harvest efficiency & productivity tracking
+ * - RegionalInsightsTab: Time-lag correlation & academic research
+ */
 
 function HealthDataTab({ cooperativeId }: { cooperativeId: string }) {
   const { t } = useI18n();
@@ -2365,6 +2380,15 @@ function HealthDataTab({ cooperativeId }: { cooperativeId: string }) {
   );
 }
 
+/**
+ * FarmersTab - Preserves existing farmer management functionality
+ * 
+ * This tab wraps the FarmersFirstDashboard component to maintain all
+ * farmer onboarding, training, and welfare tracking features within
+ * the new health-focused workspace structure. The farmer management
+ * tools align with the "Farmers First" philosophy where workforce
+ * health directly impacts farmer welfare.
+ */
 function FarmersTab({ cooperativeId }: { cooperativeId: string }) {
   const { t } = useI18n();
   
