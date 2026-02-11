@@ -11,7 +11,7 @@ import {
   LineChart,
   Line,
 } from 'recharts';
-import { PHARMACIES, computeHealthIndex } from '@/data/vrac';
+import { PHARMACIES, computeHealthIndex } from '@agrosoluce/data-insights';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import { Activity, TrendingUp, MapPin, Info } from 'lucide-react';
 
@@ -73,7 +73,7 @@ export default function VracAnalysisPage() {
       <div className="min-h-screen py-8 px-4">
         <div className="max-w-2xl mx-auto text-center py-12">
           <p className="text-red-600 dark:text-red-400 mb-4">
-            {error || 'No data available. Run: npx tsx scripts/vrac/processVracData.ts'}
+            {error || 'No data available. Run: npm run vrac:process'}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             VRAC pharmacy data must be processed before viewing the analysis dashboard.

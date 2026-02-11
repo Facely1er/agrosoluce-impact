@@ -25,6 +25,7 @@
     "vrac:process": "tsx scripts/vrac/processVracData.ts"
   },
   "devDependencies": {
+    "@agrosoluce/data-insights": "file:packages/data-insights",
     "turbo": "^1.10.0"
   },
   "engines": {
