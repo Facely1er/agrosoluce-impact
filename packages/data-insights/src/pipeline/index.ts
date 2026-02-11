@@ -5,5 +5,5 @@
 export * from './types';
 export * from './sourceRegistry';
 export * from './enrichmentRegistry';
-export { processVracPeriods } from './runVracPipeline';
+export { processVracPeriods, applyEnrichments } from './runVracPipeline';
 export type { VracPipelineOptions, VracPipelineOutput } from './runVracPipeline';

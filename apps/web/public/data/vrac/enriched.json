@@ -1,5 +1,5 @@
 {
-  "periods": [
+  "enrichedPeriods": [
     {
       "pharmacyId": "prolife",
       "periodLabel": "Aug–Dec 2025",
@@ -108,7 +108,41 @@
           "quantitySold": 441
         }
       ],
-      "totalQuantity": 17498
+      "totalQuantity": 17498,
+      "healthIndex": {
+        "antimalarialQuantity": 1290,
+        "antimalarialShare": 0.07372271116699051,
+        "totalQuantity": 17498,
+        "categoryBreakdown": [
+          {
+            "category": "analgesic",
+            "quantity": 7988
+          },
+          {
+            "category": "antibiotic",
+            "quantity": 2032
+          },
+          {
+            "category": "other",
+            "quantity": 6188
+          },
+          {
+            "category": "antimalarial",
+            "quantity": 1290
+          }
+        ]
+      },
+      "regionId": "gontougo",
+      "regionLabel": "Gontougo (cocoa)",
+      "isCocoaRegion": true,
+      "antibioticIndex": {
+        "antibioticQuantity": 2032,
+        "antibioticShare": 0.11612755743513545
+      },
+      "timeLagIndicator": {
+        "inHarvestWindow": true,
+        "harvestAlignedRisk": "low"
+      }
     },
     {
       "pharmacyId": "prolife",
@@ -218,7 +252,41 @@
           "quantitySold": 223
         }
       ],
-      "totalQuantity": 9217
+      "totalQuantity": 9217,
+      "healthIndex": {
+        "antimalarialQuantity": 271,
+        "antimalarialShare": 0.02940219160247369,
+        "totalQuantity": 9217,
+        "categoryBreakdown": [
+          {
+            "category": "analgesic",
+            "quantity": 4534
+          },
+          {
+            "category": "antibiotic",
+            "quantity": 780
+          },
+          {
+            "category": "other",
+            "quantity": 3632
+          },
+          {
+            "category": "antimalarial",
+            "quantity": 271
+          }
+        ]
+      },
+      "regionId": "gontougo",
+      "regionLabel": "Gontougo (cocoa)",
+      "isCocoaRegion": true,
+      "antibioticIndex": {
+        "antibioticQuantity": 780,
+        "antibioticShare": 0.0846262341325811
+      },
+      "timeLagIndicator": {
+        "inHarvestWindow": true,
+        "harvestAlignedRisk": "low"
+      }
     },
     {
       "pharmacyId": "prolife",
@@ -328,7 +396,41 @@
           "quantitySold": 215
         }
       ],
-      "totalQuantity": 9839
+      "totalQuantity": 9839,
+      "healthIndex": {
+        "antimalarialQuantity": 305,
+        "antimalarialShare": 0.030999085272893585,
+        "totalQuantity": 9839,
+        "categoryBreakdown": [
+          {
+            "category": "analgesic",
+            "quantity": 4095
+          },
+          {
+            "category": "other",
+            "quantity": 4941
+          },
+          {
+            "category": "antibiotic",
+            "quantity": 498
+          },
+          {
+            "category": "antimalarial",
+            "quantity": 305
+          }
+        ]
+      },
+      "regionId": "gontougo",
+      "regionLabel": "Gontougo (cocoa)",
+      "isCocoaRegion": true,
+      "antibioticIndex": {
+        "antibioticQuantity": 498,
+        "antibioticShare": 0.05061489988820002
+      },
+      "timeLagIndicator": {
+        "inHarvestWindow": true,
+        "harvestAlignedRisk": "low"
+      }
     },
     {
       "pharmacyId": "prolife",
@@ -438,7 +540,41 @@
           "quantitySold": 4
         }
       ],
-      "totalQuantity": 226
+      "totalQuantity": 226,
+      "healthIndex": {
+        "antimalarialQuantity": 9,
+        "antimalarialShare": 0.03982300884955752,
+        "totalQuantity": 226,
+        "categoryBreakdown": [
+          {
+            "category": "analgesic",
+            "quantity": 70
+          },
+          {
+            "category": "other",
+            "quantity": 141
+          },
+          {
+            "category": "antimalarial",
+            "quantity": 9
+          },
+          {
+            "category": "antibiotic",
+            "quantity": 6
+          }
+        ]
+      },
+      "regionId": "gontougo",
+      "regionLabel": "Gontougo (cocoa)",
+      "isCocoaRegion": true,
+      "antibioticIndex": {
+        "antibioticQuantity": 6,
+        "antibioticShare": 0.02654867256637168
+      },
+      "timeLagIndicator": {
+        "inHarvestWindow": true,
+        "harvestAlignedRisk": "low"
+      }
     },
     {
       "pharmacyId": "tanda",
@@ -548,7 +684,41 @@
           "quantitySold": 908
         }
       ],
-      "totalQuantity": 30492
+      "totalQuantity": 30492,
+      "healthIndex": {
+        "antimalarialQuantity": 2425,
+        "antimalarialShare": 0.07952905680178407,
+        "totalQuantity": 30492,
+        "categoryBreakdown": [
+          {
+            "category": "analgesic",
+            "quantity": 14954
+          },
+          {
+            "category": "antibiotic",
+            "quantity": 3362
+          },
+          {
+            "category": "other",
+            "quantity": 9751
+          },
+          {
+            "category": "antimalarial",
+            "quantity": 2425
+          }
+        ]
+      },
+      "regionId": "gontougo",
+      "regionLabel": "Gontougo (cocoa)",
+      "isCocoaRegion": true,
+      "antibioticIndex": {
+        "antibioticQuantity": 3362,
+        "antibioticShare": 0.11025842844024662
+      },
+      "timeLagIndicator": {
+        "inHarvestWindow": true,
+        "harvestAlignedRisk": "low"
+      }
     },
     {
       "pharmacyId": "tanda",
@@ -658,7 +828,41 @@
           "quantitySold": 635
         }
       ],
-      "totalQuantity": 22753
+      "totalQuantity": 22753,
+      "healthIndex": {
+        "antimalarialQuantity": 649,
+        "antimalarialShare": 0.028523711158968047,
+        "totalQuantity": 22753,
+        "categoryBreakdown": [
+          {
+            "category": "analgesic",
+            "quantity": 10975
+          },
+          {
+            "category": "antibiotic",
+            "quantity": 1612
+          },
+          {
+            "category": "other",
+            "quantity": 9517
+          },
+          {
+            "category": "antimalarial",
+            "quantity": 649
+          }
+        ]
+      },
+      "regionId": "gontougo",
+      "regionLabel": "Gontougo (cocoa)",
+      "isCocoaRegion": true,
+      "antibioticIndex": {
+        "antibioticQuantity": 1612,
+        "antibioticShare": 0.07084780029007164
+      },
+      "timeLagIndicator": {
+        "inHarvestWindow": true,
+        "harvestAlignedRisk": "low"
+      }
     },
     {
       "pharmacyId": "tanda",
@@ -768,7 +972,37 @@
           "quantitySold": 615
         }
       ],
-      "totalQuantity": 28310
+      "totalQuantity": 28310,
+      "healthIndex": {
+        "antimalarialQuantity": 0,
+        "antimalarialShare": 0,
+        "totalQuantity": 28310,
+        "categoryBreakdown": [
+          {
+            "category": "other",
+            "quantity": 13023
+          },
+          {
+            "category": "analgesic",
+            "quantity": 10622
+          },
+          {
+            "category": "antibiotic",
+            "quantity": 4665
+          }
+        ]
+      },
+      "regionId": "gontougo",
+      "regionLabel": "Gontougo (cocoa)",
+      "isCocoaRegion": true,
+      "antibioticIndex": {
+        "antibioticQuantity": 4665,
+        "antibioticShare": 0.16478276227481456
+      },
+      "timeLagIndicator": {
+        "inHarvestWindow": true,
+        "harvestAlignedRisk": "low"
+      }
     },
     {
       "pharmacyId": "tanda",
@@ -878,8 +1112,38 @@
           "quantitySold": 375
         }
       ],
-      "totalQuantity": 15329
+      "totalQuantity": 15329,
+      "healthIndex": {
+        "antimalarialQuantity": 0,
+        "antimalarialShare": 0,
+        "totalQuantity": 15329,
+        "categoryBreakdown": [
+          {
+            "category": "analgesic",
+            "quantity": 6812
+          },
+          {
+            "category": "antibiotic",
+            "quantity": 1361
+          },
+          {
+            "category": "other",
+            "quantity": 7156
+          }
+        ]
+      },
+      "regionId": "gontougo",
+      "regionLabel": "Gontougo (cocoa)",
+      "isCocoaRegion": true,
+      "antibioticIndex": {
+        "antibioticQuantity": 1361,
+        "antibioticShare": 0.08878596124991846
+      },
+      "timeLagIndicator": {
+        "inHarvestWindow": true,
+        "harvestAlignedRisk": "low"
+      }
     }
   ],
-  "processedAt": "2026-02-11T05:06:42.068Z"
+  "processedAt": "2026-02-11T05:06:42.070Z"
 }

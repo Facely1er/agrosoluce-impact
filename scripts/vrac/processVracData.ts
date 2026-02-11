@@ -16,11 +16,14 @@ import {
   VRAC_LISTE_MAPPINGS,
   parseVracContent,
   processVracPeriods,
+  applyEnrichments,
 } from '@agrosoluce/data-insights';
 import type { VracPeriodData } from '@agrosoluce/data-insights';
 
 const VRAC_ROOT = path.resolve(process.cwd(), 'VRAC');
-const OUTPUT_PATH = path.resolve(process.cwd(), 'apps/web/public/data/vrac/processed.json');
+const OUTPUT_DIR = path.resolve(process.cwd(), 'apps/web/public/data/vrac');
+const OUTPUT_PATH = path.join(OUTPUT_DIR, 'processed.json');
+const ENRICHED_OUTPUT_PATH = path.join(OUTPUT_DIR, 'enriched.json');
 
 function readFile(mapping: { file: string; subdir?: string }): string | null {
   const subdirPath = mapping.subdir ? path.join(VRAC_ROOT, mapping.subdir) : VRAC_ROOT;
@@ -61,18 +64,23 @@ function main() {
 
   const processed = processVracPeriods(allPeriods);
 
-  const outputDir = path.dirname(OUTPUT_PATH);
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
+  if (!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
   const output = {
     periods: processed,
     processedAt: new Date().toISOString(),
   };
-
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(output, null, 2), 'utf-8');
   console.log(`VRAC data processed: ${processed.length} periods -> ${OUTPUT_PATH}`);
+
+  const enrich = process.argv.includes('--enrich');
+  if (enrich) {
+    const enriched = applyEnrichments(processed);
+    fs.writeFileSync(ENRICHED_OUTPUT_PATH, JSON.stringify({ enrichedPeriods: enriched, processedAt: new Date().toISOString() }, null, 2), 'utf-8');
+    console.log(`Enriched data: ${enriched.length} periods -> ${ENRICHED_OUTPUT_PATH}`);
+  }
 }
 
 main();

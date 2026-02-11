@@ -63,6 +63,10 @@ Then wire it in `inferParserType()` and `parseVracContent()` in `vracSource.ts`.
 |-------|---------|------------|
 | `health-index` | Antimalarial share (malaria proxy) | — |
 | `region-normalization` | Map pharmacy → region, cocoa/urban flag | health-index |
+| `antibiotic-index` | Antibiotic share (infection proxy) | health-index |
+| `time-lag-indicator` | Flag harvest-window alignment + workforce risk | health-index |
+
+**Running with enrichment:** `npm run vrac:process:enrich` outputs `enriched.json` in addition to `processed.json`.
 
 ### Adding a new enrichment layer
 

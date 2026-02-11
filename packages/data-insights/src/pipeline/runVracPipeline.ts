@@ -4,6 +4,8 @@
  */
 
 import type { VracPeriodData } from '../sources/vrac/types';
+import { getEnrichment, getEnrichmentOrder } from './enrichmentRegistry';
+import { registerDefaultEnrichmentLayers } from '../enrichment/registerDefaultLayers';
 
 export interface VracPipelineOptions {
   /** Root directory for VRAC files (default: VRAC) */
@@ -14,6 +16,7 @@ export interface VracPipelineOptions {
 
 export interface VracPipelineOutput {
   periods: VracPeriodData[];
+  enrichedPeriods?: unknown[];
   processedAt: string;
 }
 
@@ -39,4 +42,20 @@ function deduplicatePeriods(periods: VracPeriodData[]): VracPeriodData[] {
  */
 export function processVracPeriods(periods: VracPeriodData[]): VracPeriodData[] {
   return deduplicatePeriods(periods);
+}
+
+/**
+ * Apply enrichment layers to periods in dependency order
+ */
+export function applyEnrichments(periods: VracPeriodData[]): unknown[] {
+  registerDefaultEnrichmentLayers();
+  const order = getEnrichmentOrder();
+  let data: unknown[] = periods.map((p) => ({ ...p }));
+
+  for (const layerId of order) {
+    const layer = getEnrichment(layerId);
+    if (!layer) continue;
+    data = data.map((d) => layer.enrich(d));
+  }
+  return data;
 }
