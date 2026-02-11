@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "compilerOptions": {
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleDetection": "force"
+  },
+  "references": [
+    { "path": "./apps/web" }
+  ],
+  "exclude": ["node_modules", "dist", "build", "legacy"]
+}
+

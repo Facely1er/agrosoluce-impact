@@ -1,0 +1,16 @@
+{
+  "name": "@agrosoluce/database",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "migrate:generate": "tsx ../../scripts/run-migrations.ts --generate",
+    "migrate:check": "tsx ../../scripts/run-migrations.ts --check",
+    "migrate:run": "powershell -ExecutionPolicy Bypass -File ../../scripts/run-migrations.ps1",
+    "migrate:data": "tsx ../../scripts/migrate-cooperatives-to-db.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.8.1"
+  }
+}
+

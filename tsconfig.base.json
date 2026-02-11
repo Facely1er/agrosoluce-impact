@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@agrosoluce/types/*": ["packages/types/src/*"],
+      "@agrosoluce/ui/*": ["packages/ui/src/*"],
+      "@agrosoluce/config/*": ["packages/config/src/*"],
+      "@agrosoluce/supabase/*": ["packages/supabase/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "build", "legacy", "apps/*/dist", "apps/*/build", "apps/mobile", "packages/*/dist", "packages/*/build"]
+}
+

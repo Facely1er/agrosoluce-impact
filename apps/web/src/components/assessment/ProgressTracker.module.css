@@ -1,0 +1,8 @@
+.progressBarContainer {
+  /* Container for progress bar with CSS variable support */
+}
+
+.progressBar {
+  width: var(--progress-width, 0%);
+}
+

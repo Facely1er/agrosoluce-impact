@@ -1,0 +1,9 @@
+.progressBar {
+  @apply bg-secondary-600 dark:bg-secondary-400 h-4 rounded-full transition-all;
+  width: var(--progress-width, 0%);
+}
+
+.progressBarContainer {
+  @apply flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4;
+}
+

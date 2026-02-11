@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroSoluce Intelligence™ - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #3E2723 0%, #5D4037 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone-container {
+            background: #000;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .phone-screen {
+            background: #FFF8E1;
+            border-radius: 30px;
+            overflow: hidden;
+            height: 812px;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #1B5E20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .header {
+            background: #1B5E20;
+            padding: 20px;
+            color: white;
+        }
+
+        .header.coop {
+            background: #388E3C;
+        }
+
+        .header.farmer {
+            background: #D84315;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .tab-bar {
+            background: white;
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #757575;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #1B5E20;
+            font-weight: 700;
+            border-bottom-color: #1B5E20;
+        }
+
+        .content {
+            padding: 16px;
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            border-left: 4px solid #1B5E20;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .metric-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #757575;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1B5E20;
+            margin-bottom: 4px;
+        }
+
+        .metric-trend {
+            font-size: 11px;
+            color: #757575;
+        }
+
+        .weather-card {
+            background: linear-gradient(135deg, #0277BD, #01579B);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(2,119,189,0.3);
+        }
+
+        .weather-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .weather-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .weather-temp {
+            font-size: 40px;
+            font-weight: 800;
+        }
+
+        .forecast-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 8px 0;
+            margin-top: 16px;
+        }
+
+        .forecast-day {
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            min-width: 70px;
+        }
+
+        .forecast-icon {
+            font-size: 28px;
+            margin: 8px 0;
+        }
+
+        .market-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #3E2723;
+            margin-bottom: 16px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .price-crop {
+            font-size: 16px;
+            font-weight: 700;
+            color: #3E2723;
+        }
+
+        .price-amount {
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            color: #3E2723;
+        }
+
+        .price-change {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .price-change.up {
+            color: #2E7D32;
+        }
+
+        .price-change.down {
+            color: #C62828;
+        }
+
+        .role-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 24px;
+        }
+
+        .role-button {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .role-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .role-button.ermits {
+            border-color: #1B5E20;
+        }
+
+        .role-button.coop {
+            border-color: #388E3C;
+        }
+
+        .role-button.farmer {
+            border-color: #D84315;
+        }
+
+        .role-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .role-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #3E2723;
+            margin-bottom: 8px;
+        }
+
+        .role-desc {
+            font-size: 14px;
+            color: #757575;
+        }
+
+        .farmer-nav {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            background: white;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .farmer-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .farmer-tab.active {
+            background: rgba(216, 67, 21, 0.1);
+        }
+
+        .farmer-tab-icon {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+
+        .farmer-tab-label {
+            font-size: 12px;
+            color: #3E2723;
+        }
+
+        .greeting-card {
+            background: #D84315;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .greeting-text {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .task-icon {
+            font-size: 32px;
+            margin-right: 16px;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-text {
+            font-size: 16px;
+            color: #3E2723;
+        }
+
+        .task-time {
+            font-size: 12px;
+            color: #757575;
+            margin-top: 4px;
+        }
+
+        .voice-button {
+            background: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .voice-button:active {
+            transform: scale(0.95);
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content > * {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen" id="screen">
+            <!-- Role Selector (Initial Screen) -->
+            <div class="role-selector" id="roleSelector">
+                <div style="text-align: center; padding: 40px 20px 20px;">
+                    <h1 style="font-size: 32px; font-weight: 800; color: white; margin-bottom: 8px;">
+                        AgroSoluce Intelligence™
+                    </h1>
+                    <p style="font-size: 16px; color: #F9A825;">Select Your Role</p>
+                </div>
+
+                <div class="role-button ermits" onclick="selectRole('ermits')">
+                    <div class="role-icon">🎯</div>
+                    <div class="role-title">ERMITS Team</div>
+                    <div class="role-desc">Command Center • 3,797 Cooperatives</div>
+                </div>
+
+                <div class="role-button coop" onclick="selectRole('cooperative')">
+                    <div class="role-icon">🏢</div>
+                    <div class="role-title">Cooperative</div>
+                    <div class="role-desc">Management Dashboard • Members & Sales</div>
+                </div>
+
+                <div class="role-button farmer" onclick="selectRole('farmer')">
+                    <div class="role-icon">👨‍🌾</div>
+                    <div class="role-title">Farmer</div>
+                    <div class="role-desc">Field App • Voice Guided • Offline</div>
+                </div>
+            </div>
+
+            <!-- ERMITS Dashboard -->
+            <div id="ermitsDashboard" style="display: none;">
+                <button class="back-button" onclick="goBack()">← Back</button>
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>⚡ Live</span>
+                </div>
+                <div class="header">
+                    <div class="header-title">ERMITS Command</div>
+                    <div class="header-subtitle">Managing 3,797 Cooperatives</div>
+                </div>
+                <div class="tab-bar">
+                    <div class="tab active" onclick="switchTab(this, 'ermitsOverview')">Overview</div>
+                    <div class="tab" onclick="switchTab(this, 'ermitsCoops')">Coops</div>
+                    <div class="tab" onclick="switchTab(this, 'ermitsAlerts')">Alerts</div>
+                </div>
+                <div class="content">
+                    <div id="ermitsOverview">
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <div class="metric-icon">🏢</div>
+                                <div class="metric-label">Active Cooperatives</div>
+                                <div class="metric-value">3,797</div>
+                                <div class="metric-trend">+12 this week</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-icon">👨‍🌾</div>
+                                <div class="metric-label">Total Farmers</div>
+                                <div class="metric-value">524,203</div>
+                                <div class="metric-trend">+1,847 this month</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-icon">✅</div>
+                                <div class="metric-label">EUDR Compliant</div>
+                                <div class="metric-value">98.2%</div>
+                                <div class="metric-trend">+2.1% this month</div>
+                            </div>
+                            <div class="metric-card" style="border-left-color: #F57F17;">
+                                <div class="metric-icon">⚠️</div>
+                                <div class="metric-label">Action Required</div>
+                                <div class="metric-value" style="color: #F57F17;">127</div>
+                                <div class="metric-trend">23 urgent</div>
+                            </div>
+                        </div>
+
+                        <div class="weather-card">
+                            <div class="weather-header">
+                                <div class="weather-title">🌤️ Climate Intelligence</div>
+                                <div class="weather-temp">28°C</div>
+                            </div>
+                            <div style="margin-bottom: 16px;">Partly Cloudy</div>
+                            <div style="display: flex; justify-content: space-around; margin-bottom: 16px;">
+                                <span>💧 72% Humidity</span>
+                                <span>🌧️ 0mm Rain</span>
+                            </div>
+                            <div class="forecast-scroll">
+                                <div class="forecast-day">
+                                    <div style="font-size: 12px;">Mon</div>
+                                    <div class="forecast-icon">⛅</div>
+                                    <div style="font-weight: 700;">31°</div>
+                                    <div style="font-size: 11px;">20%</div>
+                                </div>
+                                <div class="forecast-day">
+                                    <div style="font-size: 12px;">Tue</div>
+                                    <div class="forecast-icon">🌧️</div>
+                                    <div style="font-weight: 700;">29°</div>
+                                    <div style="font-size: 11px;">60%</div>
+                                </div>
+                                <div class="forecast-day">
+                                    <div style="font-size: 12px;">Wed</div>
+                                    <div class="forecast-icon">☀️</div>
+                                    <div style="font-weight: 700;">32°</div>
+                                    <div style="font-size: 11px;">10%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="market-card">
+                            <div class="section-title">💰 Market Prices</div>
+                            <div class="price-row">
+                                <div>
+                                    <div class="price-crop">Cocoa</div>
+                                    <div style="font-size: 12px; color: #757575;">XOF/kg</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="price-amount">2,850</div>
+                                    <div class="price-change up">📈 +5.2%</div>
+                                </div>
+                            </div>
+                            <div class="price-row">
+                                <div>
+                                    <div class="price-crop">Coffee</div>
+                                    <div style="font-size: 12px; color: #757575;">XOF/kg</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="price-amount">3,200</div>
+                                    <div class="price-change down">📉 -2.1%</div>
+                                </div>
+                            </div>
+                            <div class="price-row">
+                                <div>
+                                    <div class="price-crop">Cashew</div>
+                                    <div style="font-size: 12px; color: #757575;">XOF/kg</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="price-amount">1,950</div>
+                                    <div class="price-change up">📈 +8.7%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cooperative Dashboard -->
+            <div id="cooperativeDashboard" style="display: none;">
+                <button class="back-button" onclick="goBack()">← Back</button>
+                <div class="status-bar" style="background: #388E3C;">
+                    <span>9:41</span>
+                    <span>✓ Compliant</span>
+                </div>
+                <div class="header coop">
+                    <div class="header-title">SCAC Abidjan</div>
+                    <div class="header-subtitle">487 Members • Lagunes Region</div>
+                </div>
+                <div class="tab-bar">
+                    <div class="tab active">Dashboard</div>
+                    <div class="tab">Members</div>
+                    <div class="tab">Sales</div>
+                </div>
+                <div class="content">
+                    <div class="metric-grid">
+                        <div class="metric-card" style="border-left-color: #F9A825;">
+                            <div class="metric-icon">💰</div>
+                            <div class="metric-label">Monthly Revenue</div>
+                            <div class="metric-value" style="color: #F9A825;">€127.5K</div>
+                            <div class="metric-trend">+18% vs last month</div>
+                        </div>
+                        <div class="metric-card" style="border-left-color: #D84315;">
+                            <div class="metric-icon">📦</div>
+                            <div class="metric-label">Production</div>
+                            <div class="metric-value" style="color: #D84315;">23.4 tons</div>
+                            <div class="metric-trend">Cocoa, Coffee</div>
+                        </div>
+                    </div>
+
+                    <div class="weather-card">
+                        <div class="weather-header">
+                            <div class="weather-title">🌤️ Your Region Weather</div>
+                            <div class="weather-temp">28°C</div>
+                        </div>
+                        <div style="margin-bottom: 8px;">Partly Cloudy</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Good conditions for harvesting today</div>
+                    </div>
+
+                    <div class="market-card">
+                        <div class="section-title">⚡ Quick Actions</div>
+                        <div style="background: #388E3C; padding: 16px; border-radius: 12px; margin-bottom: 12px; color: white; text-align: center; cursor: pointer;">
+                            📸 Submit Harvest Report
+                        </div>
+                        <div style="background: #388E3C; padding: 16px; border-radius: 12px; margin-bottom: 12px; color: white; text-align: center; cursor: pointer;">
+                            📍 Update GPS Coordinates
+                        </div>
+                        <div style="background: #388E3C; padding: 16px; border-radius: 12px; color: white; text-align: center; cursor: pointer;">
+                            💬 Contact ERMITS Team
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Farmer App -->
+            <div id="farmerApp" style="display: none;">
+                <button class="back-button" onclick="goBack()">← Back</button>
+                <div class="status-bar" style="background: #D84315;">
+                    <span>9:41</span>
+                    <span>📡 Offline Mode</span>
+                </div>
+                <div class="header farmer" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="header-title">🌾 AgroSoluce</div>
+                        <div class="header-subtitle">Offline Mode • Baoule</div>
+                    </div>
+                    <div class="voice-button">🎤</div>
+                </div>
+                <div class="farmer-nav">
+                    <div class="farmer-tab active">
+                        <div class="farmer-tab-icon">🏠</div>
+                        <div class="farmer-tab-label">Home</div>
+                    </div>
+                    <div class="farmer-tab">
+                        <div class="farmer-tab-icon">🌤️</div>
+                        <div class="farmer-tab-label">Weather</div>
+                    </div>
+                    <div class="farmer-tab">
+                        <div class="farmer-tab-icon">💰</div>
+                        <div class="farmer-tab-label">Prices</div>
+                    </div>
+                    <div class="farmer-tab">
+                        <div class="farmer-tab-icon">📞</div>
+                        <div class="farmer-tab-label">Help</div>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="greeting-card">
+                        <div class="greeting-text">🎙️ "Ani sɔrɔ! Welcome!"</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Tap microphone to use voice commands</div>
+                    </div>
+
+                    <div class="task-card">
+                        <div class="section-title">📋 Today's Tasks</div>
+                        <div class="task-item">
+                            <div class="task-icon">🍫</div>
+                            <div class="task-info">
+                                <div class="task-text">Check cocoa pods</div>
+                                <div class="task-time">Morning</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-icon">💧</div>
+                            <div class="task-info">
+                                <div class="task-text">Water young plants</div>
+                                <div class="task-time">Afternoon</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-icon">📸</div>
+                            <div class="task-info">
+                                <div class="task-text">Report harvest</div>
+                                <div class="task-time">Evening</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <div style="flex: 1; background: white; border-radius: 16px; padding: 20px; text-align: center;">
+                            <div style="font-size: 40px; margin-bottom: 12px;">🌱</div>
+                            <div style="font-size: 24px; font-weight: 800; color: #3E2723; margin-bottom: 4px;">2.3 ha</div>
+                            <div style="font-size: 12px; color: #757575;">Farm Size</div>
+                        </div>
+                        <div style="flex: 1; background: white; border-radius: 16px; padding: 20px; text-align: center;">
+                            <div style="font-size: 40px; margin-bottom: 12px;">🍫</div>
+                            <div style="font-size: 24px; font-weight: 800; color: #3E2723; margin-bottom: 4px;">850 kg</div>
+                            <div style="font-size: 12px; color: #757575;">This Season</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectRole(role) {
+            document.getElementById('roleSelector').style.display = 'none';
+            
+            if (role === 'ermits') {
+                document.getElementById('ermitsDashboard').style.display = 'block';
+            } else if (role === 'cooperative') {
+                document.getElementById('cooperativeDashboard').style.display = 'block';
+            } else if (role === 'farmer') {
+                document.getElementById('farmerApp').style.display = 'block';
+            }
+        }
+
+        function goBack() {
+            document.getElementById('ermitsDashboard').style.display = 'none';
+            document.getElementById('cooperativeDashboard').style.display = 'none';
+            document.getElementById('farmerApp').style.display = 'none';
+            document.getElementById('roleSelector').style.display = 'block';
+        }
+
+        function switchTab(element, contentId) {
+            // Remove active from all tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            // Add active to clicked tab
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>

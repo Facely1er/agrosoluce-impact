@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroSoluce® Farm Assessment Platform</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --agrosoluce-green: #2E7D32;
+            --agrosoluce-gold: #FFB300;
+            --earth-brown: #5D4037;
+            --leaf-green: #4CAF50;
+            --soil-dark: #3E2723;
+            --sky-blue: #1976D2;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            margin: 0;
+            padding: 0;
+        }
+
+        .grain-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 179, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(46, 125, 50, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--agrosoluce-green) 0%, var(--leaf-green) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.6;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .agrosoluce-logo {
+            width: 64px;
+            height: 64px;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .orbital-rings {
+            position: absolute;
+            width: 72px;
+            height: 72px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            animation: orbit 8s linear infinite;
+        }
+
+        .orbital-rings::before,
+        .orbital-rings::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--agrosoluce-gold);
+            border-radius: 50%;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .orbital-rings::after {
+            top: auto;
+            bottom: -4px;
+            background: white;
+        }
+
+        @keyframes orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .leaf-icon {
+            font-size: 2rem;
+            color: var(--agrosoluce-green);
+            position: relative;
+            z-index: 1;
+        }
+
+        .assessment-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .assessment-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(46, 125, 50, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--soil-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--agrosoluce-green), var(--leaf-green));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .question-group {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .question-group:last-child {
+            border-bottom: none;
+        }
+
+        .question {
+            font-weight: 600;
+            color: var(--soil-dark);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .answer-options {
+            display: grid;
+            gap: 0.75rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .answer-option:hover {
+            background: #e8f5e8;
+            border-color: var(--leaf-green);
+            transform: translateY(-1px);
+        }
+
+        .answer-option.selected {
+            background: linear-gradient(135deg, var(--agrosoluce-green), var(--leaf-green));
+            color: white;
+            border-color: var(--agrosoluce-green);
+        }
+
+        .radio-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .answer-option.selected .radio-custom {
+            border-color: white;
+            background: white;
+        }
+
+        .answer-option.selected .radio-custom::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: var(--agrosoluce-green);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .progress-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .progress-title {
+            font-family: 'Crimson Pro', serif;
+            font-weight: 600;
+            color: var(--soil-dark);
+        }
+
+        .progress-percentage {
+            font-weight: 600;
+            color: var(--agrosoluce-green);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--agrosoluce-green), var(--leaf-green));
+            border-radius: 4px;
+            transition: width 0.6s ease-in-out;
+        }
+
+        .results-section {
+            display: none;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .results-section.show {
+            display: block;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .score-display {
+            margin: 2rem 0;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            border-radius: 50%;
+            background: conic-gradient(var(--agrosoluce-green) 0deg, var(--leaf-green) 120deg, #e9ecef 120deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-inner {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--agrosoluce-green);
+        }
+
+        .recommendations {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            border-left: 4px solid var(--agrosoluce-green);
+        }
+
+        .recommendation-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--agrosoluce-green), var(--leaf-green));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, var(--agrosoluce-green) 0%, var(--leaf-green) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-radius: 20px;
+            margin: 2rem 0;
+        }
+
+        .cta-button {
+            background: white;
+            color: var(--agrosoluce-green);
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+
+        .farmers-first-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 768px) {
+            .assessment-container {
+                padding: 1rem;
+            }
+            
+            .answer-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grain-overlay"></div>
+    <div class="main-container">
+        <header class="hero-section">
+            <div class="hero-content">
+                <div class="farmers-first-badge">
+                    <i class="fas fa-heart"></i>
+                    Farmers First - 100% Free Assessment
+                </div>
+                <div class="logo-section">
+                    <div class="agrosoluce-logo">
+                        <div class="orbital-rings"></div>
+                        <i class="fas fa-seedling leaf-icon"></i>
+                    </div>
+                    <div>
+                        <h1 style="font-family: 'Crimson Pro', serif; font-size: 3rem; margin: 0; font-weight: 700;">
+                            AgroSoluce<sup>®</sup>
+                        </h1>
+                        <p style="font-style: italic; opacity: 0.9; margin: 0.5rem 0 0 0;">
+                            Cultivating Secure Agriculture
+                        </p>
+                    </div>
+                </div>
+                <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto; opacity: 0.95;">
+                    Complete assessment of your cooperative's security, compliance, and child protection readiness. 
+                    Get personalized recommendations to access premium markets and protect your community.
+                </p>
+            </div>
+        </header>
+
+        <main class="assessment-container">
+            <div id="assessment-app"></div>
+        </main>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Assessment Data Structure
+        const assessmentSections = [
+            {
+                id: 'farm-profile',
+                title: 'Farm & Cooperative Profile',
+                icon: 'fas fa-farm',
+                questions: [
+                    {
+                        id: 'cooperative-size',
+                        question: 'How many members are in your cooperative?',
+                        options: [
+                            { value: 'small', label: '50-150 members', score: 1 },
+                            { value: 'medium', label: '150-400 members', score: 2 },
+                            { value: 'large', label: '400+ members', score: 3 }
+                        ]
+                    },
+                    {
+                        id: 'primary-crop',
+                        question: 'What is your primary crop?',
+                        options: [
+                            { value: 'cocoa', label: 'Cocoa', score: 3 },
+                            { value: 'cashew', label: 'Cashew', score: 3 },
+                            { value: 'coffee', label: 'Coffee', score: 2 },
+                            { value: 'mixed', label: 'Mixed crops', score: 1 }
+                        ]
+                    },
+                    {
+                        id: 'certification-status',
+                        question: 'Do you have any certifications?',
+                        options: [
+                            { value: 'fair-trade', label: 'Fair Trade certified', score: 3 },
+                            { value: 'organic', label: 'Organic certified', score: 3 },
+                            { value: 'in-progress', label: 'Certification in progress', score: 2 },
+                            { value: 'none', label: 'No certifications', score: 1 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'security-assessment',
+                title: 'Farm Security & Data Protection',
+                icon: 'fas fa-shield-alt',
+                questions: [
+                    {
+                        id: 'data-storage',
+                        question: 'How do you currently store cooperative records?',
+                        options: [
+                            { value: 'digital-secure', label: 'Secure digital system with backups', score: 3 },
+                            { value: 'digital-basic', label: 'Basic computer/phone storage', score: 2 },
+                            { value: 'paper-organized', label: 'Organized paper records', score: 1 },
+                            { value: 'paper-basic', label: 'Basic paper records', score: 0 }
+                        ]
+                    },
+                    {
+                        id: 'financial-security',
+                        question: 'How do you protect financial information?',
+                        options: [
+                            { value: 'bank-secure', label: 'Bank accounts with proper controls', score: 3 },
+                            { value: 'mobile-money', label: 'Mobile money with PIN protection', score: 2 },
+                            { value: 'cash-safe', label: 'Cash in secure location', score: 1 },
+                            { value: 'cash-basic', label: 'Basic cash management', score: 0 }
+                        ]
+                    },
+                    {
+                        id: 'communication-security',
+                        question: 'How do you communicate sensitive information?',
+                        options: [
+                            { value: 'secure-apps', label: 'Secure messaging apps', score: 3 },
+                            { value: 'whatsapp', label: 'WhatsApp or SMS', score: 2 },
+                            { value: 'phone-calls', label: 'Phone calls only', score: 1 },
+                            { value: 'in-person', label: 'In-person meetings only', score: 0 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'compliance-readiness',
+                title: 'Compliance & Certification Readiness',
+                icon: 'fas fa-certificate',
+                questions: [
+                    {
+                        id: 'documentation-organization',
+                        question: 'How well organized are your compliance documents?',
+                        options: [
+                            { value: 'digital-organized', label: 'Digital filing system with search', score: 3 },
+                            { value: 'folders-organized', label: 'Well-organized paper folders', score: 2 },
+                            { value: 'somewhat-organized', label: 'Somewhat organized', score: 1 },
+                            { value: 'disorganized', label: 'Difficult to find documents', score: 0 }
+                        ]
+                    },
+                    {
+                        id: 'deadline-tracking',
+                        question: 'How do you track certification deadlines?',
+                        options: [
+                            { value: 'automated-system', label: 'Automated reminder system', score: 3 },
+                            { value: 'calendar-system', label: 'Calendar or planner system', score: 2 },
+                            { value: 'manual-tracking', label: 'Manual notes and reminders', score: 1 },
+                            { value: 'no-system', label: 'No systematic tracking', score: 0 }
+                        ]
+                    },
+                    {
+                        id: 'audit-preparation',
+                        question: 'How prepared are you for audits?',
+                        options: [
+                            { value: 'always-ready', label: 'Always audit-ready', score: 3 },
+                            { value: 'few-days-prep', label: 'Can prepare in a few days', score: 2 },
+                            { value: 'weeks-prep', label: 'Need weeks to prepare', score: 1 },
+                            { value: 'difficult-prep', label: 'Very difficult to prepare', score: 0 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'child-protection',
+                title: 'Child Protection & Social Responsibility',
+                icon: 'fas fa-child',
+                questions: [
+                    {
+                        id: 'child-labor-policy',
+                        question: 'Do you have a child labor prevention policy?',
+                        options: [
+                            { value: 'written-enforced', label: 'Written policy, actively enforced', score: 3 },
+                            { value: 'written-policy', label: 'Written policy exists', score: 2 },
+                            { value: 'verbal-agreement', label: 'Verbal understanding among members', score: 1 },
+                            { value: 'no-policy', label: 'No formal policy', score: 0 }
+                        ]
+                    },
+                    {
+                        id: 'child-monitoring',
+                        question: 'How do you monitor child welfare in your community?',
+                        options: [
+                            { value: 'systematic-monitoring', label: 'Systematic monitoring with records', score: 3 },
+                            { value: 'regular-discussions', label: 'Regular discussions in meetings', score: 2 },
+                            { value: 'informal-awareness', label: 'Informal community awareness', score: 1 },
+                            { value: 'no-monitoring', label: 'No specific monitoring', score: 0 }
+                        ]
+                    },
+                    {
+                        id: 'education-support',
+                        question: 'How does your cooperative support children\'s education?',
+                        options: [
+                            { value: 'education-fund', label: 'Education fund and scholarships', score: 3 },
+                            { value: 'school-supplies', label: 'Help with school supplies', score: 2 },
+                            { value: 'encourage-education', label: 'Encourage education', score: 1 },
+                            { value: 'no-specific-support', label: 'No specific support', score: 0 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'economic-baseline',
+                title: 'Economic Performance & Market Access',
+                icon: 'fas fa-chart-line',
+                questions: [
+                    {
+                        id: 'price-information',
+                        question: 'How do you get market price information?',
+                        options: [
+                            { value: 'real-time-data', label: 'Real-time market data access', score: 3 },
+                            { value: 'weekly-updates', label: 'Weekly market updates', score: 2 },
+                            { value: 'buyer-information', label: 'Information from buyers', score: 1 },
+                            { value: 'limited-information', label: 'Limited price information', score: 0 }
+                        ]
+                    },
+                    {
+                        id: 'buyer-relationships',
+                        question: 'How many regular buyers do you have?',
+                        options: [
+                            { value: 'multiple-premium', label: '5+ buyers including premium markets', score: 3 },
+                            { value: 'multiple-buyers', label: '3-5 regular buyers', score: 2 },
+                            { value: 'few-buyers', label: '1-2 regular buyers', score: 1 },
+                            { value: 'single-buyer', label: 'Single buyer or irregular sales', score: 0 }
+                        ]
+                    },
+                    {
+                        id: 'financial-planning',
+                        question: 'Do you have financial planning and budgets?',
+                        options: [
+                            { value: 'detailed-budgets', label: 'Detailed annual budgets and planning', score: 3 },
+                            { value: 'basic-budgets', label: 'Basic budget planning', score: 2 },
+                            { value: 'informal-planning', label: 'Informal financial planning', score: 1 },
+                            { value: 'no-planning', label: 'No systematic financial planning', score: 0 }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        function AssessmentApp() {
+            const [currentSection, setCurrentSection] = useState(0);
+            const [answers, setAnswers] = useState({});
+            const [isComplete, setIsComplete] = useState(false);
+            const [results, setResults] = useState(null);
+
+            const totalQuestions = assessmentSections.reduce((acc, section) => acc + section.questions.length, 0);
+            const answeredQuestions = Object.keys(answers).length;
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+
+            const handleAnswer = (questionId, answer) => {
+                setAnswers(prev => ({
+                    ...prev,
+                    [questionId]: answer
+                }));
+            };
+
+            const calculateResults = () => {
+                const sectionScores = assessmentSections.map(section => {
+                    const sectionAnswers = section.questions.map(q => answers[q.id]).filter(Boolean);
+                    const totalScore = sectionAnswers.reduce((acc, answer) => acc + answer.score, 0);
+                    const maxPossibleScore = section.questions.length * 3; // Max score per question is 3
+                    const percentage = Math.round((totalScore / maxPossibleScore) * 100);
+                    
+                    return {
+                        section: section.title,
+                        score: percentage,
+                        totalScore,
+                        maxPossibleScore
+                    };
+                });
+
+                const overallScore = Math.round(
+                    sectionScores.reduce((acc, section) => acc + section.score, 0) / sectionScores.length
+                );
+
+                const recommendations = generateRecommendations(sectionScores, overallScore);
+
+                return {
+                    overallScore,
+                    sectionScores,
+                    recommendations,
+                    readyForToolkit: overallScore >= 60
+                };
+            };
+
+            const generateRecommendations = (sectionScores, overallScore) => {
+                const recommendations = [];
+
+                // Security recommendations
+                if (sectionScores[1].score < 60) {
+                    recommendations.push({
+                        priority: 'high',
+                        category: 'Security',
+                        title: 'Improve Data Security',
+                        description: 'Implement secure data storage and backup systems to protect cooperative information.',
+                        icon: 'fas fa-shield-alt'
+                    });
+                }
+
+                // Compliance recommendations
+                if (sectionScores[2].score < 70) {
+                    recommendations.push({
+                        priority: 'high',
+                        category: 'Compliance',
+                        title: 'Strengthen Compliance Systems',
+                        description: 'Organize documentation and create deadline tracking system for certifications.',
+                        icon: 'fas fa-certificate'
+                    });
+                }
+
+                // Child protection recommendations
+                if (sectionScores[3].score < 80) {
+                    recommendations.push({
+                        priority: 'critical',
+                        category: 'Child Protection',
+                        title: 'Enhance Child Protection Measures',
+                        description: 'Develop comprehensive child labor prevention and education support programs.',
+                        icon: 'fas fa-child'
+                    });
+                }
+
+                // Economic recommendations
+                if (sectionScores[4].score < 60) {
+                    recommendations.push({
+                        priority: 'medium',
+                        category: 'Economic',
+                        title: 'Improve Market Access',
+                        description: 'Develop better market information systems and diversify buyer relationships.',
+                        icon: 'fas fa-chart-line'
+                    });
+                }
+
+                // Always add toolkit recommendation if ready
+                if (overallScore >= 60) {
+                    recommendations.push({
+                        priority: 'action',
+                        category: 'Next Steps',
+                        title: 'Access Implementation Toolkit',
+                        description: 'You\'re ready for our premium toolkit with step-by-step implementation guides.',
+                        icon: 'fas fa-tools'
+                    });
+                }
+
+                return recommendations;
+            };
+
+            const nextSection = () => {
+                if (currentSection < assessmentSections.length - 1) {
+                    setCurrentSection(currentSection + 1);
+                } else {
+                    const assessmentResults = calculateResults();
+                    setResults(assessmentResults);
+                    setIsComplete(true);
+                }
+            };
+
+            const prevSection = () => {
+                if (currentSection > 0) {
+                    setCurrentSection(currentSection - 1);
+                }
+            };
+
+            if (isComplete && results) {
+                return (
+                    <div className="results-section show">
+                        <h2 style={{ fontFamily: "'Crimson Pro', serif", fontSize: '2.5rem', color: 'var(--soil-dark)', marginBottom: '1rem' }}>
+                            Your AgroSoluce Assessment Results
+                        </h2>
+                        <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '2rem' }}>
+                            Based on your responses, here's your cooperative's readiness profile
+                        </p>
+
+                        <div className="score-display">
+                            <div className="score-circle">
+                                <div className="score-inner">
+                                    {results.overallScore}%
+                                </div>
+                            </div>
+                            <h3 style={{ color: 'var(--agrosoluce-green)', marginBottom: '0.5rem' }}>
+                                Overall Readiness Score
+                            </h3>
+                            <p style={{ color: '#666' }}>
+                                {results.overallScore >= 80 ? 'Excellent - Premium market ready' :
+                                 results.overallScore >= 60 ? 'Good - Implementation toolkit recommended' :
+                                 results.overallScore >= 40 ? 'Fair - Foundational improvements needed' :
+                                 'Needs attention - Start with basic improvements'}
+                            </p>
+                        </div>
+
+                        <div className="recommendations">
+                            <h3 style={{ fontFamily: "'Crimson Pro', serif", fontSize: '1.5rem', color: 'var(--soil-dark)', marginBottom: '1.5rem' }}>
+                                Personalized Recommendations
+                            </h3>
+                            {results.recommendations.map((rec, index) => (
+                                <div key={index} className="recommendation-item">
+                                    <div className="recommendation-icon">
+                                        <i className={rec.icon}></i>
+                                    </div>
+                                    <div>
+                                        <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--soil-dark)' }}>
+                                            {rec.title}
+                                        </h4>
+                                        <p style={{ margin: 0, color: '#666' }}>
+                                            {rec.description}
+                                        </p>
+                                        <span style={{ 
+                                            fontSize: '0.8rem', 
+                                            color: rec.priority === 'critical' ? '#d32f2f' : 
+                                                   rec.priority === 'high' ? '#f57c00' : 
+                                                   rec.priority === 'action' ? 'var(--agrosoluce-green)' : '#666',
+                                            fontWeight: 600,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.5px'
+                                        }}>
+                                            {rec.priority} Priority
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="cta-section">
+                            <h3 style={{ fontFamily: "'Crimson Pro', serif", fontSize: '1.8rem', marginBottom: '1rem' }}>
+                                Ready for the Next Step?
+                            </h3>
+                            <p style={{ fontSize: '1.1rem', marginBottom: '2rem', opacity: 0.95 }}>
+                                {results.readyForToolkit ? 
+                                    'Your cooperative is ready for our implementation toolkit. Get step-by-step guidance to improve your operations and access premium markets.' :
+                                    'Let\'s start with foundational improvements. Our basic toolkit will help you build the foundation for premium market access.'
+                                }
+                            </p>
+                            <button className="cta-button" onClick={() => alert('Implementation toolkit coming soon!')}>
+                                <i className="fas fa-tools" style={{ marginRight: '0.5rem' }}></i>
+                                Access Implementation Toolkit
+                            </button>
+                            <button className="cta-button" onClick={() => alert('Support contact coming soon!')}>
+                                <i className="fas fa-phone" style={{ marginRight: '0.5rem' }}></i>
+                                Speak with Agricultural Expert
+                            </button>
+                        </div>
+
+                        <div style={{ textAlign: 'center', padding: '2rem 0', color: '#666' }}>
+                            <p><strong>Remember:</strong> This assessment and all our farmer support tools are 100% free. We believe in helping farmers succeed before asking for anything in return.</p>
+                        </div>
+                    </div>
+                );
+            }
+
+            const currentSectionData = assessmentSections[currentSection];
+
+            return (
+                <div>
+                    <div className="progress-section">
+                        <div className="progress-header">
+                            <span className="progress-title">Assessment Progress</span>
+                            <span className="progress-percentage">{Math.round(progressPercentage)}% Complete</span>
+                        </div>
+                        <div className="progress-bar">
+                            <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
+                        </div>
+                    </div>
+
+                    <div className="assessment-card">
+                        <div className="card-header">
+                            <div className="card-title">
+                                <div className="card-icon">
+                                    <i className={currentSectionData.icon}></i>
+                                </div>
+                                {currentSectionData.title}
+                            </div>
+                            <p style={{ color: '#666', margin: '0.5rem 0 0 0' }}>
+                                Section {currentSection + 1} of {assessmentSections.length}
+                            </p>
+                        </div>
+
+                        {currentSectionData.questions.map((question) => (
+                            <div key={question.id} className="question-group">
+                                <div className="question">{question.question}</div>
+                                <div className="answer-options">
+                                    {question.options.map((option) => (
+                                        <div
+                                            key={option.value}
+                                            className={`answer-option ${answers[question.id]?.value === option.value ? 'selected' : ''}`}
+                                            onClick={() => handleAnswer(question.id, option)}
+                                        >
+                                            <div className="radio-custom"></div>
+                                            <span>{option.label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                        <div style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #e9ecef' }}>
+                            <button
+                                onClick={prevSection}
+                                disabled={currentSection === 0}
+                                style={{
+                                    background: currentSection === 0 ? '#e9ecef' : 'var(--agrosoluce-green)',
+                                    color: currentSection === 0 ? '#666' : 'white',
+                                    border: 'none',
+                                    padding: '0.75rem 1.5rem',
+                                    borderRadius: '8px',
+                                    cursor: currentSection === 0 ? 'not-allowed' : 'pointer',
+                                    fontWeight: 600
+                                }}
+                            >
+                                <i className="fas fa-arrow-left" style={{ marginRight: '0.5rem' }}></i>
+                                Previous
+                            </button>
+
+                            <span style={{ color: '#666', fontWeight: 500 }}>
+                                {currentSection + 1} of {assessmentSections.length}
+                            </span>
+
+                            <button
+                                onClick={nextSection}
+                                disabled={!currentSectionData.questions.every(q => answers[q.id])}
+                                style={{
+                                    background: currentSectionData.questions.every(q => answers[q.id]) ? 'var(--agrosoluce-green)' : '#e9ecef',
+                                    color: currentSectionData.questions.every(q => answers[q.id]) ? 'white' : '#666',
+                                    border: 'none',
+                                    padding: '0.75rem 1.5rem',
+                                    borderRadius: '8px',
+                                    cursor: currentSectionData.questions.every(q => answers[q.id]) ? 'pointer' : 'not-allowed',
+                                    fontWeight: 600
+                                }}
+                            >
+                                {currentSection === assessmentSections.length - 1 ? 'Complete Assessment' : 'Next Section'}
+                                <i className="fas fa-arrow-right" style={{ marginLeft: '0.5rem' }}></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<AssessmentApp />, document.getElementById('assessment-app'));
+    </script>
+</body>
+</html>

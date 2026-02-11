@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroSoluce® Farm Assessment Platform</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            font-style: italic;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .free-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .progress-bar {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #166534, #15803d);
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .assessment-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #166534;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        .question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .option {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .option:hover {
+            background: #f0f9ff;
+            border-color: #166534;
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #166534, #15803d);
+            color: white;
+            border-color: #166534;
+        }
+
+        .radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .option.selected .radio {
+            border-color: white;
+            background: white;
+        }
+
+        .option.selected .radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #166534;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #166534;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #15803d;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .btn:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .results {
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(#166534 0deg, #15803d 120deg, #e2e8f0 120deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem auto;
+            position: relative;
+        }
+
+        .score-inner {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #166534;
+        }
+
+        .recommendations {
+            text-align: left;
+            margin: 2rem 0;
+        }
+
+        .recommendation {
+            background: #f8fafc;
+            border-left: 4px solid #166534;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .cta {
+            background: linear-gradient(135deg, #166534, #15803d);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .cta-button {
+            background: white;
+            color: #166534;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+                padding: 0 0.5rem;
+            }
+            
+            .assessment-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="logo">AgroSoluce<sup>®</sup></h1>
+        <p class="tagline">Cultivating Secure Agriculture</p>
+        <div class="free-badge">
+            ❤️ Farmers First - 100% Free Assessment
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="app"></div>
+    </div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const assessmentData = [
+            {
+                title: "Farm & Cooperative Profile",
+                icon: "🏛️",
+                questions: [
+                    {
+                        id: "size",
+                        question: "How many members are in your cooperative?",
+                        options: [
+                            { value: "small", label: "50-150 members", score: 1 },
+                            { value: "medium", label: "150-400 members", score: 2 },
+                            { value: "large", label: "400+ members", score: 3 }
+                        ]
+                    },
+                    {
+                        id: "crop",
+                        question: "What is your primary crop?",
+                        options: [
+                            { value: "cocoa", label: "Cocoa", score: 3 },
+                            { value: "cashew", label: "Cashew", score: 3 },
+                            { value: "coffee", label: "Coffee", score: 2 },
+                            { value: "mixed", label: "Mixed crops", score: 1 }
+                        ]
+                    },
+                    {
+                        id: "certification",
+                        question: "Do you have any certifications?",
+                        options: [
+                            { value: "fair-trade", label: "Fair Trade certified", score: 3 },
+                            { value: "organic", label: "Organic certified", score: 3 },
+                            { value: "in-progress", label: "Certification in progress", score: 2 },
+                            { value: "none", label: "No certifications", score: 1 }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: "Security & Data Protection",
+                icon: "🛡️",
+                questions: [
+                    {
+                        id: "records",
+                        question: "How do you store cooperative records?",
+                        options: [
+                            { value: "digital-secure", label: "Secure digital system with backups", score: 3 },
+                            { value: "computer", label: "Basic computer storage", score: 2 },
+                            { value: "paper-organized", label: "Organized paper records", score: 1 },
+                            { value: "paper-basic", label: "Basic paper records", score: 0 }
+                        ]
+                    },
+                    {
+                        id: "financial",
+                        question: "How do you protect financial information?",
+                        options: [
+                            { value: "bank", label: "Bank accounts with proper controls", score: 3 },
+                            { value: "mobile", label: "Mobile money with PIN protection", score: 2 },
+                            { value: "cash-safe", label: "Cash in secure location", score: 1 },
+                            { value: "cash-basic", label: "Basic cash management", score: 0 }
+                        ]
+                    },
+                    {
+                        id: "communication",
+                        question: "How do you communicate sensitive information?",
+                        options: [
+                            { value: "secure-apps", label: "Secure messaging apps", score: 3 },
+                            { value: "whatsapp", label: "WhatsApp or SMS", score: 2 },
+                            { value: "phone", label: "Phone calls only", score: 1 },
+                            { value: "person", label: "In-person meetings only", score: 0 }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: "Child Protection & Social Responsibility",
+                icon: "👶",
+                questions: [
+                    {
+                        id: "policy",
+                        question: "Do you have child labor prevention policies?",
+                        options: [
+                            { value: "enforced", label: "Written policy, actively enforced", score: 3 },
+                            { value: "written", label: "Written policy exists", score: 2 },
+                            { value: "verbal", label: "Verbal understanding among members", score: 1 },
+                            { value: "none", label: "No formal policy", score: 0 }
+                        ]
+                    },
+                    {
+                        id: "monitoring",
+                        question: "How do you monitor child welfare in your community?",
+                        options: [
+                            { value: "systematic", label: "Systematic monitoring with records", score: 3 },
+                            { value: "discussions", label: "Regular discussions in meetings", score: 2 },
+                            { value: "informal", label: "Informal community awareness", score: 1 },
+                            { value: "none", label: "No specific monitoring", score: 0 }
+                        ]
+                    },
+                    {
+                        id: "education",
+                        question: "How do you support children's education?",
+                        options: [
+                            { value: "fund", label: "Education fund & scholarships", score: 3 },
+                            { value: "supplies", label: "Help with school supplies", score: 2 },
+                            { value: "encourage", label: "Encourage education", score: 1 },
+                            { value: "none", label: "No specific support", score: 0 }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: "Economic Performance & Market Access",
+                icon: "📊",
+                questions: [
+                    {
+                        id: "prices",
+                        question: "How do you get market price information?",
+                        options: [
+                            { value: "real-time", label: "Real-time market data access", score: 3 },
+                            { value: "weekly", label: "Weekly market updates", score: 2 },
+                            { value: "buyers", label: "Information from buyers", score: 1 },
+                            { value: "limited", label: "Limited price information", score: 0 }
+                        ]
+                    },
+                    {
+                        id: "buyers",
+                        question: "How many regular buyers do you have?",
+                        options: [
+                            { value: "multiple-premium", label: "5+ buyers including premium markets", score: 3 },
+                            { value: "multiple", label: "3-5 regular buyers", score: 2 },
+                            { value: "few", label: "1-2 regular buyers", score: 1 },
+                            { value: "single", label: "Single buyer or irregular sales", score: 0 }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        function AssessmentApp() {
+            const [currentSection, setCurrentSection] = useState(0);
+            const [answers, setAnswers] = useState({});
+            const [showResults, setShowResults] = useState(false);
+
+            const totalQuestions = assessmentData.reduce((acc, section) => acc + section.questions.length, 0);
+            const answeredQuestions = Object.keys(answers).length;
+            const progress = Math.round((answeredQuestions / totalQuestions) * 100);
+
+            const handleAnswer = (questionId, option) => {
+                setAnswers(prev => ({
+                    ...prev,
+                    [questionId]: option
+                }));
+            };
+
+            const canProceed = () => {
+                const currentQuestions = assessmentData[currentSection].questions;
+                return currentQuestions.every(q => answers[q.id]);
+            };
+
+            const nextSection = () => {
+                if (currentSection < assessmentData.length - 1) {
+                    setCurrentSection(currentSection + 1);
+                } else {
+                    setShowResults(true);
+                }
+            };
+
+            const prevSection = () => {
+                if (currentSection > 0) {
+                    setCurrentSection(currentSection - 1);
+                }
+            };
+
+            const calculateScore = () => {
+                const totalScore = Object.values(answers).reduce((acc, answer) => acc + answer.score, 0);
+                const maxScore = totalQuestions * 3;
+                return Math.round((totalScore / maxScore) * 100);
+            };
+
+            const getRecommendations = (score) => {
+                const recs = [];
+                
+                if (score >= 80) {
+                    recs.push("🎉 Excellent! You're ready for premium market certification.");
+                } else if (score >= 60) {
+                    recs.push("✅ Good foundation. Ready for implementation toolkit.");
+                } else {
+                    recs.push("🔧 Let's strengthen your foundation with basic improvements.");
+                }
+
+                // Check specific areas
+                if (answers.policy && answers.policy.score < 2) {
+                    recs.push("⚠️ Child protection policies need immediate attention.");
+                }
+                
+                if (answers.records && answers.records.score < 2) {
+                    recs.push("💾 Improve data security and record keeping systems.");
+                }
+
+                if (answers.financial && answers.financial.score < 2) {
+                    recs.push("💰 Strengthen financial security measures.");
+                }
+
+                return recs;
+            };
+
+            if (showResults) {
+                const score = calculateScore();
+                const recommendations = getRecommendations(score);
+
+                return React.createElement('div', { className: 'assessment-card results' },
+                    React.createElement('h2', { className: 'section-title' }, 'Your Assessment Results'),
+                    React.createElement('div', { className: 'score-circle' },
+                        React.createElement('div', { className: 'score-inner' }, score + '%')
+                    ),
+                    React.createElement('h3', { 
+                        style: { color: '#166534', marginBottom: '1rem' } 
+                    }, 'Overall Readiness Score'),
+                    React.createElement('p', { 
+                        style: { color: '#64748b', marginBottom: '2rem' } 
+                    }, score >= 80 ? 'Premium market ready!' :
+                       score >= 60 ? 'Good - toolkit recommended' :
+                       'Foundational improvements needed'),
+                    React.createElement('div', { className: 'recommendations' },
+                        React.createElement('h4', null, 'Recommendations:'),
+                        ...recommendations.map((rec, index) =>
+                            React.createElement('div', { key: index, className: 'recommendation' }, rec)
+                        )
+                    ),
+                    React.createElement('div', { className: 'cta' },
+                        React.createElement('h3', null, 'Ready for Next Steps?'),
+                        React.createElement('p', { style: { marginBottom: '1.5rem' } },
+                            score >= 60 ? 
+                                'Access our implementation toolkit with step-by-step guidance.' :
+                                'Start with our foundation-building tools and support.'
+                        ),
+                        React.createElement('button', { 
+                            className: 'cta-button',
+                            onClick: () => alert('Implementation toolkit coming soon!')
+                        }, '🛠️ Access Toolkit'),
+                        React.createElement('button', { 
+                            className: 'cta-button',
+                            onClick: () => alert('Expert consultation coming soon!')
+                        }, '📞 Speak with Expert')
+                    )
+                );
+            }
+
+            const section = assessmentData[currentSection];
+
+            return React.createElement('div', null,
+                React.createElement('div', { className: 'progress-bar' },
+                    React.createElement('div', { className: 'progress-text' },
+                        React.createElement('span', null, 'Assessment Progress'),
+                        React.createElement('span', null, progress + '% Complete')
+                    ),
+                    React.createElement('div', { 
+                        style: { background: '#e2e8f0', height: '8px', borderRadius: '4px' } 
+                    },
+                        React.createElement('div', { 
+                            className: 'progress-fill',
+                            style: { width: progress + '%' }
+                        })
+                    )
+                ),
+                React.createElement('div', { className: 'assessment-card' },
+                    React.createElement('h2', { className: 'section-title' },
+                        React.createElement('span', null, section.icon),
+                        section.title
+                    ),
+                    React.createElement('p', { className: 'section-subtitle' },
+                        'Section ' + (currentSection + 1) + ' of ' + assessmentData.length
+                    ),
+                    ...section.questions.map(question =>
+                        React.createElement('div', { 
+                            key: question.id,
+                            style: { marginBottom: '2rem' }
+                        },
+                            React.createElement('div', { className: 'question' }, question.question),
+                            React.createElement('div', { className: 'options' },
+                                ...question.options.map(option =>
+                                    React.createElement('div', {
+                                        key: option.value,
+                                        className: 'option' + (answers[question.id]?.value === option.value ? ' selected' : ''),
+                                        onClick: () => handleAnswer(question.id, option)
+                                    },
+                                        React.createElement('div', { className: 'radio' }),
+                                        React.createElement('span', null, option.label)
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: 'navigation' },
+                        React.createElement('button', {
+                            className: 'btn btn-secondary',
+                            onClick: prevSection,
+                            disabled: currentSection === 0
+                        }, '← Previous'),
+                        React.createElement('span', { 
+                            style: { color: '#64748b' } 
+                        }, (currentSection + 1) + ' of ' + assessmentData.length),
+                        React.createElement('button', {
+                            className: 'btn btn-primary',
+                            onClick: nextSection,
+                            disabled: !canProceed()
+                        }, currentSection === assessmentData.length - 1 ? 'Complete' : 'Next →')
+                    )
+                )
+            );
+        }
+
+        ReactDOM.render(React.createElement(AssessmentApp), document.getElementById('app'));
+    </script>
+</body>
+</html>

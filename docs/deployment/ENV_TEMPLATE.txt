@@ -1,0 +1,19 @@
+# AgroSoluce Environment Variables Template
+# Copy these variables to your .env file or Vercel dashboard
+
+# Supabase Configuration (Database 3)
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_SCHEMA=agrosoluce
+
+# Application Configuration
+VITE_APP_URL=http://localhost:5173
+VITE_ENVIRONMENT=development
+
+# Instructions:
+# 1. For local development: Create a .env file in the root directory with these variables
+# 2. For Vercel: Add these as environment variables in the Vercel dashboard
+#    - Go to Project Settings > Environment Variables
+#    - Add each variable for Production, Preview, and Development environments
+#    - Make sure VITE_SUPABASE_SCHEMA is set to "agrosoluce"
+

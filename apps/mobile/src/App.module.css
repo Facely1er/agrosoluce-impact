@@ -1,0 +1,64 @@
+.container {
+  min-height: 100vh;
+  background-color: #FFFFFF;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  margin-top: 40px;
+  text-align: center;
+  color: #246628;
+  max-width: 600px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #757575;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.infoBox {
+  text-align: left;
+  background-color: #F5F5F5;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.infoTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #246628;
+}
+
+.infoList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.infoItem {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #424242;
+}
+
+.status {
+  font-size: 14px;
+  color: #757575;
+  margin-top: 24px;
+  font-style: italic;
+}
+

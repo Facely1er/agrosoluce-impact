@@ -1,0 +1,32 @@
+{
+  "name": "agrosoluce-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace apps/web",
+    "build:web": "npm run build --workspace apps/web",
+    "preview:web": "npm run preview --workspace apps/web",
+    "dev": "npm run dev:web",
+    "build": "npm run build:web",
+    "preview": "npm run preview:web",
+    "lint": "npm run lint --workspace apps/web",
+    "typecheck": "npm run typecheck --workspace apps/web",
+    "clean": "rm -rf node_modules apps/**/node_modules packages/**/node_modules build apps/**/build packages/**/build",
+    "turbo": "turbo",
+    "_comment_mobile": "Mobile app scripts (separate build - run from apps/mobile/ or use workspace commands)",
+    "dev:mobile": "npm run dev --workspace apps/mobile",
+    "build:mobile": "npm run build --workspace apps/mobile",
+    "preview:mobile": "npm run preview --workspace apps/mobile"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
