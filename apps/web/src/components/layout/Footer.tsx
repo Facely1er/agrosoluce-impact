@@ -45,7 +45,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  to="/cooperatives" 
+                  to="/directory" 
                   className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-1"
                 >
                   <UsersRound className="h-3 w-3" />

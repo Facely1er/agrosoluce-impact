@@ -141,7 +141,7 @@ export default function CooperativeLandingPage({ cooperativeId }: CooperativeLan
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/cooperatives"
+              to="/directory"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
             >
               {t.cooperativeWorkspaceLanding.cta.register}
@@ -166,7 +166,7 @@ export default function CooperativeLandingPage({ cooperativeId }: CooperativeLan
           </p>
           <p className="text-sm text-gray-500">
             {t.cooperativeWorkspaceLanding.additional.errorMessage}{' '}
-            <Link to="/cooperatives" className="text-primary-600 hover:text-primary-700 underline">
+            <Link to="/directory" className="text-primary-600 hover:text-primary-700 underline">
               {t.cooperativeWorkspaceLanding.additional.checkDirectory}
             </Link>
             {' '}to find your cooperative.

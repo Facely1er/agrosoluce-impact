@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -14,8 +14,6 @@ const BuyerRequestForm = lazy(() => import('./pages/buyer/BuyerRequestForm'));
 const BuyerMatches = lazy(() => import('./pages/buyer/BuyerMatches'));
 const BuyerLandingPage = lazy(() => import('./pages/buyer/BuyerLandingPage'));
 const AboutPage = lazy(() => import('./pages/about/AboutPage'));
-const WhatWeDoPage = lazy(() => import('./pages/about/WhatWeDoPage'));
-const WhoItsForPage = lazy(() => import('./pages/about/WhoItsForPage'));
 const PartnerLandingPage = lazy(() => import('./pages/partners/PartnerLandingPage'));
 const CooperativeDashboard = lazy(() => import('./pages/cooperative/CooperativeDashboard'));
 const FarmersFirstDashboard = lazy(() => import('./pages/cooperative/FarmersFirstDashboard'));
@@ -64,43 +62,51 @@ function App() {
         <main className="flex-grow">
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
+            {/* Core Routes */}
             <Route path="/" element={<HomePage />} />
-            <Route path="/cooperatives" element={<CooperativeDirectory />} />
-            <Route path="/cooperatives/:id" element={<CooperativeProfile />} />
+            
+            {/* Cooperative Directory */}
             <Route path="/directory" element={<DirectoryPage />} />
             <Route path="/directory/:coop_id" element={<DirectoryDetailPage />} />
+            
+            {/* Health & Impact Analysis (Primary Feature) */}
+            <Route path="/health-impact" element={<CooperativeWorkspace />} />
             <Route path="/workspace/:coop_id" element={<CooperativeWorkspace />} />
-            <Route path="/pilot" element={<PilotListingPage />} />
-            <Route path="/pilot/:pilot_id" element={<PilotDashboardPage />} />
-            <Route path="/buyers" element={<BuyerLandingPage />} />
-            <Route path="/buyer" element={<BuyerPortal />} />
-            <Route path="/buyer/request" element={<BuyerRequestForm />} />
-            <Route path="/buyer/requests/:requestId/matches" element={<BuyerMatches />} />
-            <Route path="/buyer/*" element={<BuyerPortal />} />
-            <Route path="/partners" element={<PartnerLandingPage />} />
-            <Route path="/ngos" element={<PartnerLandingPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/what-we-do" element={<WhatWeDoPage />} />
-            <Route path="/who-its-for" element={<WhoItsForPage />} />
-            <Route path="/cooperative/*" element={<CooperativeDashboard />} />
-            <Route path="/cooperative/:id/farmers-first" element={<FarmersFirstDashboard />} />
-            <Route path="/principles/farmer-protection" element={<FarmerProtectionPage />} />
-            <Route path="/regulatory-references" element={<RegulatoryReferencesPage />} />
-            <Route path="/references/ngo" element={<NGORegistryPage />} />
-            <Route path="/governance/due-care" element={<DueCarePrinciplesPage />} />
-            <Route
-              path="/monitoring"
-              element={
-                <ErrorBoundary>
-                  <MonitoringPage />
-                </ErrorBoundary>
-              }
-            />
+            
+            {/* VRAC Regional Analysis */}
             <Route
               path="/vrac"
               element={
                 <ErrorBoundary>
                   <VracAnalysisPage />
+                </ErrorBoundary>
+              }
+            />
+            
+            {/* Pilot Programs */}
+            <Route path="/pilot" element={<PilotListingPage />} />
+            <Route path="/pilot/:pilot_id" element={<PilotDashboardPage />} />
+            
+            {/* About (Consolidated) */}
+            <Route path="/about" element={<AboutPage />} />
+            
+            {/* Buyer Portal (Secondary) */}
+            <Route path="/buyer" element={<BuyerPortal />} />
+            <Route path="/buyer/request" element={<BuyerRequestForm />} />
+            <Route path="/buyer/requests/:requestId/matches" element={<BuyerMatches />} />
+            <Route path="/buyer/*" element={<BuyerPortal />} />
+            <Route path="/buyers" element={<BuyerLandingPage />} />
+            
+            {/* Partners (Secondary) */}
+            <Route path="/partners" element={<PartnerLandingPage />} />
+            <Route path="/ngos" element={<PartnerLandingPage />} />
+            
+            {/* Compliance Tools (Secondary) */}
+            <Route
+              path="/monitoring"
+              element={
+                <ErrorBoundary>
+                  <MonitoringPage />
                 </ErrorBoundary>
               }
             />
@@ -136,6 +142,22 @@ function App() {
                 </ErrorBoundary>
               }
             />
+            
+            {/* Reference Pages */}
+            <Route path="/principles/farmer-protection" element={<FarmerProtectionPage />} />
+            <Route path="/regulatory-references" element={<RegulatoryReferencesPage />} />
+            <Route path="/references/ngo" element={<NGORegistryPage />} />
+            <Route path="/governance/due-care" element={<DueCarePrinciplesPage />} />
+            
+            {/* REDIRECTS for deprecated routes */}
+            <Route path="/cooperatives" element={<Navigate to="/directory" replace />} />
+            <Route path="/cooperatives/:id" element={<Navigate to="/directory/:id" replace />} />
+            <Route path="/cooperative/*" element={<Navigate to="/workspace/:id" replace />} />
+            <Route path="/cooperative/:id/farmers-first" element={<Navigate to="/workspace/:id" replace />} />
+            <Route path="/what-we-do" element={<Navigate to="/about?tab=what-we-do" replace />} />
+            <Route path="/who-its-for" element={<Navigate to="/about?tab=who-its-for" replace />} />
+            
+            {/* 404 */}
             <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>

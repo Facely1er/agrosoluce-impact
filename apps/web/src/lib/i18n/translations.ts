@@ -17,6 +17,10 @@ export interface Translations {
     about: string;
     more: string;
     workforceHealth?: string;
+    healthImpact: string;
+    regionalAnalysis: string;
+    complianceTools: string;
+    pilotPrograms: string;
     main: string;
     theme: string;
     language: string;
@@ -920,6 +924,10 @@ export const translations: Record<Language, Translations> = {
       cooperativeSpace: 'Cooperative Space',
       compliance: 'Monitoring',
       workforceHealth: 'Workforce Health',
+      healthImpact: 'Health & Impact',
+      regionalAnalysis: 'Regional Analysis',
+      complianceTools: 'Compliance Tools',
+      pilotPrograms: 'Pilot Programs',
       partners: 'Partners & NGOs',
       about: 'About',
       more: 'More',
@@ -1835,6 +1843,10 @@ export const translations: Record<Language, Translations> = {
       cooperativeSpace: 'Espace Coopérative',
       compliance: 'Suivi',
       workforceHealth: 'Santé des Travailleurs',
+      healthImpact: 'Santé & Impact',
+      regionalAnalysis: 'Analyse Régionale',
+      complianceTools: 'Outils de Conformité',
+      pilotPrograms: 'Programmes Pilotes',
       partners: 'Partenaires & ONG',
       about: 'À Propos',
       more: 'Plus',

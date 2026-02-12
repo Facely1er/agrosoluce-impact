@@ -202,7 +202,7 @@ export default function AboutPage() {
         <section className="mt-12 text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/cooperatives"
+              to="/directory"
               className="bg-primary-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary-700 transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
             >
               {t.about.cta.explore}

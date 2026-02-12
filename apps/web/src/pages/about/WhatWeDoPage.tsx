@@ -198,7 +198,7 @@ export default function WhatWeDoPage() {
         {/* CTA */}
         <div className="mt-12 text-center">
           <Link
-            to="/cooperatives"
+            to="/directory"
             className="inline-flex items-center gap-2 bg-primary-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl"
           >
             {t.whatWeDo.cta}

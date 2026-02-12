@@ -98,7 +98,7 @@ export default function BuyerPortal() {
         {/* Main Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Link
-            to="/cooperatives"
+            to="/directory"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border-l-4 border-primary-500 group transform hover:-translate-y-1"
           >
             <div className="flex items-center gap-4 mb-4">

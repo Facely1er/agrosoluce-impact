@@ -238,7 +238,7 @@ export default function HomePage() {
                 size="lg"
                 className="group"
               >
-                <Link to="/cooperatives">
+                <Link to="/directory">
                   {t.landing.hero.ctaCooperatives}
                   <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -632,7 +632,7 @@ export default function HomePage() {
               size="lg"
               className="group"
             >
-              <Link to="/cooperatives">
+              <Link to="/directory">
                 {t.landing.cta.buttonCooperatives}
                 <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>

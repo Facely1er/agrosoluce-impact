@@ -241,7 +241,7 @@ export default function PartnerLandingPage() {
               <ArrowRight className="h-5 w-5" />
             </Link>
             <Link
-              to="/cooperatives"
+              to="/directory"
               className="bg-white text-green-600 border-2 border-green-600 px-8 py-4 rounded-lg font-semibold hover:bg-green-50 transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
             >
               {t.partnerLanding.cta.explore}
