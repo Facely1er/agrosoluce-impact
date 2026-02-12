@@ -9,11 +9,15 @@ import {
   LineChart,
   Users,
   Target,
-  Zap
+  Zap,
+  Heart,
+  Sprout,
+  Shield
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import { Button, Card, CardContent, Badge } from '@/components/ui';
+import { FrameworkComplianceBadge } from '@/components/framework';
 
 export default function HealthImpactOverview() {
   const { t } = useI18n();
@@ -65,7 +69,7 @@ export default function HealthImpactOverview() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-health-50 via-wellness-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[
@@ -75,10 +79,17 @@ export default function HealthImpactOverview() {
 
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <Badge variant="primary" size="lg" className="mb-6">
-            <Activity className="h-4 w-4 mr-2" />
-            Health-Agriculture Impact Analysis
-          </Badge>
+          <div className="flex flex-col items-center gap-4 mb-6">
+            <Badge variant="primary" size="lg" className="bg-health-100 text-health-700 border-health-300">
+              <Activity className="h-4 w-4 mr-2" />
+              Health-Agriculture Impact Analysis
+            </Badge>
+            <FrameworkComplianceBadge
+              version="1.0"
+              status="partial"
+              size="md"
+            />
+          </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-gray-900 dark:text-white">
             The Human Health Signal in Agricultural Productivity
           </h1>
@@ -104,9 +115,9 @@ export default function HealthImpactOverview() {
                     Traditional satellite monitoring tracks forest cover and land use, but it can't detect the 
                     human health factors that directly impact production capacity.
                   </p>
-                  <div className="bg-primary-50 dark:bg-primary-900/30 p-6 rounded-lg border-l-4 border-primary-600">
+                  <div className="bg-health-50 dark:bg-health-900/30 p-6 rounded-lg border-l-4 border-health-600">
                     <div className="flex items-start gap-3">
-                      <Zap className="h-6 w-6 text-primary-600 flex-shrink-0 mt-1" />
+                      <Heart className="h-6 w-6 text-health-600 flex-shrink-0 mt-1" />
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Key Insight</h3>
                         <p className="text-gray-700 dark:text-gray-300">
@@ -117,29 +128,32 @@ export default function HealthImpactOverview() {
                     </div>
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-900/30 dark:to-teal-900/30 p-8 rounded-xl">
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">The Data Source</h3>
+                <div className="bg-gradient-to-br from-health-50 to-vitality-50 dark:from-health-900/30 dark:to-vitality-900/30 p-8 rounded-xl">
+                  <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+                    <Sprout className="h-6 w-6 text-wellness-600" />
+                    The Data Source
+                  </h3>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
-                      <div className="w-2 h-2 rounded-full bg-teal-600 mt-2 flex-shrink-0"></div>
+                      <div className="w-2 h-2 rounded-full bg-vitality-600 mt-2 flex-shrink-0"></div>
                       <span className="text-gray-700 dark:text-gray-300">
                         <strong>VRAC (Veille Régionale Anti-Contrefaçon)</strong> - Pharmacy surveillance network
                       </span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <div className="w-2 h-2 rounded-full bg-teal-600 mt-2 flex-shrink-0"></div>
+                      <div className="w-2 h-2 rounded-full bg-vitality-600 mt-2 flex-shrink-0"></div>
                       <span className="text-gray-700 dark:text-gray-300">
                         Tracks antimalarial sales across cocoa-producing regions
                       </span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <div className="w-2 h-2 rounded-full bg-teal-600 mt-2 flex-shrink-0"></div>
+                      <div className="w-2 h-2 rounded-full bg-vitality-600 mt-2 flex-shrink-0"></div>
                       <span className="text-gray-700 dark:text-gray-300">
                         Real-time proxy for workforce health burden
                       </span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <div className="w-2 h-2 rounded-full bg-teal-600 mt-2 flex-shrink-0"></div>
+                      <div className="w-2 h-2 rounded-full bg-vitality-600 mt-2 flex-shrink-0"></div>
                       <span className="text-gray-700 dark:text-gray-300">
                         Complements satellite and weather data
                       </span>
@@ -218,8 +232,8 @@ export default function HealthImpactOverview() {
                 <Card key={feature.title} className="hover:shadow-xl transition-all">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4 mb-4">
-                      <div className="bg-primary-100 dark:bg-primary-900/30 p-3 rounded-lg">
-                        <Icon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+                      <div className="bg-health-100 dark:bg-health-900/30 p-3 rounded-lg">
+                        <Icon className="h-6 w-6 text-health-600 dark:text-health-400" />
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
@@ -230,7 +244,7 @@ export default function HealthImpactOverview() {
                         </p>
                         <Link 
                           to={feature.link}
-                          className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium inline-flex items-center gap-2"
+                          className="text-health-600 dark:text-health-400 hover:text-health-700 dark:hover:text-health-300 font-medium inline-flex items-center gap-2"
                         >
                           {feature.linkText}
                           <ArrowRight className="h-4 w-4" />
@@ -246,14 +260,15 @@ export default function HealthImpactOverview() {
 
         {/* Business Value Section */}
         <section className="mb-16">
-          <Card className="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 border-green-200 dark:border-green-800">
+          <Card className="bg-gradient-to-br from-wellness-50 to-health-50 dark:from-wellness-900/20 dark:to-health-900/20 border-wellness-200 dark:border-wellness-800">
             <CardContent className="p-8 md:p-12">
-              <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+              <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-3">
+                <Shield className="h-8 w-8 text-wellness-600" />
                 Business Value
               </h2>
               <div className="grid md:grid-cols-3 gap-8">
                 <div>
-                  <Target className="h-10 w-10 text-green-600 mb-4" />
+                  <Target className="h-10 w-10 text-wellness-600 mb-4" />
                   <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
                     For Commodity Traders
                   </h3>
@@ -262,7 +277,7 @@ export default function HealthImpactOverview() {
                   </p>
                 </div>
                 <div>
-                  <LineChart className="h-10 w-10 text-green-600 mb-4" />
+                  <LineChart className="h-10 w-10 text-wellness-600 mb-4" />
                   <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
                     For Processors
                   </h3>
@@ -271,7 +286,7 @@ export default function HealthImpactOverview() {
                   </p>
                 </div>
                 <div>
-                  <Users className="h-10 w-10 text-green-600 mb-4" />
+                  <Users className="h-10 w-10 text-wellness-600 mb-4" />
                   <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
                     For Supply Chain Managers
                   </h3>
