@@ -20,6 +20,7 @@ const FarmersFirstDashboard = lazy(() => import('./pages/cooperative/FarmersFirs
 const DirectoryPage = lazy(() => import('./pages/directory/DirectoryPage'));
 const DirectoryDetailPage = lazy(() => import('./pages/directory/DirectoryDetailPage'));
 const CooperativeWorkspace = lazy(() => import('./pages/workspace/CooperativeWorkspace'));
+const HealthImpactOverview = lazy(() => import('./pages/health-impact/HealthImpactOverview'));
 const PilotListingPage = lazy(() => import('./pages/pilot/PilotListingPage'));
 const PilotDashboardPage = lazy(() => import('./pages/pilot/PilotDashboardPage'));
 const FarmerProtectionPage = lazy(() => import('./pages/principles/FarmerProtectionPage'));
@@ -70,7 +71,7 @@ function App() {
             <Route path="/directory/:coop_id" element={<DirectoryDetailPage />} />
             
             {/* Health & Impact Analysis (Primary Feature) */}
-            <Route path="/health-impact" element={<CooperativeWorkspace />} />
+            <Route path="/health-impact" element={<HealthImpactOverview />} />
             <Route path="/workspace/:coop_id" element={<CooperativeWorkspace />} />
             
             {/* VRAC Regional Analysis */}
