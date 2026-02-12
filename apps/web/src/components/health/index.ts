@@ -6,3 +6,5 @@
 export { HealthIndexTrendChart } from './HealthIndexTrendChart';
 export { TimeLagCorrelationTimeline } from './TimeLagCorrelationTimeline';
 export { RegionalHealthComparison } from './RegionalHealthComparison';
+export { HealthIndicatorsDashboard } from './HealthIndicatorsDashboard';
+export type { HealthIndicator, HealthIndicatorsDashboardProps } from './HealthIndicatorsDashboard';
