@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -33,6 +33,25 @@ const AssessmentPage = lazy(() => import('./pages/assessment'));
 const MonitoringPage = lazy(() => import('./pages/monitoring/MonitoringPage'));
 const VracAnalysisPage = lazy(() => import('./pages/vrac/VracAnalysisPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+
+// Redirect components for deprecated routes
+function RedirectCooperativeId() {
+  const { id } = useParams();
+  return <Navigate to={`/directory/${id}`} replace />;
+}
+
+function RedirectCooperativeWildcard() {
+  const { '*': wildcardPath } = useParams();
+  // Extract ID if present in the wildcard path
+  const pathSegments = wildcardPath?.split('/') || [];
+  const id = pathSegments[0] || '';
+  return <Navigate to={`/workspace/${id}`} replace />;
+}
+
+function RedirectCooperativeFarmersFirst() {
+  const { id } = useParams();
+  return <Navigate to={`/workspace/${id}`} replace />;
+}
 
 // Loading component
 const LoadingSpinner = () => (
@@ -152,9 +171,9 @@ function App() {
             
             {/* REDIRECTS for deprecated routes */}
             <Route path="/cooperatives" element={<Navigate to="/directory" replace />} />
-            <Route path="/cooperatives/:id" element={<Navigate to="/directory/:id" replace />} />
-            <Route path="/cooperative/*" element={<Navigate to="/workspace/:id" replace />} />
-            <Route path="/cooperative/:id/farmers-first" element={<Navigate to="/workspace/:id" replace />} />
+            <Route path="/cooperatives/:id" element={<RedirectCooperativeId />} />
+            <Route path="/cooperative/*" element={<RedirectCooperativeWildcard />} />
+            <Route path="/cooperative/:id/farmers-first" element={<RedirectCooperativeFarmersFirst />} />
             <Route path="/what-we-do" element={<Navigate to="/about?tab=what-we-do" replace />} />
             <Route path="/who-its-for" element={<Navigate to="/about?tab=who-its-for" replace />} />
             
