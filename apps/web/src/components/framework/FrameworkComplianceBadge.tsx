@@ -54,7 +54,11 @@ export function FrameworkComplianceBadge({
   };
 
   return (
-    <div className="inline-flex items-center gap-2">
+    <div 
+      className="inline-flex items-center gap-2"
+      role="status"
+      aria-label={`Framework version ${version}: ${config.label}`}
+    >
       <div
         className={`
           inline-flex items-center gap-1.5 rounded-lg border font-medium
@@ -62,12 +66,15 @@ export function FrameworkComplianceBadge({
           ${showTooltip ? 'cursor-help' : ''}
         `}
         title={showTooltip ? config.description : undefined}
+        aria-describedby={showTooltip ? `framework-desc-${status}` : undefined}
       >
-        <Icon className={size === 'sm' ? 'h-3 w-3' : size === 'lg' ? 'h-5 w-5' : 'h-4 w-4'} />
+        <Icon className={size === 'sm' ? 'h-3 w-3' : size === 'lg' ? 'h-5 w-5' : 'h-4 w-4'} aria-hidden="true" />
         <span>Framework v{version}</span>
       </div>
       {size !== 'sm' && (
-        <span className="text-xs text-gray-500 dark:text-gray-400">{config.label}</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400" id={`framework-desc-${status}`}>
+          {config.label}
+        </span>
       )}
     </div>
   );
@@ -102,8 +109,11 @@ export function FrameworkTooltip({ term, definition, category = 'general' }: Fra
         ${categoryColors[category]}
       `}
       title={definition}
+      role="tooltip"
+      aria-label={`${term}: ${definition}`}
+      tabIndex={0}
     >
-      <Info className="h-3 w-3" />
+      <Info className="h-3 w-3" aria-hidden="true" />
       {term}
     </span>
   );

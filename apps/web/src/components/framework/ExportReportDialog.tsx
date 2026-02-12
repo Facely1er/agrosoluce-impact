@@ -36,27 +36,47 @@ export function ExportReportDialog({ isOpen, onClose, cooperativeName }: ExportR
     }, 2000);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      onKeyDown={handleKeyDown}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="export-dialog-title"
+      aria-describedby="export-dialog-description"
+    >
       <Card className="max-w-2xl w-full">
         <CardContent className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="bg-health-100 p-3 rounded-lg">
-                <Download className="h-6 w-6 text-health-600" />
+                <Download className="h-6 w-6 text-health-600" aria-hidden="true" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Export Health Impact Report</h2>
+                <h2 id="export-dialog-title" className="text-2xl font-bold text-gray-900">
+                  Export Health Impact Report
+                </h2>
                 {cooperativeName && (
-                  <p className="text-sm text-gray-600">For: {cooperativeName}</p>
+                  <p id="export-dialog-description" className="text-sm text-gray-600">
+                    For: {cooperativeName}
+                  </p>
                 )}
               </div>
             </div>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
-              aria-label="Close"
+              aria-label="Close dialog"
             >
               <X className="h-6 w-6" />
             </button>

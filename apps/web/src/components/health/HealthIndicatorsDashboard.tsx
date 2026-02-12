@@ -119,9 +119,9 @@ export function HealthIndicatorsDashboard({ indicators = mockIndicators }: Healt
   const categories = Array.from(new Set(indicators.map((i) => i.category)));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" role="region" aria-label="Health Indicators Dashboard">
       {/* Category Filter */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Health indicator categories">
         <button
           onClick={() => setSelectedCategory(null)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -129,6 +129,9 @@ export function HealthIndicatorsDashboard({ indicators = mockIndicators }: Healt
               ? 'bg-gray-900 text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
+          role="tab"
+          aria-selected={selectedCategory === null}
+          aria-controls="indicators-panel"
         >
           All Indicators
         </button>
@@ -144,8 +147,12 @@ export function HealthIndicatorsDashboard({ indicators = mockIndicators }: Healt
                   ? `${config.bgColor} ${config.color}`
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
+              role="tab"
+              aria-selected={selectedCategory === category}
+              aria-controls="indicators-panel"
+              aria-label={config.label}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4" aria-hidden="true" />
               {config.label}
             </button>
           );
@@ -153,7 +160,12 @@ export function HealthIndicatorsDashboard({ indicators = mockIndicators }: Healt
       </div>
 
       {/* Indicators Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div 
+        className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+        id="indicators-panel"
+        role="tabpanel"
+        aria-label={selectedCategory ? `${selectedCategory} indicators` : 'All health indicators'}
+      >
         {filteredIndicators.map((indicator) => {
           const config = categoryConfig[indicator.category];
           const Icon = config.icon;
@@ -175,16 +187,26 @@ export function HealthIndicatorsDashboard({ indicators = mockIndicators }: Healt
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className={`${config.bgColor} p-3 rounded-lg`}>
-                    <Icon className={`h-6 w-6 ${config.color}`} />
+                    <Icon className={`h-6 w-6 ${config.color}`} aria-hidden="true" />
                   </div>
-                  <span className="text-2xl" title={`Trend: ${indicator.trend}`}>
+                  <span 
+                    className="text-2xl" 
+                    title={`Trend: ${indicator.trend}`}
+                    aria-label={`Trend: ${indicator.trend}`}
+                  >
                     {trendIcons[indicator.trend]}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{indicator.name}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {indicator.name}
+                </h3>
                 <div className="text-3xl font-bold text-gray-900 mb-2">
-                  {indicator.value}
-                  <span className="text-lg text-gray-600 ml-1">{indicator.unit}</span>
+                  <span aria-label={`${indicator.value} ${indicator.unit}`}>
+                    {indicator.value}
+                  </span>
+                  <span className="text-lg text-gray-600 ml-1" aria-hidden="true">
+                    {indicator.unit}
+                  </span>
                 </div>
                 <p className="text-sm text-gray-600">{indicator.description}</p>
                 <div className="mt-4 pt-4 border-t border-gray-200">
