@@ -65,6 +65,35 @@ export default function CooperativeProfile() {
   const sector = cooperative.sector || cooperative.secteur || '';
   const department = cooperative.department || cooperative.departement;
 
+  // Helper function to get regional health index based on region
+  const getRegionalHealthIndex = (region?: string): number => {
+    if (!region) return 50; // Default moderate
+    if (region === 'Gontougo') return 72;
+    if (region.includes('Abidjan')) return 45;
+    return 58; // Default for other regions
+  };
+
+  const healthIndex = getRegionalHealthIndex(cooperative.region);
+
+  const getHealthSeverity = (index: number): 'High' | 'Moderate' | 'Low' => {
+    if (index >= 70) return 'High';
+    if (index >= 50) return 'Moderate';
+    return 'Low';
+  };
+
+  const getHealthSeverityClass = (severity: 'High' | 'Moderate' | 'Low'): string => {
+    switch (severity) {
+      case 'High':
+        return 'bg-red-100 text-red-700';
+      case 'Moderate':
+        return 'bg-amber-100 text-amber-700';
+      case 'Low':
+        return 'bg-green-100 text-green-700';
+    }
+  };
+
+  const healthSeverity = getHealthSeverity(healthIndex);
+
   return (
     <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -256,25 +285,10 @@ export default function CooperativeProfile() {
                         <div className="flex-1">
                           <div className="flex items-baseline gap-2">
                             <span className="text-2xl font-bold text-red-600">
-                              {cooperative.region === 'Gontougo' ? '72' : 
-                               cooperative.region?.includes('Abidjan') ? '45' : '58'}/100
+                              {healthIndex}/100
                             </span>
-                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                              (cooperative.region === 'Gontougo' ? 72 : 
-                               cooperative.region?.includes('Abidjan') ? 45 : 58) >= 70 
-                                ? 'bg-red-100 text-red-700' 
-                                : (cooperative.region === 'Gontougo' ? 72 : 
-                                   cooperative.region?.includes('Abidjan') ? 45 : 58) >= 50 
-                                  ? 'bg-amber-100 text-amber-700' 
-                                  : 'bg-green-100 text-green-700'
-                            }`}>
-                              {(cooperative.region === 'Gontougo' ? 72 : 
-                                cooperative.region?.includes('Abidjan') ? 45 : 58) >= 70 
-                                 ? 'High' 
-                                 : (cooperative.region === 'Gontougo' ? 72 : 
-                                    cooperative.region?.includes('Abidjan') ? 45 : 58) >= 50 
-                                   ? 'Moderate' 
-                                   : 'Low'}
+                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${getHealthSeverityClass(healthSeverity)}`}>
+                              {healthSeverity}
                             </span>
                           </div>
                           <p className="text-xs text-gray-600 mt-1">Malaria burden indicator</p>

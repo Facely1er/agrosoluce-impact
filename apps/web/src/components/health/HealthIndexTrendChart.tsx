@@ -65,8 +65,8 @@ export function HealthIndexTrendChart({ pharmacyIds }: HealthIndexTrendChartProp
           month: item.periodLabel.split(' ')[0], // Extract month name for sorting
         };
       }
-      // Store antimalarial share as percentage
-      byPeriod[key][item.pharmacyId] = (item.antimalarialShare * 100).toFixed(2);
+      // Store antimalarial share as percentage (number, not string)
+      byPeriod[key][item.pharmacyId] = item.antimalarialShare * 100;
     }
 
     // Sort by year and month
@@ -109,8 +109,8 @@ export function HealthIndexTrendChart({ pharmacyIds }: HealthIndexTrendChartProp
   const pharmacyLabels: Record<string, string> = {
     tanda: 'Tanda (Gontougo)',
     prolife: 'Prolife (Gontougo)',
-    olympique: 'Olympique (La Mé)',
-    attobrou: 'Attobrou (Abidjan)',
+    olympique: 'Olympique (Abidjan)',
+    attobrou: 'Attobrou (La Mé)',
   };
 
   if (loading) {

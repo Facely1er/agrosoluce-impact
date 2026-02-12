@@ -76,7 +76,7 @@ export default function VracAnalysisPage() {
         byKey[key] = { period: p.periodLabel, year: p.year };
       }
       if (viewType === 'share') {
-        byKey[key][p.pharmacyId] = (p.antimalarialShare * 100).toFixed(2);
+        byKey[key][p.pharmacyId] = p.antimalarialShare * 100; // Store as number, format in tooltip
       } else {
         byKey[key][p.pharmacyId] = p.antimalarialQuantity;
       }
