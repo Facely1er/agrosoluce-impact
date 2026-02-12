@@ -17,6 +17,10 @@ export interface Translations {
     about: string;
     more: string;
     workforceHealth?: string;
+    healthImpact: string;
+    regionalAnalysis: string;
+    complianceTools: string;
+    pilotPrograms: string;
     main: string;
     theme: string;
     language: string;
@@ -920,6 +924,10 @@ export const translations: Record<Language, Translations> = {
       cooperativeSpace: 'Cooperative Space',
       compliance: 'Monitoring',
       workforceHealth: 'Workforce Health',
+      healthImpact: 'Health & Impact',
+      regionalAnalysis: 'Regional Analysis',
+      complianceTools: 'Compliance Tools',
+      pilotPrograms: 'Pilot Programs',
       partners: 'Partners & NGOs',
       about: 'About',
       more: 'More',
@@ -993,13 +1001,14 @@ export const translations: Record<Language, Translations> = {
     },
     landing: {
     hero: {
-      tagline: 'Farmers-First Due Diligence for Responsible Agricultural Sourcing',
-      title: 'AgroSoluce™',
-      subtitle: 'Making Farmer Engagement, Documentation Coverage, and Improvement Efforts Visible',
-      description: 'AgroSoluce™ helps cooperatives, buyers, and partners make farmer engagement, documentation coverage, and improvement efforts visible — without overstating readiness or replacing audits. We start from the farmer, structure reality at the cooperative level, and support credible EUDR-aligned due diligence across agricultural supply chains.',
-      ctaCooperatives: 'Explore Cooperatives',
+      tagline: 'Health-Agriculture Impact Analysis',
+      title: 'Revealing the Human Health Signal in Agricultural Productivity',
+      subtitle: 'Pharmacy surveillance data that complements satellite monitoring',
+      description: 'Malaria reduces harvest efficiency by 40-60%. We detect these surges weeks before production impact — helping traders, processors, and supply chain managers make informed decisions.',
+      ctaCooperatives: 'View Cooperatives',
+      ctaHealthData: 'Explore Regional Health Data',
       ctaBuyer: 'Buyer Portal',
-      freeNote: 'Free for cooperatives • Transparent • Progress-focused',
+      freeNote: 'Pharmacy surveillance • Academic research • Early warning signals',
     },
       stats: {
         productCategories: 'Product Categories',
@@ -1835,6 +1844,10 @@ export const translations: Record<Language, Translations> = {
       cooperativeSpace: 'Espace Coopérative',
       compliance: 'Suivi',
       workforceHealth: 'Santé des Travailleurs',
+      healthImpact: 'Santé & Impact',
+      regionalAnalysis: 'Analyse Régionale',
+      complianceTools: 'Outils de Conformité',
+      pilotPrograms: 'Programmes Pilotes',
       partners: 'Partenaires & ONG',
       about: 'À Propos',
       more: 'Plus',
@@ -1908,13 +1921,14 @@ export const translations: Record<Language, Translations> = {
     },
     landing: {
       hero: {
-        tagline: 'Autonomiser l\'Agriculture Durable en Afrique de l\'Ouest',
-        title: 'AgroSoluce™',
-        subtitle: 'Naviguer la Conformité Réglementaire, la Protection Environnementale et la Responsabilité Sociale',
-        description: 'Une plateforme axée sur la mission qui aide les coopératives ouest-africaines à répondre aux exigences de l\'EUDR, à lutter contre la déforestation, à éliminer le travail des enfants et à accéder aux marchés mondiaux tout en protégeant les moyens de subsistance des agriculteurs et en préservant notre planète.',
-        ctaCooperatives: 'Explorer les Coopératives',
+        tagline: 'Analyse d\'Impact Santé-Agriculture',
+        title: 'Révéler le Signal de Santé Humaine dans la Productivité Agricole',
+        subtitle: 'Données de surveillance pharmaceutique qui complètent la surveillance par satellite',
+        description: 'Le paludisme réduit l\'efficacité de récolte de 40-60%. Nous détectons ces poussées des semaines avant l\'impact sur la production — aidant les traders, transformateurs et gestionnaires de chaîne d\'approvisionnement à prendre des décisions éclairées.',
+        ctaCooperatives: 'Voir les Coopératives',
+        ctaHealthData: 'Explorer les Données de Santé Régionales',
         ctaBuyer: 'Espace Acheteur',
-        freeNote: 'Gratuit pour les coopératives • Sécurisé • Conforme aux réglementations',
+        freeNote: 'Surveillance pharmaceutique • Recherche académique • Signaux d\'alerte précoce',
       },
       stats: {
         productCategories: 'Catégories de Produits',

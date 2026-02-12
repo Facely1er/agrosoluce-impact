@@ -48,7 +48,7 @@ export default function CooperativeProfile() {
         <div className="text-center">
           <p className="text-gray-600 mb-4">Coopérative non trouvée</p>
           <Link
-            to="/cooperatives"
+            to="/directory"
             className="text-secondary-600 hover:text-secondary-700"
           >
             Retour à la liste

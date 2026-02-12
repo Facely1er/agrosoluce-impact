@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import { 
   Shield, 
   TrendingUp, 
@@ -24,22 +23,6 @@ import { Button, Card, CardContent, Badge } from '@/components/ui';
 
 export default function HomePage() {
   const { t } = useI18n();
-  const [carouselIndex, setCarouselIndex] = useState(0);
-
-  // Split description into carousel items
-  const carouselItems = [
-    t.landing.carousel.item1,
-    t.landing.carousel.item2,
-    t.landing.carousel.item3,
-  ];
-
-  // Auto-rotate carousel every 4 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCarouselIndex((prev) => (prev + 1) % carouselItems.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [carouselItems.length]);
 
   const outcomes = [
     {
@@ -220,16 +203,10 @@ export default function HomePage() {
               {t.landing.hero.title}
             </h1>
             <p className="text-xl md:text-2xl lg:text-3xl mb-4 text-white/95 font-medium">
-              {t.landing.heroSubtitle.line1}<br />
-              {t.landing.heroSubtitle.line2}
+              {t.landing.hero.subtitle}
             </p>
-            <div className="text-base md:text-lg lg:text-xl mb-10 text-white/85 max-w-3xl mx-auto leading-relaxed px-4 min-h-[4rem] md:min-h-[5rem] flex items-center justify-center">
-              <p 
-                key={carouselIndex}
-                className="animate-fade-in"
-              >
-                {carouselItems[carouselIndex]}
-              </p>
+            <div className="text-base md:text-lg lg:text-xl mb-10 text-white/85 max-w-3xl mx-auto leading-relaxed px-4">
+              <p>{t.landing.hero.description}</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8 px-4">
               <Button
@@ -238,8 +215,8 @@ export default function HomePage() {
                 size="lg"
                 className="group"
               >
-                <Link to="/cooperatives">
-                  {t.landing.hero.ctaCooperatives}
+                <Link to="/vrac">
+                  {t.landing.hero.ctaHealthData}
                   <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
@@ -249,8 +226,8 @@ export default function HomePage() {
                 size="lg"
                 className="group bg-secondary-600 hover:bg-secondary-700 border-2 border-secondary-400"
               >
-                <Link to="/buyers">
-                  {t.landing.hero.ctaBuyer}
+                <Link to="/directory">
+                  {t.landing.hero.ctaCooperatives}
                   <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
@@ -632,7 +609,7 @@ export default function HomePage() {
               size="lg"
               className="group"
             >
-              <Link to="/cooperatives">
+              <Link to="/directory">
                 {t.landing.cta.buttonCooperatives}
                 <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>

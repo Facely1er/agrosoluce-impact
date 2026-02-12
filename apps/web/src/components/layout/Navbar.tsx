@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { Home, UsersRound, Briefcase, User, Shield, Menu, X, Globe, Info, Handshake, Sun, Moon, Activity } from 'lucide-react';
+import { Home, UsersRound, Briefcase, User, Shield, Menu, X, Globe, Info, Handshake, Sun, Moon, Activity, TrendingUp, Target } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 import type { Language } from '@/lib/i18n/translations';
@@ -27,14 +27,18 @@ export default function Navbar() {
     exact: boolean;
     secondary?: boolean;
   }> = [
+    // PRIMARY NAVIGATION (Always visible)
     { to: '/', icon: Home, label: t.nav.home, exact: true },
-    { to: '/buyer', icon: Briefcase, label: t.nav.buyers, exact: false },
-    { to: '/partners', icon: Handshake, label: t.nav.partners, exact: false },
+    { to: '/directory', icon: UsersRound, label: t.nav.cooperatives, exact: false },
+    { to: '/health-impact', icon: Activity, label: t.nav.healthImpact, exact: false },
+    { to: '/vrac', icon: TrendingUp, label: t.nav.regionalAnalysis, exact: false },
     { to: '/about', icon: Info, label: t.nav.about, exact: false },
-    { to: '/cooperatives', icon: UsersRound, label: t.nav.cooperatives, exact: true, secondary: true },
-    { to: '/cooperative', icon: User, label: t.nav.cooperativeSpace, exact: false, secondary: true },
-    { to: '/monitoring', icon: Shield, label: t.nav.compliance, exact: false, secondary: true },
-    { to: '/vrac', icon: Activity, label: t.nav.workforceHealth || 'Workforce Health', exact: false, secondary: true },
+    
+    // SECONDARY NAVIGATION (Dropdown menu)
+    { to: '/buyer', icon: Briefcase, label: t.nav.buyers, exact: false, secondary: true },
+    { to: '/partners', icon: Handshake, label: t.nav.partners, exact: false, secondary: true },
+    { to: '/monitoring', icon: Shield, label: t.nav.complianceTools, exact: false, secondary: true },
+    { to: '/pilot', icon: Target, label: t.nav.pilotPrograms, exact: false, secondary: true },
   ];
 
   return (
