@@ -738,6 +738,32 @@ export interface Translations {
       exportEnablementData: string;
       exportingEnablement: string;
     };
+    regionalInsights: {
+      healthIndexTrend: string;
+      antimalarialShareByPharmacy: string;
+      malarialSurgePeriod: string;
+      harvestImpact: string;
+      timeLagCorrelation: string;
+      timeLagDescription: string;
+      regionalComparison: string;
+      regionalComparisonDesc: string;
+      exportCSV: string;
+      healthIndexBadge: string;
+      malarialBurdenIndicator: string;
+      basedOnPharmacyData: string;
+      viewDetailedInsights: string;
+      academicFoundation: string;
+      researchEvidence: string;
+      researchEvidenceDesc: string;
+      uniqueValue: string;
+      uniqueValueDesc: string;
+      avgAntimalarialShare: string;
+      peakMalariaMonths: string;
+      correlationStrength: string;
+      dataPoints: string;
+      methodology: string;
+      methodologyNote: string;
+    };
   };
 
   // Pilot
@@ -1704,6 +1730,32 @@ export const translations: Record<Language, Translations> = {
         exportEnablementData: 'Export Enablement Data',
         exportingEnablement: 'Exporting...',
       },
+      regionalInsights: {
+        healthIndexTrend: 'Health Index Trend (2020-2024)',
+        antimalarialShareByPharmacy: 'Antimalarial share by pharmacy - Higher values indicate increased malaria burden',
+        malarialSurgePeriod: 'Malaria Surge Period (Aug-Dec)',
+        harvestImpact: 'Harvest Efficiency Impact (Oct-Dec)',
+        timeLagCorrelation: 'Time-Lag Correlation Analysis',
+        timeLagDescription: 'Academic research demonstrates a 2-6 month lag between malaria surges and measurable production impacts in cocoa-growing regions.',
+        regionalComparison: 'Regional Health Comparison',
+        regionalComparisonDesc: 'Aggregated antimalarial share by region (2020-2024)',
+        exportCSV: 'Export CSV',
+        healthIndexBadge: 'Regional Health Index',
+        malarialBurdenIndicator: 'Malaria burden indicator',
+        basedOnPharmacyData: 'Based on regional pharmacy surveillance data (2020-2024). Higher scores indicate increased malaria burden.',
+        viewDetailedInsights: 'View detailed health insights',
+        academicFoundation: 'Academic Foundation',
+        researchEvidence: 'Research Evidence',
+        researchEvidenceDesc: 'Research demonstrates that malaria episodes cause 5-10 lost workdays per incident, with peak transmission overlapping critical pre-harvest periods.',
+        uniqueValue: 'Unique Value',
+        uniqueValueDesc: 'Human health signal that satellite data misses. Pharmacy surveillance provides monthly resolution for early warning of productivity challenges.',
+        avgAntimalarialShare: 'Avg. Antimalarial Share',
+        peakMalariaMonths: 'Peak Malaria Months',
+        correlationStrength: 'Correlation Strength',
+        dataPoints: 'Data Points',
+        methodology: 'Methodology',
+        methodologyNote: 'Regional health indices are calculated by averaging antimalarial share across all pharmacies within each region. Correlation strength is based on proximity to cocoa-growing areas and documented harvest impact studies.',
+      },
     },
     pilot: {
       backToDirectory: 'Back to Directory',
@@ -2592,6 +2644,32 @@ export const translations: Record<Language, Translations> = {
         viewFarmerProtectionPrinciples: 'Voir les Principes de Protection des Agriculteurs',
         exportEnablementData: 'Exporter les Données d\'Autonomisation',
         exportingEnablement: 'Exportation...',
+      },
+      regionalInsights: {
+        healthIndexTrend: 'Tendance de l\'Indice de Santé (2020-2024)',
+        antimalarialShareByPharmacy: 'Part des antipaludéens par pharmacie - Des valeurs plus élevées indiquent un fardeau paludique accru',
+        malarialSurgePeriod: 'Période de Pointe du Paludisme (Août-Déc)',
+        harvestImpact: 'Impact sur l\'Efficacité de la Récolte (Oct-Déc)',
+        timeLagCorrelation: 'Analyse de Corrélation avec Décalage Temporel',
+        timeLagDescription: 'La recherche académique démontre un décalage de 2 à 6 mois entre les poussées de paludisme et les impacts mesurables sur la production dans les régions cacaoyères.',
+        regionalComparison: 'Comparaison Régionale de la Santé',
+        regionalComparisonDesc: 'Part agrégée des antipaludéens par région (2020-2024)',
+        exportCSV: 'Exporter CSV',
+        healthIndexBadge: 'Indice de Santé Régional',
+        malarialBurdenIndicator: 'Indicateur du fardeau paludique',
+        basedOnPharmacyData: 'Basé sur les données de surveillance pharmaceutique régionale (2020-2024). Des scores plus élevés indiquent un fardeau paludique accru.',
+        viewDetailedInsights: 'Voir les informations détaillées sur la santé',
+        academicFoundation: 'Fondation Académique',
+        researchEvidence: 'Preuves de Recherche',
+        researchEvidenceDesc: 'La recherche démontre que les épisodes de paludisme causent 5 à 10 jours de travail perdus par incident, la transmission maximale coïncidant avec les périodes critiques pré-récolte.',
+        uniqueValue: 'Valeur Unique',
+        uniqueValueDesc: 'Signal de santé humaine que les données satellitaires manquent. La surveillance pharmaceutique fournit une résolution mensuelle pour l\'alerte précoce des défis de productivité.',
+        avgAntimalarialShare: 'Part Moy. des Antipaludéens',
+        peakMalariaMonths: 'Mois de Pic du Paludisme',
+        correlationStrength: 'Force de Corrélation',
+        dataPoints: 'Points de Données',
+        methodology: 'Méthodologie',
+        methodologyNote: 'Les indices de santé régionaux sont calculés en faisant la moyenne de la part des antipaludéens dans toutes les pharmacies de chaque région. La force de corrélation est basée sur la proximité des zones cacaoyères et les études d\'impact sur la récolte documentées.',
       },
     },
     pilot: {

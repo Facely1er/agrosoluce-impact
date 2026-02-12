@@ -20,6 +20,7 @@ import {
   ChevronUp,
   ExternalLink
 } from 'lucide-react';
+import { HealthIndexTrendChart, TimeLagCorrelationTimeline, RegionalHealthComparison } from '@/components/health';
 import { getCurrentUser } from '@/lib/supabase/client';
 import { 
   uploadEvidenceDocument, 
@@ -2438,6 +2439,7 @@ function RegionalInsightsTab({ cooperativeId }: { cooperativeId: string }) {
   
   return (
     <div className="space-y-6">
+      {/* Info Banner */}
       <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
         <div className="flex items-start gap-3">
           <Info className="h-6 w-6 text-purple-600 mt-0.5 flex-shrink-0" />
@@ -2453,12 +2455,22 @@ function RegionalInsightsTab({ cooperativeId }: { cooperativeId: string }) {
         </div>
       </div>
 
+      {/* Regional Health Index Chart */}
+      <HealthIndexTrendChart pharmacyIds={['tanda', 'prolife', 'olympique', 'attobrou']} />
+
+      {/* Time-Lag Correlation Timeline */}
+      <TimeLagCorrelationTimeline />
+
+      {/* Regional Comparison */}
+      <RegionalHealthComparison />
+
+      {/* Academic Foundation */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Regional Insights</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">Academic Foundation</h3>
         
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
+        <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-blue-50 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-900 mb-2">Academic Foundation</h4>
+            <h4 className="font-semibold text-blue-900 mb-2">Research Evidence</h4>
             <p className="text-sm text-blue-800">
               Research demonstrates that malaria episodes cause 5-10 lost workdays per incident, 
               with peak transmission overlapping critical pre-harvest periods.
@@ -2472,11 +2484,6 @@ function RegionalInsightsTab({ cooperativeId }: { cooperativeId: string }) {
               monthly resolution for early warning of productivity challenges.
             </p>
           </div>
-        </div>
-
-        <div className="bg-gray-50 rounded-lg p-8 text-center">
-          <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-500">Correlation visualization in development</p>
         </div>
       </div>
     </div>

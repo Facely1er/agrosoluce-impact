@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import { PHARMACIES, computeHealthIndex } from '@agrosoluce/data-insights';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
-import { Activity, TrendingUp, MapPin, Info } from 'lucide-react';
+import { Activity, TrendingUp, MapPin, Info, Download, Filter } from 'lucide-react';
 
 interface ProcessedPeriod {
   pharmacyId: string;
@@ -28,6 +28,11 @@ export default function VracAnalysisPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Filter states
+  const [selectedYear, setSelectedYear] = useState<number | 'all'>('all');
+  const [selectedPharmacy, setSelectedPharmacy] = useState<string | 'all'>('all');
+  const [viewType, setViewType] = useState<'quantity' | 'share'>('quantity');
+
   useEffect(() => {
     fetch('/data/vrac/processed.json')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to load'))))
@@ -41,23 +46,117 @@ export default function VracAnalysisPage() {
     return computeHealthIndex(data.periods);
   }, [data]);
 
+  // Get available years
+  const availableYears = useMemo(() => {
+    if (!healthIndex.length) return [];
+    const years = Array.from(new Set(healthIndex.map((h) => h.year)));
+    return years.sort((a, b) => a - b);
+  }, [healthIndex]);
+
+  // Filter health index data
+  const filteredHealthIndex = useMemo(() => {
+    let filtered = healthIndex;
+
+    if (selectedYear !== 'all') {
+      filtered = filtered.filter((h) => h.year === selectedYear);
+    }
+
+    if (selectedPharmacy !== 'all') {
+      filtered = filtered.filter((h) => h.pharmacyId === selectedPharmacy);
+    }
+
+    return filtered;
+  }, [healthIndex, selectedYear, selectedPharmacy]);
+
   const chartData = useMemo(() => {
     const byKey: Record<string, { period: string; year: number; [key: string]: string | number }> = {};
-    for (const p of healthIndex) {
+    for (const p of filteredHealthIndex) {
       const key = `${p.periodLabel}`;
       if (!byKey[key]) {
         byKey[key] = { period: p.periodLabel, year: p.year };
       }
-      byKey[key][p.pharmacyId] = p.antimalarialQuantity;
+      if (viewType === 'share') {
+        byKey[key][p.pharmacyId] = p.antimalarialShare * 100; // Store as number, format in tooltip
+      } else {
+        byKey[key][p.pharmacyId] = p.antimalarialQuantity;
+      }
     }
     return Object.values(byKey).sort((a, b) => (a.year as number) - (b.year as number));
-  }, [healthIndex]);
+  }, [filteredHealthIndex, viewType]);
 
   const pharmacyLabels: Record<string, string> = {
     tanda: 'Tanda (Gontougo)',
     prolife: 'Prolife (Gontougo)',
     olympique: 'Olympique (Abidjan)',
     attobrou: 'Attobrou (La Mé)',
+  };
+
+  // Export functionality
+  const exportToCSV = () => {
+    if (!filteredHealthIndex.length) return;
+
+    const headers = [
+      'Pharmacy',
+      'Period',
+      'Year',
+      'Antimalarial Quantity',
+      'Total Quantity',
+      'Antimalarial Share (%)',
+    ];
+
+    const rows = filteredHealthIndex.map((item) => [
+      item.pharmacyId,
+      item.periodLabel,
+      item.year.toString(),
+      item.antimalarialQuantity.toString(),
+      item.totalQuantity.toString(),
+      (item.antimalarialShare * 100).toFixed(2),
+    ]);
+
+    const csvContent = [headers, ...rows].map((row) => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute(
+      'download',
+      `vrac_analysis_${selectedYear}_${selectedPharmacy}_${new Date().toISOString().split('T')[0]}.csv`
+    );
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportToJSON = () => {
+    if (!filteredHealthIndex.length) return;
+
+    const jsonData = JSON.stringify(
+      {
+        filters: {
+          year: selectedYear,
+          pharmacy: selectedPharmacy,
+        },
+        data: filteredHealthIndex,
+        exportDate: new Date().toISOString(),
+      },
+      null,
+      2
+    );
+
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute(
+      'download',
+      `vrac_analysis_${selectedYear}_${selectedPharmacy}_${new Date().toISOString().split('T')[0]}.json`
+    );
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (loading) {
@@ -109,6 +208,94 @@ export default function VracAnalysisPage() {
           </div>
         </div>
 
+        {/* Filters and Export Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 border border-gray-100 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <Filter className="h-5 w-5 text-primary-600" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Filters & Export
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={exportToCSV}
+                className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+              >
+                <Download className="h-4 w-4" />
+                Export CSV
+              </button>
+              <button
+                onClick={exportToJSON}
+                className="flex items-center gap-2 px-4 py-2 bg-secondary-600 text-white rounded-lg hover:bg-secondary-700 transition-colors text-sm"
+              >
+                <Download className="h-4 w-4" />
+                Export JSON
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Year
+              </label>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="all">All Years</option>
+                {availableYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Pharmacy
+              </label>
+              <select
+                value={selectedPharmacy}
+                onChange={(e) => setSelectedPharmacy(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="all">All Pharmacies</option>
+                {PHARMACIES.map((pharmacy) => (
+                  <option key={pharmacy.id} value={pharmacy.id}>
+                    {pharmacy.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                View Type
+              </label>
+              <select
+                value={viewType}
+                onChange={(e) => setViewType(e.target.value as 'quantity' | 'share')}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="quantity">Quantity (units)</option>
+                <option value="share">Share (%)</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              <strong>Showing:</strong> {filteredHealthIndex.length} data points
+              {selectedYear !== 'all' && ` from ${selectedYear}`}
+              {selectedPharmacy !== 'all' && ` for ${PHARMACIES.find(p => p.id === selectedPharmacy)?.name || selectedPharmacy}`}
+            </p>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-4">
@@ -144,6 +331,7 @@ export default function VracAnalysisPage() {
             <TrendingUp className="h-6 w-6 text-primary-600" />
             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
               Antimalarial Sales by Pharmacy & Period
+              {viewType === 'share' ? ' (%)' : ' (Quantity)'}
             </h2>
           </div>
           <div className="h-80">
@@ -151,7 +339,7 @@ export default function VracAnalysisPage() {
               <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-600" />
                 <XAxis dataKey="period" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} label={{ value: viewType === 'share' ? 'Share (%)' : 'Quantity', angle: -90, position: 'insideLeft' }} />
                 <Tooltip />
                 <Legend />
                 {Array.from(new Set(healthIndex.map((h) => h.pharmacyId))).map((phId) => (
@@ -171,13 +359,14 @@ export default function VracAnalysisPage() {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">
             Antimalarial Trend Over Time
+            {viewType === 'share' ? ' (%)' : ' (Quantity)'}
           </h2>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-600" />
                 <XAxis dataKey="period" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} label={{ value: viewType === 'share' ? 'Share (%)' : 'Quantity', angle: -90, position: 'insideLeft' }} />
                 <Tooltip />
                 <Legend />
                 {Array.from(new Set(healthIndex.map((h) => h.pharmacyId))).map((phId) => (
