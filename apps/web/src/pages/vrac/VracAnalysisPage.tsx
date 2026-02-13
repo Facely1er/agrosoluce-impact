@@ -321,10 +321,12 @@ export default function VracAnalysisPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="vrac-filter-year" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Year
               </label>
               <select
+                id="vrac-filter-year"
+                aria-label="Filter by year"
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value === 'all' ? 'all' : Number(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -339,10 +341,12 @@ export default function VracAnalysisPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="vrac-filter-pharmacy" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Pharmacy
               </label>
               <select
+                id="vrac-filter-pharmacy"
+                aria-label="Filter by pharmacy"
                 value={selectedPharmacy}
                 onChange={(e) => setSelectedPharmacy(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -357,10 +361,12 @@ export default function VracAnalysisPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="vrac-filter-view-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 View Type
               </label>
               <select
+                id="vrac-filter-view-type"
+                aria-label="Chart view type: quantity or share"
                 value={viewType}
                 onChange={(e) => setViewType(e.target.value as 'quantity' | 'share')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -528,10 +534,12 @@ export default function VracAnalysisPage() {
               <HarvestRiskBadges data={filteredHealthIndex} pharmacyLabels={pharmacyLabels} />
             </div>
             <div className="flex items-center gap-2 mb-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="vrac-category-view" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Category view:
               </label>
               <select
+                id="vrac-category-view"
+                aria-label="Category breakdown view: by period or overall mix"
                 value={categoryView}
                 onChange={(e) => setCategoryView(e.target.value as 'stacked' | 'pie')}
                 className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm"
