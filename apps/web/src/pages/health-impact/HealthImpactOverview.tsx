@@ -28,7 +28,7 @@ export default function HealthImpactOverview() {
       title: 'Regional Health Index',
       description: 'Track antimalarial share by pharmacy and period across cocoa-growing regions',
       link: '/vrac',
-      linkText: 'View Regional Analysis',
+      linkText: 'View Health Intelligence',
     },
     {
       icon: Users,
@@ -212,7 +212,7 @@ export default function HealthImpactOverview() {
               <Button asChild variant="primary" size="lg">
                 <Link to="/vrac" className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  View Regional Analysis
+                  View Health Intelligence Dashboard
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
