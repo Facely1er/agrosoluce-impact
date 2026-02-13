@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS agrosoluce.vrac_period_aggregates (
   antimalarial_quantity INTEGER NOT NULL,
   antibiotic_quantity INTEGER NOT NULL,
   analgesic_quantity INTEGER NOT NULL,
-  antimalarial_share DECIMAL(5,4) NOT NULL,
+  antimalarial_share DECIMAL(4,4) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(pharmacy_id, year, period_label),
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS agrosoluce.vrac_regional_health_index (
   year INTEGER NOT NULL,
   antimalarial_quantity INTEGER NOT NULL,
   total_quantity INTEGER NOT NULL,
-  antimalarial_share DECIMAL(5,4) NOT NULL,
+  antimalarial_share DECIMAL(4,4) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(pharmacy_id, year, period_label),
   CONSTRAINT vrac_health_index_share_check CHECK (antimalarial_share >= 0 AND antimalarial_share <= 1)
