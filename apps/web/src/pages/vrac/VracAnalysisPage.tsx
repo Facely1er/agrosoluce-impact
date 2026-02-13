@@ -29,6 +29,7 @@ export default function VracAnalysisPage() {
   const hasEnrichedData =
     source === 'enriched' ||
     healthIndex.some((h) => h.antibioticShare != null) ||
+    healthIndex.some((h) => h.analgesicShare != null) ||
     healthIndex.some((h) => h.harvestAlignedRisk != null) ||
     healthIndex.some((h) => (h.categoryBreakdown?.length ?? 0) > 0);
 
@@ -81,7 +82,9 @@ export default function VracAnalysisPage() {
   const exportToCSV = () => {
     if (!filteredHealthIndex.length) return;
 
-    const hasExtra = filteredHealthIndex.some((h) => h.antibioticShare != null || h.harvestAlignedRisk != null);
+    const hasExtra = filteredHealthIndex.some(
+      (h) => h.antibioticShare != null || h.analgesicShare != null || h.harvestAlignedRisk != null
+    );
     const headers = hasExtra
       ? [
           'Pharmacy',
@@ -91,6 +94,7 @@ export default function VracAnalysisPage() {
           'Total Quantity',
           'Antimalarial Share (%)',
           'Antibiotic Share (%)',
+          'Analgesic Share (%)',
           'Harvest Risk',
         ]
       : [
@@ -114,6 +118,7 @@ export default function VracAnalysisPage() {
       if (hasExtra) {
         base.push(
           item.antibioticShare != null ? (item.antibioticShare * 100).toFixed(2) : '',
+          item.analgesicShare != null ? (item.analgesicShare * 100).toFixed(2) : '',
           item.harvestAlignedRisk ?? ''
         );
       }

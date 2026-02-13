@@ -13,6 +13,8 @@ import type { PharmacyProfile, RegionalHealthIndex } from '@agrosoluce/types';
 export interface EnrichedHealthIndex extends RegionalHealthIndex {
   antibioticQuantity?: number;
   antibioticShare?: number;
+  analgesicQuantity?: number;
+  analgesicShare?: number;
   harvestAlignedRisk?: 'low' | 'medium' | 'high';
   inHarvestWindow?: boolean;
   regionId?: string;
@@ -71,6 +73,8 @@ export function useVracData(): UseVracDataResult {
             antimalarialShare: p.healthIndex?.antimalarialShare ?? 0,
             antibioticQuantity: p.antibioticIndex?.antibioticQuantity,
             antibioticShare: p.antibioticIndex?.antibioticShare,
+            analgesicQuantity: p.analgesicIndex?.analgesicQuantity,
+            analgesicShare: p.analgesicIndex?.analgesicShare,
             harvestAlignedRisk: p.timeLagIndicator?.harvestAlignedRisk,
             inHarvestWindow: p.timeLagIndicator?.inHarvestWindow,
             regionId: p.regionId,
@@ -100,6 +104,8 @@ export function useVracData(): UseVracDataResult {
               antimalarialShare: p.healthIndex?.antimalarialShare ?? 0,
               antibioticQuantity: p.antibioticIndex?.antibioticQuantity,
               antibioticShare: p.antibioticIndex?.antibioticShare,
+              analgesicQuantity: p.analgesicIndex?.analgesicQuantity,
+              analgesicShare: p.analgesicIndex?.analgesicShare,
               harvestAlignedRisk: p.timeLagIndicator?.harvestAlignedRisk,
               inHarvestWindow: p.timeLagIndicator?.inHarvestWindow,
               regionId: p.regionId,

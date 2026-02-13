@@ -11,6 +11,8 @@ export { regionNormalizationEnrichment } from './regionNormalizationEnrichment';
 export type { RegionEnrichedPeriod } from './regionNormalizationEnrichment';
 export { antibioticIndexEnrichment } from './antibioticIndexEnrichment';
 export type { AntibioticEnrichedPeriod } from './antibioticIndexEnrichment';
+export { analgesicIndexEnrichment } from './analgesicIndexEnrichment';
+export type { AnalgesicEnrichedPeriod } from './analgesicIndexEnrichment';
 export { timeLagIndicatorEnrichment } from './timeLagIndicatorEnrichment';
 export type { TimeLagEnrichedPeriod } from './timeLagIndicatorEnrichment';
 export { getProductCategory } from './productTaxonomy';

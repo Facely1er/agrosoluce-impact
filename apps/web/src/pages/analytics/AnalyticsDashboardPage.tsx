@@ -1,7 +1,6 @@
 /**
- * Centralized Analytics Dashboard — map-centric with tabs.
- * Health tab: regional health (VRAC) only, no cooperatives.
- * Cooperatives tab: directory map with cooperatives and optional health overlay.
+ * Centralized Analytics Dashboard — one central map with layers (Cooperatives + Health)
+ * and heatmap (density / health burden). Tabs below switch summary strip and links.
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -15,7 +14,6 @@ import {
   ChevronDown,
   ChevronUp,
   BookOpen,
-  ExternalLink,
   AlertCircle,
   TrendingUp,
   UsersRound,
@@ -41,7 +39,6 @@ import type { RegionHealthInfo } from '@/features/cooperatives/components/Canoni
 import CanonicalDirectoryMap from '@/features/cooperatives/components/CanonicalDirectoryMap';
 import { getCanonicalDirectoryRecordsByStatus } from '@/features/cooperatives/api/canonicalDirectoryApi';
 import type { CanonicalCooperativeDirectory } from '@/types';
-import AnalyticsHealthMap from './AnalyticsHealthMap';
 
 const VRAC_REGION_TO_DISPLAY: Record<string, string> = {
   gontougo: 'Gontougo',
@@ -159,9 +156,8 @@ export default function AnalyticsDashboardPage() {
     return out;
   }, [healthIndex]);
 
-  // Fetch directory records for Cooperatives tab
+  // Fetch directory records on mount for central map (Cooperatives + Health layers)
   useEffect(() => {
-    if (activeTab !== 'cooperatives') return;
     let cancelled = false;
     (async () => {
       setDirectoryLoading(true);
@@ -175,7 +171,7 @@ export default function AnalyticsDashboardPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [activeTab]);
+  }, []);
 
   // Fetch compliance summary
   useEffect(() => {
@@ -342,27 +338,22 @@ export default function AnalyticsDashboardPage() {
           </button>
         </div>
 
-        {/* Central map */}
-        <div className="mb-6">
-          {activeTab === 'health' && (
-            <AnalyticsHealthMap regionHealth={regionHealth} height="min(60vh, 560px)" />
-          )}
-          {activeTab === 'cooperatives' && (
-            <>
-              {directoryLoading ? (
-                <div className="rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center min-h-[400px]">
-                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-                </div>
-              ) : (
-                <CanonicalDirectoryMap
-                  records={directoryRecords}
-                  height="min(60vh, 560px)"
-                  displayMode="both"
-                  regionHealth={Object.keys(regionHealth).length > 0 ? regionHealth : undefined}
-                  onRegionClick={(region) => navigate(`/directory?region=${encodeURIComponent(region)}`)}
-                />
-              )}
-            </>
+        {/* Central map: Cooperatives + Health layers, heatmap (density / health burden) */}
+        <div className="mb-6 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+          {directoryLoading && directoryRecords.length === 0 ? (
+            <div className="rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center min-h-[min(60vh,560px)]">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
+            </div>
+          ) : (
+            <CanonicalDirectoryMap
+              records={directoryRecords}
+              height="min(60vh, 560px)"
+              displayMode="both"
+              regionHealth={Object.keys(regionHealth).length > 0 ? regionHealth : undefined}
+              layerCooperatives={directoryRecords.length > 0}
+              layerHealth={Object.keys(regionHealth).length > 0}
+              onRegionClick={(region) => navigate(`/directory?region=${encodeURIComponent(region)}`)}
+            />
           )}
         </div>
 

@@ -66,6 +66,7 @@ Then wire it in `inferParserType()` and `parseVracContent()` in `vracSource.ts`.
 | `health-index` | Antimalarial share (malaria proxy) | — |
 | `region-normalization` | Map pharmacy → region, cocoa/urban flag | health-index |
 | `antibiotic-index` | Antibiotic share (infection proxy) | health-index |
+| `analgesic-index` | Analgesic share (pain/comfort proxy) | health-index |
 | `time-lag-indicator` | Flag harvest-window alignment + workforce risk | health-index |
 
 **Running with enrichment:** `npm run vrac:process:enrich` outputs `enriched.json` in addition to `processed.json`.
@@ -99,6 +100,7 @@ export const myEnrichment: EnrichmentLayer<InputType, OutputType> = {
 | **production-forecast** | Cocoa marketing year data | Correlate health index with production decline |
 | **time-lag-indicator** | Derived | Flag periods where malaria surge aligns with harvest window |
 | **antibiotic-index** | Product taxonomy | Respiratory/infection proxy (complement to antimalarial) |
+| **analgesic-index** | Product taxonomy | Pain/comfort proxy (complement to antimalarial/antibiotic) |
 | **census-overlay** | RGPH2021, FAO census | Population-normalize sales by region |
 | **deforestation-risk** | Satelligence, GFW | Overlay deforestation alerts with pharmacy regions |
 

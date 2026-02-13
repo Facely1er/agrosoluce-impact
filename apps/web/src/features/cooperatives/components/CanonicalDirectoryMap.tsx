@@ -27,6 +27,9 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 export type MapDisplayMode = 'markers' | 'heatmap' | 'both';
 
+/** Heatmap metric: density = cooperatives per region; health = VRAC antimalarial burden */
+export type HeatmapMetric = 'density' | 'health';
+
 /** Health metrics per region (VRAC pharmacy surveillance). Key = region display name (e.g. Gontougo, La Mé, Abidjan). */
 export interface RegionHealthInfo {
   antimalarialSharePct: number;
@@ -44,15 +47,25 @@ interface CanonicalDirectoryMapProps {
   displayMode?: MapDisplayMode;
   /** Optional health data by region (VRAC). When set, region tooltips/popups show health metrics and circles can be colored by burden. */
   regionHealth?: Record<string, RegionHealthInfo>;
+  /** Initial layer visibility: cooperatives (markers + density). Default true when records.length > 0 */
+  layerCooperatives?: boolean;
+  /** Initial layer visibility: health (VRAC burden circles). Default true when regionHealth is set */
+  layerHealth?: boolean;
+  /** Initial heatmap metric when both layers available. Default 'health' when regionHealth set, else 'density' */
+  heatmapMetric?: HeatmapMetric;
 }
 
-// Component to update map bounds when records change
-function MapUpdater({ records }: { records: CanonicalCooperativeDirectory[] }) {
+// Component to update map bounds when records or region names change
+function MapUpdater({
+  records,
+  regionNames,
+}: {
+  records: CanonicalCooperativeDirectory[];
+  regionNames: string[];
+}) {
   const map = useMap();
 
   useEffect(() => {
-    if (records.length === 0) return;
-
     const coordinates: [number, number][] = [];
     records.forEach(record => {
       const region = record.regionName || record.region;
@@ -61,12 +74,16 @@ function MapUpdater({ records }: { records: CanonicalCooperativeDirectory[] }) {
         coordinates.push(coords);
       }
     });
-
+    if (coordinates.length === 0 && regionNames.length > 0) {
+      regionNames.forEach(region => {
+        coordinates.push(getRegionCoordinates(region));
+      });
+    }
     if (coordinates.length > 0) {
       const bounds = L.latLngBounds(coordinates);
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
     }
-  }, [records, map]);
+  }, [records, regionNames, map]);
 
   return null;
 }
@@ -120,8 +137,20 @@ export default function CanonicalDirectoryMap({
   height = 'min(70vh, 720px)',
   displayMode: initialMode = 'both',
   regionHealth,
+  layerCooperatives: initialLayerCoop,
+  layerHealth: initialLayerHealth,
+  heatmapMetric: initialHeatmapMetric,
 }: CanonicalDirectoryMapProps) {
   const [displayMode, setDisplayMode] = useState<MapDisplayMode>(initialMode);
+  const [layerCooperatives, setLayerCooperatives] = useState(
+    () => initialLayerCoop ?? records.length > 0
+  );
+  const [layerHealth, setLayerHealth] = useState(
+    () => initialLayerHealth ?? (regionHealth != null && Object.keys(regionHealth).length > 0)
+  );
+  const [heatmapMetric, setHeatmapMetric] = useState<HeatmapMetric>(
+    () => initialHeatmapMetric ?? (regionHealth && Object.keys(regionHealth).length > 0 ? 'health' : 'density')
+  );
 
   // Calculate cooperative counts per region
   const regionData: Record<string, { count: number; records: CanonicalCooperativeDirectory[] }> = {};
@@ -134,8 +163,17 @@ export default function CanonicalDirectoryMap({
     regionData[region].records.push(record);
   });
 
+  // When no directory records but health data exists, include health-only regions for the map
+  const healthOnlyRegions = regionHealth
+    ? Object.keys(regionHealth).filter(r => !regionData[r])
+    : [];
+  healthOnlyRegions.forEach(region => {
+    regionData[region] = { count: 0, records: [] };
+  });
+
   const maxCount = Math.max(0, ...Object.values(regionData).map(d => d.count));
   const regionEntries = Object.entries(regionData);
+  const hasHealthData = regionHealth != null && Object.keys(regionHealth).length > 0;
 
   // Default center for Côte d'Ivoire
   const defaultCenter: [number, number] = [7.54, -5.55];
@@ -154,17 +192,19 @@ export default function CanonicalDirectoryMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MapUpdater records={records} />
+        <MapUpdater records={records} regionNames={regionEntries.map(([r]) => r)} />
 
-        {/* Heatmap layer: density circles per region */}
+        {/* Heatmap layer: density or health burden circles — visible when layer matches heatmap metric */}
         {(displayMode === 'heatmap' || displayMode === 'both') &&
+          (heatmapMetric === 'health' ? layerHealth : layerCooperatives) &&
           regionEntries.map(([region, data]) => {
             const coords = getRegionCoordinates(region);
             const health = regionHealth?.[region];
-            const style = health
+            const useHealthStyle = heatmapMetric === 'health' && health;
+            const style = useHealthStyle
               ? { ...getHealthStyle(health.antimalarialSharePct), radius: 20 + (data.count / Math.max(maxCount, 1)) * 60, opacity: 0.45 }
               : getHeatStyle(data.count, maxCount);
-            const pathOpts = health
+            const pathOpts = useHealthStyle
               ? { fillColor: style.fillColor, color: style.color, fillOpacity: style.opacity ?? 0.45, weight: 2, opacity: 0.8 }
               : { fillColor: style.fillColor, color: style.color, fillOpacity: style.opacity, weight: 2, opacity: 0.8 };
             return (
@@ -198,9 +238,9 @@ export default function CanonicalDirectoryMap({
             );
           })}
 
-        {/* Markers with popups */}
-        {(displayMode === 'markers' || displayMode === 'both') &&
-          regionEntries.map(([region, data]) => {
+        {/* Markers with popups — only when Cooperatives layer is on; skip health-only regions (count 0) */}
+        {layerCooperatives && (displayMode === 'markers' || displayMode === 'both') &&
+          regionEntries.filter(([, data]) => data.count > 0).map(([region, data]) => {
           const coords = getRegionCoordinates(region);
           
           // Determine marker color based on count
@@ -310,12 +350,66 @@ export default function CanonicalDirectoryMap({
         })}
       </MapContainer>
 
-      {/* Layer / display mode control */}
+      {/* Layer and display mode controls */}
       <div className="absolute top-4 left-4 flex flex-col gap-2 z-[1000]">
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-1 flex flex-col gap-0.5">
           <span className="px-2 py-1 text-xs font-semibold text-gray-600 flex items-center gap-1">
-            <Layers className="h-3.5 w-3.5" /> View
+            <Layers className="h-3.5 w-3.5" /> Layers
           </span>
+          {(records.length > 0 || hasHealthData) && (
+            <>
+              {records.length > 0 && (
+                <label className="flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium text-gray-700 hover:bg-gray-50 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={layerCooperatives}
+                    onChange={() => setLayerCooperatives((v) => !v)}
+                    className="rounded"
+                  />
+                  <MapPin className="h-3.5 w-3.5" /> Cooperatives
+                </label>
+              )}
+              {hasHealthData && (
+                <label className="flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium text-gray-700 hover:bg-gray-50 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={layerHealth}
+                    onChange={() => setLayerHealth((v) => !v)}
+                    className="rounded"
+                  />
+                  <Heart className="h-3.5 w-3.5" /> Health (VRAC)
+                </label>
+              )}
+              {hasHealthData && (displayMode === 'heatmap' || displayMode === 'both') && (
+                <div className="px-2 py-1.5 border-t border-gray-100 mt-0.5">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Heatmap color</span>
+                  <div className="flex gap-1 mt-1">
+                    <button
+                      type="button"
+                      onClick={() => setHeatmapMetric('density')}
+                      className={`flex-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+                        heatmapMetric === 'density' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      Density
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setHeatmapMetric('health')}
+                      className={`flex-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+                        heatmapMetric === 'health' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      Health
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-1 flex flex-col gap-0.5">
+          <span className="px-2 py-1 text-xs font-semibold text-gray-600 flex items-center gap-1">View</span>
           <button
             type="button"
             onClick={() => setDisplayMode('both')}
@@ -349,13 +443,13 @@ export default function CanonicalDirectoryMap({
       {/* Legend */}
       <div className="absolute bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg z-[1000] max-w-[260px] border border-gray-200">
         <h4 className="font-semibold text-secondary-600 mb-3 text-sm">
-          {regionHealth && displayMode === 'heatmap'
+          {(displayMode === 'heatmap' || displayMode === 'both') && heatmapMetric === 'health'
             ? 'Health burden (antimalarial share %)'
-            : displayMode === 'heatmap'
+            : displayMode === 'heatmap' || displayMode === 'both'
               ? 'Density (cooperatives per region)'
               : 'Légende'}
         </h4>
-        {regionHealth && displayMode === 'heatmap' ? (
+        {(displayMode === 'heatmap' || displayMode === 'both') && heatmapMetric === 'health' ? (
           <div className="space-y-2 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-red-600 border-2 border-white shadow" />

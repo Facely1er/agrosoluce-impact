@@ -68,6 +68,7 @@ This document defines and documents the methodologies used across AgroSoluce Imp
    - `health-index` (no deps)
    - `region-normalization` (depends on health-index)
    - `antibiotic-index` (depends on health-index)
+   - `analgesic-index` (depends on health-index)
    - `time-lag-indicator` (depends on health-index)
 3. **Application:** For each period, layers run in order; each layer receives the output of the previous. Code: `applyEnrichments()` in `runVracPipeline.ts`.
 4. **Client-side fallback:** If the app loads `processed.json` and `enriched.json` is not found, it can run `applyEnrichments()` in the browser so that antibiotic, time-lag, and region insights are still available.
@@ -132,7 +133,25 @@ Antibiotic Share = Antibiotic Quantity / Total Pharmaceutical Quantity
 
 ---
 
-### 2.4 Time-Lag Indicator (Harvest-Window Workforce Risk)
+### 2.4 Analgesic Index (Pain/Comfort Proxy)
+
+**Purpose:** Complement antimalarial and antibiotic with a proxy for pain/comfort medication demand (analgesics, anti-inflammatories).
+
+**Formula:**
+```
+Analgesic Share = Analgesic Quantity / Total Pharmaceutical Quantity
+```
+- **Analgesic Quantity:** Sum of `quantitySold` for products classified as `analgesic` in product taxonomy (e.g. PARACETAMOL, NOVALG, DICLO, IBUPROF).
+
+**Output:** `analgesicIndex.analgesicQuantity`, `analgesicIndex.analgesicShare` (0–1).
+
+**Implementation:** `packages/data-insights/src/enrichment/analgesicIndexEnrichment.ts`.
+
+**Interpretation:** Contributes to broader health burden context; category breakdown (health index) also exposes analgesic quantities.
+
+---
+
+### 2.5 Time-Lag Indicator (Harvest-Window Workforce Risk)
 
 **Purpose:** Flag periods that fall within the cocoa harvest window and classify workforce risk based on antimalarial share (malaria surge overlapping with harvest).
 
@@ -152,7 +171,7 @@ Antibiotic Share = Antibiotic Quantity / Total Pharmaceutical Quantity
 
 ---
 
-### 2.5 Household Welfare Index (HWI)
+### 2.6 Household Welfare Index (HWI)
 
 **Purpose:** Composite indicator of household distress from pharmaceutical purchasing patterns (0–100, higher = worse conditions). Used as an early-warning signal for living income, child labor risk, gender equity, and health access (ESG alignment in [HWI Methodology](../analytics/HWI_METHODOLOGY.md)).
 

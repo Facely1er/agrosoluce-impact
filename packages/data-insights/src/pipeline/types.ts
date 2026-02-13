@@ -8,6 +8,8 @@ export type SourceId = 'vrac' | 'weather' | 'production' | 'census' | string;
 export type EnrichmentLayerId =
   | 'health-index'
   | 'region-normalization'
+  | 'antibiotic-index'
+  | 'analgesic-index'
   | 'time-lag-indicator'
   | 'weather-correlation'
   | 'production-forecast'

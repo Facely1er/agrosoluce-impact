@@ -139,6 +139,10 @@
         "antibioticQuantity": 2032,
         "antibioticShare": 0.11612755743513545
       },
+      "analgesicIndex": {
+        "analgesicQuantity": 7988,
+        "analgesicShare": 0.45650931535032574
+      },
       "timeLagIndicator": {
         "inHarvestWindow": true,
         "harvestAlignedRisk": "low"
@@ -282,6 +286,10 @@
       "antibioticIndex": {
         "antibioticQuantity": 780,
         "antibioticShare": 0.0846262341325811
+      },
+      "analgesicIndex": {
+        "analgesicQuantity": 4534,
+        "analgesicShare": 0.49191710968861885
       },
       "timeLagIndicator": {
         "inHarvestWindow": true,
@@ -427,6 +435,10 @@
         "antibioticQuantity": 498,
         "antibioticShare": 0.05061489988820002
       },
+      "analgesicIndex": {
+        "analgesicQuantity": 4095,
+        "analgesicShare": 0.41620083341803027
+      },
       "timeLagIndicator": {
         "inHarvestWindow": true,
         "harvestAlignedRisk": "low"
@@ -570,6 +582,10 @@
       "antibioticIndex": {
         "antibioticQuantity": 6,
         "antibioticShare": 0.02654867256637168
+      },
+      "analgesicIndex": {
+        "analgesicQuantity": 70,
+        "analgesicShare": 0.30973451327433627
       },
       "timeLagIndicator": {
         "inHarvestWindow": true,
@@ -715,6 +731,10 @@
         "antibioticQuantity": 3362,
         "antibioticShare": 0.11025842844024662
       },
+      "analgesicIndex": {
+        "analgesicQuantity": 14954,
+        "analgesicShare": 0.490423717696445
+      },
       "timeLagIndicator": {
         "inHarvestWindow": true,
         "harvestAlignedRisk": "low"
@@ -859,6 +879,10 @@
         "antibioticQuantity": 1612,
         "antibioticShare": 0.07084780029007164
       },
+      "analgesicIndex": {
+        "analgesicQuantity": 10975,
+        "analgesicShare": 0.48235397529996044
+      },
       "timeLagIndicator": {
         "inHarvestWindow": true,
         "harvestAlignedRisk": "low"
@@ -998,6 +1022,10 @@
       "antibioticIndex": {
         "antibioticQuantity": 4665,
         "antibioticShare": 0.16478276227481456
+      },
+      "analgesicIndex": {
+        "analgesicQuantity": 10622,
+        "analgesicShare": 0.3752031084422466
       },
       "timeLagIndicator": {
         "inHarvestWindow": true,
@@ -1139,11 +1167,15 @@
         "antibioticQuantity": 1361,
         "antibioticShare": 0.08878596124991846
       },
+      "analgesicIndex": {
+        "analgesicQuantity": 6812,
+        "analgesicShare": 0.4443864570422076
+      },
       "timeLagIndicator": {
         "inHarvestWindow": true,
         "harvestAlignedRisk": "low"
       }
     }
   ],
-  "processedAt": "2026-02-13T15:54:46.678Z"
+  "processedAt": "2026-02-13T16:29:14.724Z"
 }
