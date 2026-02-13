@@ -10,6 +10,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { getProductCategory } from '../../apps/web/src/data/vrac/productTaxonomy';
+import { classifyMedication } from '../../packages/data-insights/src/classification/medicationTaxonomy';
+import { processBatchHWI } from '../../packages/data-insights/src/pipeline/processHWI';
 
 // Load environment variables
 import * as dotenv from 'dotenv';
@@ -263,6 +265,135 @@ async function calculateAndInsertHealthIndex(supabase: SupabaseClient, periods: 
   console.log(`Total health index records inserted: ${healthIndex.length}`);
 }
 
+// Calculate and insert category aggregates for HWI
+async function calculateAndInsertCategoryAggregates(supabase: SupabaseClient, periods: PeriodData[]): Promise<void> {
+  console.log('\n=== Calculating Category Aggregates for HWI ===');
+  
+  // Add departement/region mapping to periods
+  const enrichedPeriods = periods.map(period => ({
+    ...period,
+    departement: getDepartementForPharmacy(period.pharmacyId),
+    region: getRegionForPharmacy(period.pharmacyId),
+  }));
+
+  // Process all periods
+  const { categoryAggregates } = processBatchHWI(enrichedPeriods);
+  
+  console.log(`Calculated ${categoryAggregates.length} category aggregates`);
+
+  // Prepare for insertion
+  const aggregatesToInsert = categoryAggregates.map(agg => ({
+    pharmacy_id: agg.pharmacyId,
+    period_label: agg.periodLabel,
+    year: agg.year,
+    category: agg.category,
+    quantity: agg.quantity,
+    share: agg.share,
+  }));
+
+  // Insert in batches
+  const BATCH_SIZE = 500;
+  for (let i = 0; i < aggregatesToInsert.length; i += BATCH_SIZE) {
+    const batch = aggregatesToInsert.slice(i, i + BATCH_SIZE);
+    const { error } = await supabase
+      .from('vrac_category_aggregates')
+      .upsert(batch, { onConflict: 'pharmacy_id,year,period_label,category' });
+
+    if (error) {
+      console.error('Error inserting category aggregates:', error);
+      throw error;
+    }
+    console.log(`✓ Inserted batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(aggregatesToInsert.length / BATCH_SIZE)}`);
+  }
+  
+  console.log(`Total category aggregates inserted: ${aggregatesToInsert.length}`);
+}
+
+// Calculate and insert HWI scores
+async function calculateAndInsertHWI(supabase: SupabaseClient, periods: PeriodData[]): Promise<void> {
+  console.log('\n=== Calculating HWI Scores ===');
+  
+  // Add departement/region mapping to periods
+  const enrichedPeriods = periods.map(period => ({
+    ...period,
+    departement: getDepartementForPharmacy(period.pharmacyId),
+    region: getRegionForPharmacy(period.pharmacyId),
+  }));
+
+  // Process all periods
+  const { hwiScores } = processBatchHWI(enrichedPeriods);
+  
+  console.log(`Calculated ${hwiScores.length} HWI scores`);
+
+  // Prepare for insertion
+  const scoresToInsert = hwiScores.map(score => ({
+    pharmacy_id: score.pharmacyId,
+    departement: score.departement,
+    region: score.region || null,
+    period_label: score.periodLabel,
+    year: score.year,
+    hwi_score: score.hwiScore,
+    workforce_health_score: score.components.workforce_health,
+    child_welfare_score: score.components.child_welfare,
+    womens_health_score: score.components.womens_health,
+    womens_empowerment_score: score.components.womens_empowerment,
+    nutrition_score: score.components.nutrition,
+    chronic_illness_score: score.components.chronic_illness,
+    acute_illness_score: score.components.acute_illness,
+    alert_level: score.alertLevel,
+    total_quantity: score.totalQuantity,
+    category_breakdown: score.categoryBreakdown,
+  }));
+
+  // Insert all scores
+  const { error } = await supabase
+    .from('household_welfare_index')
+    .upsert(scoresToInsert, { onConflict: 'pharmacy_id,year,period_label' });
+
+  if (error) {
+    console.error('Error inserting HWI scores:', error);
+    throw error;
+  }
+
+  // Log summary
+  console.log(`Total HWI scores inserted: ${scoresToInsert.length}`);
+  
+  const alertCounts = {
+    green: scoresToInsert.filter(s => s.alert_level === 'green').length,
+    yellow: scoresToInsert.filter(s => s.alert_level === 'yellow').length,
+    red: scoresToInsert.filter(s => s.alert_level === 'red').length,
+    black: scoresToInsert.filter(s => s.alert_level === 'black').length,
+  };
+  
+  console.log('Alert Level Distribution:');
+  console.log(`  Green (normal): ${alertCounts.green}`);
+  console.log(`  Yellow (elevated): ${alertCounts.yellow}`);
+  console.log(`  Red (crisis): ${alertCounts.red}`);
+  console.log(`  Black (severe): ${alertCounts.black}`);
+}
+
+// Helper: Get departement for pharmacy
+function getDepartementForPharmacy(pharmacyId: string): string {
+  const mapping: Record<string, string> = {
+    'tanda': 'Gontougo',
+    'prolife': 'Gontougo',
+    'olympique': 'Abidjan',
+    'attobrou': 'La Mé',
+  };
+  return mapping[pharmacyId] || 'Unknown';
+}
+
+// Helper: Get region for pharmacy
+function getRegionForPharmacy(pharmacyId: string): string {
+  const mapping: Record<string, string> = {
+    'tanda': 'gontougo',
+    'prolife': 'gontougo',
+    'olympique': 'abidjan',
+    'attobrou': 'la_me',
+  };
+  return mapping[pharmacyId] || 'unknown';
+}
+
 // Main migration function
 async function main() {
   console.log('='.repeat(60));
@@ -283,6 +414,10 @@ async function main() {
     await insertProductSales(supabase, data.periods);
     await calculateAndInsertAggregates(supabase, data.periods);
     await calculateAndInsertHealthIndex(supabase, data.periods);
+    
+    // HWI calculation steps
+    await calculateAndInsertCategoryAggregates(supabase, data.periods);
+    await calculateAndInsertHWI(supabase, data.periods);
 
     console.log('\n' + '='.repeat(60));
     console.log('✅ Migration completed successfully!');
@@ -292,6 +427,8 @@ async function main() {
     console.log(`- Product sales records: ${data.periods.reduce((sum, p) => sum + p.products.length, 0)}`);
     console.log(`- Period aggregates: ${data.periods.length}`);
     console.log(`- Health index records: ${data.periods.length}`);
+    console.log(`- Category aggregates: ${data.periods.length * 8} (approx)`); // 8 categories per period
+    console.log(`- HWI scores: ${data.periods.length}`);
 
   } catch (error) {
     console.error('\n❌ Migration failed:', error);
