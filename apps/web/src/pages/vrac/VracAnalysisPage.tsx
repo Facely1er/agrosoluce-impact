@@ -246,8 +246,7 @@ export default function VracAnalysisPage() {
                 Elevated Activity
               </p>
               <p className="text-sm text-amber-800 dark:text-amber-200">
-                Antimalarial sales in Gontougo region showing{' '}
-                <span className="font-bold">+34% increase</span> vs. previous period
+                Antimalarial sales in Gontougo region showing elevated levels in recent monitoring periods
               </p>
             </div>
 

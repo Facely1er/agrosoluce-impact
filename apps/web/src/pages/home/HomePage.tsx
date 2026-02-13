@@ -578,7 +578,7 @@ export default function HomePage() {
                   <MapPin className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-900">
-                  🛰️ What Satellites See
+                  <span aria-label="Satellite">🛰️</span> What Satellites See
                 </h3>
                 <p className="text-gray-600 mb-4">
                   Crop growth, deforestation, land use changes
@@ -596,7 +596,7 @@ export default function HomePage() {
                   <Activity className="h-8 w-8 text-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-white">
-                  🏥 What Pharmacies Reveal
+                  <span aria-label="Hospital">🏥</span> What Pharmacies Reveal
                 </h3>
                 <p className="text-blue-50 mb-4">
                   Workforce health, malaria burden, productivity signals
@@ -617,7 +617,7 @@ export default function HomePage() {
                   <TrendingUp className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-900">
-                  📊 Combined Intelligence
+                  <span aria-label="Chart">📊</span> Combined Intelligence
                 </h3>
                 <p className="text-gray-600 mb-4">
                   Complete supply chain risk visibility
