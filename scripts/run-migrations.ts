@@ -19,17 +19,24 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
 
-/** Load .env from project root into process.env */
+/** Load .env from project root and cwd into process.env */
 function loadEnv() {
-  const envPath = path.join(__dirname, '../.env');
-  if (!fs.existsSync(envPath)) return;
-  const content = fs.readFileSync(envPath, 'utf-8');
-  for (const line of content.split('\n')) {
-    const match = line.match(/^([^#=]+)=(.*)$/);
-    if (match) {
-      const key = match[1].trim();
-      const val = match[2].trim().replace(/^["']|["']$/g, '');
-      process.env[key] = val;
+  const candidates = [
+    path.join(__dirname, '../.env'),
+    path.join(__dirname, '../.env.local'),
+    path.join(process.cwd(), '.env'),
+    path.join(process.cwd(), '.env.local'),
+  ];
+  for (const envPath of candidates) {
+    if (!fs.existsSync(envPath)) continue;
+    const content = fs.readFileSync(envPath, 'utf-8');
+    for (const line of content.split('\n')) {
+      const match = line.match(/^([^#=]+)=(.*)$/);
+      if (match) {
+        const key = match[1].trim();
+        const val = match[2].trim().replace(/^["']|["']$/g, '');
+        if (!process.env[key]) process.env[key] = val;
+      }
     }
   }
 }
@@ -120,6 +127,8 @@ async function checkMigrationStatus() {
     console.error('❌ Missing environment variables:');
     console.error('   VITE_SUPABASE_URL or SUPABASE_URL');
     console.error('   VITE_SUPABASE_ANON_KEY or SUPABASE_ANON_KEY');
+    console.error('\n💡 Ensure .env (or .env.local) in the project root contains these variables,');
+    console.error('   then run: npm run migration:check');
     return;
   }
 
