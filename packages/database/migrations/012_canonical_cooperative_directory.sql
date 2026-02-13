@@ -107,7 +107,6 @@ COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.created_at IS 'Time
 -- Grant permissions to authenticated users
 GRANT USAGE ON SCHEMA agrosoluce TO authenticated;
 GRANT ALL ON agrosoluce.canonical_cooperative_directory TO authenticated;
-GRANT USAGE, SELECT ON SEQUENCE IF EXISTS agrosoluce.canonical_cooperative_directory_coop_id_seq TO authenticated;
 
 -- Grant read access to anon users for active records
 GRANT USAGE ON SCHEMA agrosoluce TO anon;

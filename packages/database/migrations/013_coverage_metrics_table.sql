@@ -80,7 +80,6 @@ COMMENT ON COLUMN agrosoluce.coverage_metrics.last_updated IS 'Timestamp when co
 -- Grant permissions to authenticated users
 GRANT USAGE ON SCHEMA agrosoluce TO authenticated;
 GRANT ALL ON agrosoluce.coverage_metrics TO authenticated;
-GRANT USAGE, SELECT ON SEQUENCE IF EXISTS agrosoluce.coverage_metrics_id_seq TO authenticated;
 
 -- Grant read access to anon users
 GRANT USAGE ON SCHEMA agrosoluce TO anon;

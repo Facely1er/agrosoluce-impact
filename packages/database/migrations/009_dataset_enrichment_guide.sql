@@ -154,7 +154,7 @@ SELECT
     c.certifications AS cooperative_certifications,
     COUNT(DISTINCT b.id) AS total_batches,
     SUM(b.quantity) AS total_production_quantity,
-    MAX(b.harvest_date) AS last_harvest_date,
+    MAX(b.harvest_date) AS last_batch_harvest_date,
     -- Calculate farmer productivity score
     CASE 
         WHEN f.farm_size_hectares > 0 AND f.yield_per_hectare > 0 
@@ -330,7 +330,7 @@ CREATE POLICY "Anyone can view certification standards" ON agrosoluce.certificat
 CREATE POLICY "Users can view enrichment logs for their entities" ON agrosoluce.enrichment_log
     FOR SELECT USING (
         (entity_type = 'cooperative' AND entity_id IN (
-            SELECT id FROM agrosoluce.cooperatives c
+            SELECT c.id FROM agrosoluce.cooperatives c
             JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
             WHERE up.user_id = auth.uid()
         ))

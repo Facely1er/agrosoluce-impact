@@ -4,7 +4,7 @@
 -- This file contains all migrations in order.
 -- Execute this file in Supabase SQL Editor.
 -- 
--- Generated: 2025-12-06T03:31:12.508Z
+-- Generated: 2026-02-13T14:35:23.256Z
 -- =============================================
 
 -- =============================================
@@ -1882,6 +1882,8 @@ INSERT INTO agrosoluce.migrations (migration_name, description)
 VALUES ('008_farmers_first_toolkit', 'Farmers First Implementation Toolkit: onboarding, training, feedback, and value tracking')
 ON CONFLICT (migration_name) DO NOTHING;
 
+
+
 -- =============================================
 -- Migration: 009_dataset_enrichment_guide.sql
 -- =============================================
@@ -2264,6 +2266,8 @@ COMMENT ON FUNCTION agrosoluce.auto_enrich_cooperative IS 'Automatically enriche
 INSERT INTO agrosoluce.migrations (migration_name, description) 
 VALUES ('009_dataset_enrichment_guide', 'Dataset enrichment guide: additional fields, lookup tables, computed views, and enrichment functions')
 ON CONFLICT (migration_name) DO NOTHING;
+
+
 
 -- =============================================
 -- Migration: 010_cooperative_dashboard_enhancements.sql
@@ -2787,5 +2791,1715 @@ INSERT INTO agrosoluce.migrations (migration_name, description)
 VALUES ('010_cooperative_dashboard_enhancements', 'Cooperative Dashboard enhancements: profile management, lots, buyer requests, documents, declarations, notifications')
 ON CONFLICT (migration_name) DO NOTHING;
 
+
+
+-- =============================================
+-- Migration: 011_phase1_data_enrichment.sql
+-- =============================================
+
+-- Migration: Phase 1 Data Enrichment
+-- Adds enrichment fields to cooperatives table and document metadata enhancements
+-- Implements contextual risks, regulatory context, coverage metrics, and readiness status
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('011_phase1_data_enrichment', 'Phase 1 Data Enrichment: contextual risks, regulatory context, coverage metrics, readiness status, and document metadata')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- 1. COOPERATIVE ENRICHMENT FIELDS
+-- =============================================
+
+-- Add enrichment columns to cooperatives table
+ALTER TABLE agrosoluce.cooperatives
+ADD COLUMN IF NOT EXISTS contextual_risks JSONB,
+ADD COLUMN IF NOT EXISTS regulatory_context JSONB,
+ADD COLUMN IF NOT EXISTS coverage_metrics JSONB,
+ADD COLUMN IF NOT EXISTS readiness_status TEXT DEFAULT 'not_ready'
+    CHECK (readiness_status IN ('not_ready', 'in_progress', 'buyer_ready'));
+
+-- Create indexes for enrichment fields
+CREATE INDEX IF NOT EXISTS idx_cooperatives_readiness_status ON agrosoluce.cooperatives(readiness_status);
+CREATE INDEX IF NOT EXISTS idx_cooperatives_contextual_risks ON agrosoluce.cooperatives USING GIN (contextual_risks);
+CREATE INDEX IF NOT EXISTS idx_cooperatives_regulatory_context ON agrosoluce.cooperatives USING GIN (regulatory_context);
+CREATE INDEX IF NOT EXISTS idx_cooperatives_coverage_metrics ON agrosoluce.cooperatives USING GIN (coverage_metrics);
+
+-- =============================================
+-- 2. DOCUMENT METADATA ENHANCEMENTS
+-- =============================================
+
+-- Add metadata fields to documents table
+ALTER TABLE agrosoluce.documents
+ADD COLUMN IF NOT EXISTS doc_type TEXT, -- 'certification' | 'policy' | 'land_evidence' | 'other'
+ADD COLUMN IF NOT EXISTS issuer TEXT,
+ADD COLUMN IF NOT EXISTS issued_at TIMESTAMP WITH TIME ZONE,
+ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP WITH TIME ZONE,
+ADD COLUMN IF NOT EXISTS is_required_type BOOLEAN DEFAULT false;
+
+-- Create indexes for document metadata
+CREATE INDEX IF NOT EXISTS idx_documents_doc_type ON agrosoluce.documents(doc_type);
+CREATE INDEX IF NOT EXISTS idx_documents_issuer ON agrosoluce.documents(issuer);
+CREATE INDEX IF NOT EXISTS idx_documents_is_required_type ON agrosoluce.documents(is_required_type);
+CREATE INDEX IF NOT EXISTS idx_documents_expires_at ON agrosoluce.documents(expires_at);
+
+-- Update existing documents: map document_type to doc_type if doc_type is null
+UPDATE agrosoluce.documents
+SET doc_type = CASE
+    WHEN document_type LIKE '%certif%' OR document_type LIKE '%cert%' THEN 'certification'
+    WHEN document_type LIKE '%policy%' THEN 'policy'
+    WHEN document_type LIKE '%plot%' OR document_type LIKE '%land%' OR document_type LIKE '%map%' OR document_type LIKE '%gps%' THEN 'land_evidence'
+    ELSE 'other'
+END
+WHERE doc_type IS NULL;
+
+-- Map expiry_date to expires_at if expires_at is null
+UPDATE agrosoluce.documents
+SET expires_at = expiry_date::TIMESTAMP WITH TIME ZONE
+WHERE expires_at IS NULL AND expiry_date IS NOT NULL;
+
+-- =============================================
+-- 3. COMMENTS
+-- =============================================
+
+COMMENT ON COLUMN agrosoluce.cooperatives.contextual_risks IS 'Contextual risk tags (geo & regulatory): deforestation_zone, protected_area_overlap, climate_risk';
+COMMENT ON COLUMN agrosoluce.cooperatives.regulatory_context IS 'Regulatory context: eudr_applicable, child_labor_due_diligence_required, other_requirements';
+COMMENT ON COLUMN agrosoluce.cooperatives.coverage_metrics IS 'Coverage ratios: farmers_total, farmers_with_declarations, plots_total, plots_with_geo, required_docs_total, required_docs_present';
+COMMENT ON COLUMN agrosoluce.cooperatives.readiness_status IS 'Readiness status: not_ready, in_progress, buyer_ready';
+COMMENT ON COLUMN agrosoluce.documents.doc_type IS 'Document type: certification, policy, land_evidence, other';
+COMMENT ON COLUMN agrosoluce.documents.is_required_type IS 'Whether this document type is required for buyer readiness';
+
+-- =============================================
+-- MIGRATION RECORD
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('011_phase1_data_enrichment', 'Phase 1 Data Enrichment: contextual risks, regulatory context, coverage metrics, readiness status, and document metadata')
+ON CONFLICT (migration_name) DO NOTHING;
+
+
+
+-- =============================================
+-- Migration: 012_canonical_cooperative_directory.sql
+-- =============================================
+
+-- Migration: Canonical Cooperative Directory
+-- Creates a canonical cooperative directory table for standardized directory management
+-- This table serves as the authoritative source for cooperative directory entries
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('012_canonical_cooperative_directory', 'Canonical Cooperative Directory: standardized directory model with coop_id, name, country, region, department, primary_crop, source_registry, record_status')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- CANONICAL COOPERATIVE DIRECTORY TABLE
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS agrosoluce.canonical_cooperative_directory (
+    coop_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    country VARCHAR(100),
+    region VARCHAR(100),
+    department VARCHAR(100),
+    primary_crop VARCHAR(100),
+    source_registry VARCHAR(255),
+    record_status VARCHAR(50) DEFAULT 'active' CHECK (record_status IN ('active', 'inactive', 'archived', 'pending')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- =============================================
+-- INDEXES FOR PERFORMANCE
+-- =============================================
+
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_country ON agrosoluce.canonical_cooperative_directory(country);
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_region ON agrosoluce.canonical_cooperative_directory(region);
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_department ON agrosoluce.canonical_cooperative_directory(department);
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_primary_crop ON agrosoluce.canonical_cooperative_directory(primary_crop);
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_source_registry ON agrosoluce.canonical_cooperative_directory(source_registry);
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_record_status ON agrosoluce.canonical_cooperative_directory(record_status);
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_created_at ON agrosoluce.canonical_cooperative_directory(created_at);
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_name ON agrosoluce.canonical_cooperative_directory(name);
+
+-- Composite index for common queries
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_country_region ON agrosoluce.canonical_cooperative_directory(country, region);
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_status_created ON agrosoluce.canonical_cooperative_directory(record_status, created_at DESC);
+
+-- =============================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- =============================================
+
+-- Enable RLS on canonical directory table
+ALTER TABLE agrosoluce.canonical_cooperative_directory ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Anyone can view active records
+CREATE POLICY "Anyone can view active canonical directory records" 
+    ON agrosoluce.canonical_cooperative_directory
+    FOR SELECT 
+    USING (record_status = 'active');
+
+-- Policy: Authenticated users can view all records
+CREATE POLICY "Authenticated users can view all canonical directory records" 
+    ON agrosoluce.canonical_cooperative_directory
+    FOR SELECT 
+    USING (auth.role() = 'authenticated');
+
+-- Policy: Authenticated users can insert records
+CREATE POLICY "Authenticated users can insert canonical directory records" 
+    ON agrosoluce.canonical_cooperative_directory
+    FOR INSERT 
+    WITH CHECK (auth.role() = 'authenticated');
+
+-- Policy: Authenticated users can update records
+CREATE POLICY "Authenticated users can update canonical directory records" 
+    ON agrosoluce.canonical_cooperative_directory
+    FOR UPDATE 
+    USING (auth.role() = 'authenticated');
+
+-- Policy: Admins can delete records
+CREATE POLICY "Admins can delete canonical directory records" 
+    ON agrosoluce.canonical_cooperative_directory
+    FOR DELETE 
+    USING (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.user_profiles
+            WHERE user_id = auth.uid() AND user_type = 'admin'
+        )
+    );
+
+-- =============================================
+-- COMMENTS AND DOCUMENTATION
+-- =============================================
+
+COMMENT ON TABLE agrosoluce.canonical_cooperative_directory IS 'Canonical Cooperative Directory - Authoritative source for standardized cooperative directory entries';
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.coop_id IS 'Unique identifier for the cooperative directory entry';
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.name IS 'Cooperative name';
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.country IS 'Country where the cooperative is located';
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.region IS 'Region/state where the cooperative is located';
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.department IS 'Department/district where the cooperative is located';
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.primary_crop IS 'Primary crop/commodity produced by the cooperative';
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.source_registry IS 'Source registry or data source identifier';
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.record_status IS 'Status of the record: active, inactive, archived, or pending';
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.created_at IS 'Timestamp when the record was created';
+
+-- =============================================
+-- GRANTS
+-- =============================================
+
+-- Grant permissions to authenticated users
+GRANT USAGE ON SCHEMA agrosoluce TO authenticated;
+GRANT ALL ON agrosoluce.canonical_cooperative_directory TO authenticated;
+GRANT USAGE, SELECT ON SEQUENCE IF EXISTS agrosoluce.canonical_cooperative_directory_coop_id_seq TO authenticated;
+
+-- Grant read access to anon users for active records
+GRANT USAGE ON SCHEMA agrosoluce TO anon;
+GRANT SELECT ON agrosoluce.canonical_cooperative_directory TO anon;
+
+-- =============================================
+-- MIGRATION COMPLETION
+-- =============================================
+
+-- Log successful completion
+INSERT INTO agrosoluce.migrations (migration_name, description, executed_at) 
+VALUES ('012_canonical_cooperative_directory_completed', 'Canonical Cooperative Directory migration completed successfully', NOW())
+ON CONFLICT (migration_name) DO NOTHING;
+
+
+
+-- =============================================
+-- Migration: 013_coverage_metrics_table.sql
+-- =============================================
+
+-- Migration: Coverage Metrics Table
+-- Creates a dedicated table for document coverage metrics per cooperative
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('013_coverage_metrics_table', 'Coverage Metrics Table: dedicated table for document coverage metrics per cooperative')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- COVERAGE METRICS TABLE
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS agrosoluce.coverage_metrics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    coop_id UUID NOT NULL,
+    required_docs_total INTEGER NOT NULL DEFAULT 0,
+    required_docs_present INTEGER NOT NULL DEFAULT 0,
+    coverage_percentage NUMERIC(5, 2) NOT NULL DEFAULT 0,
+    last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(coop_id)
+);
+
+-- =============================================
+-- INDEXES FOR PERFORMANCE
+-- =============================================
+
+CREATE INDEX IF NOT EXISTS idx_coverage_metrics_coop_id ON agrosoluce.coverage_metrics(coop_id);
+CREATE INDEX IF NOT EXISTS idx_coverage_metrics_last_updated ON agrosoluce.coverage_metrics(last_updated DESC);
+
+-- =============================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- =============================================
+
+-- Enable RLS on coverage metrics table
+ALTER TABLE agrosoluce.coverage_metrics ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Authenticated users can view coverage metrics
+CREATE POLICY "Authenticated users can view coverage metrics" 
+    ON agrosoluce.coverage_metrics
+    FOR SELECT 
+    USING (auth.role() = 'authenticated');
+
+-- Policy: Authenticated users can insert coverage metrics
+CREATE POLICY "Authenticated users can insert coverage metrics" 
+    ON agrosoluce.coverage_metrics
+    FOR INSERT 
+    WITH CHECK (auth.role() = 'authenticated');
+
+-- Policy: Authenticated users can update coverage metrics
+CREATE POLICY "Authenticated users can update coverage metrics" 
+    ON agrosoluce.coverage_metrics
+    FOR UPDATE 
+    USING (auth.role() = 'authenticated');
+
+-- Grant read access to anon users (for public viewing)
+CREATE POLICY "Anon users can view coverage metrics" 
+    ON agrosoluce.coverage_metrics
+    FOR SELECT 
+    USING (true);
+
+-- =============================================
+-- COMMENTS AND DOCUMENTATION
+-- =============================================
+
+COMMENT ON TABLE agrosoluce.coverage_metrics IS 'Document coverage metrics per cooperative - tracks required vs present document types';
+COMMENT ON COLUMN agrosoluce.coverage_metrics.coop_id IS 'Reference to cooperative (can reference canonical_cooperative_directory or cooperatives table)';
+COMMENT ON COLUMN agrosoluce.coverage_metrics.required_docs_total IS 'Total number of required document types for this cooperative';
+COMMENT ON COLUMN agrosoluce.coverage_metrics.required_docs_present IS 'Number of required document types that have at least one evidence document';
+COMMENT ON COLUMN agrosoluce.coverage_metrics.coverage_percentage IS 'Percentage coverage: (required_docs_present / required_docs_total) * 100';
+COMMENT ON COLUMN agrosoluce.coverage_metrics.last_updated IS 'Timestamp when coverage metrics were last calculated';
+
+-- =============================================
+-- GRANTS
+-- =============================================
+
+-- Grant permissions to authenticated users
+GRANT USAGE ON SCHEMA agrosoluce TO authenticated;
+GRANT ALL ON agrosoluce.coverage_metrics TO authenticated;
+GRANT USAGE, SELECT ON SEQUENCE IF EXISTS agrosoluce.coverage_metrics_id_seq TO authenticated;
+
+-- Grant read access to anon users
+GRANT USAGE ON SCHEMA agrosoluce TO anon;
+GRANT SELECT ON agrosoluce.coverage_metrics TO anon;
+
+-- =============================================
+-- MIGRATION COMPLETION
+-- =============================================
+
+-- Log successful completion
+INSERT INTO agrosoluce.migrations (migration_name, description, executed_at) 
+VALUES ('013_coverage_metrics_table_completed', 'Coverage Metrics Table migration completed successfully', NOW())
+ON CONFLICT (migration_name) DO NOTHING;
+
+
+
+-- =============================================
+-- Migration: 014_readiness_snapshots.sql
+-- =============================================
+
+-- Migration: Readiness Snapshots Table
+-- Creates a table for tracking readiness status snapshots per cooperative
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('014_readiness_snapshots', 'Readiness Snapshots Table: tracks readiness status snapshots per cooperative based on coverage metrics')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- READINESS SNAPSHOTS TABLE
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS agrosoluce.readiness_snapshots (
+    snapshot_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    coop_id UUID NOT NULL,
+    readiness_status VARCHAR(20) NOT NULL CHECK (readiness_status IN ('not_ready', 'in_progress', 'buyer_ready')),
+    snapshot_reason TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- =============================================
+-- INDEXES FOR PERFORMANCE
+-- =============================================
+
+CREATE INDEX IF NOT EXISTS idx_readiness_snapshots_coop_id ON agrosoluce.readiness_snapshots(coop_id);
+CREATE INDEX IF NOT EXISTS idx_readiness_snapshots_created_at ON agrosoluce.readiness_snapshots(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_readiness_snapshots_coop_created ON agrosoluce.readiness_snapshots(coop_id, created_at DESC);
+
+-- =============================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- =============================================
+
+-- Enable RLS on readiness snapshots table
+ALTER TABLE agrosoluce.readiness_snapshots ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Authenticated users can view readiness snapshots
+CREATE POLICY "Authenticated users can view readiness snapshots" 
+    ON agrosoluce.readiness_snapshots
+    FOR SELECT 
+    USING (auth.role() = 'authenticated');
+
+-- Policy: Authenticated users can insert readiness snapshots
+CREATE POLICY "Authenticated users can insert readiness snapshots" 
+    ON agrosoluce.readiness_snapshots
+    FOR INSERT 
+    WITH CHECK (auth.role() = 'authenticated');
+
+-- Grant read access to anon users (for public viewing)
+CREATE POLICY "Anon users can view readiness snapshots" 
+    ON agrosoluce.readiness_snapshots
+    FOR SELECT 
+    USING (true);
+
+-- =============================================
+-- COMMENTS AND DOCUMENTATION
+-- =============================================
+
+COMMENT ON TABLE agrosoluce.readiness_snapshots IS 'Readiness status snapshots per cooperative - internal shorthand based on documentation coverage';
+COMMENT ON COLUMN agrosoluce.readiness_snapshots.coop_id IS 'Reference to cooperative (can reference canonical_cooperative_directory or cooperatives table)';
+COMMENT ON COLUMN agrosoluce.readiness_snapshots.readiness_status IS 'Readiness status: not_ready, in_progress, or buyer_ready';
+COMMENT ON COLUMN agrosoluce.readiness_snapshots.snapshot_reason IS 'Short text explaining the snapshot reason (e.g., coverage percentage)';
+COMMENT ON COLUMN agrosoluce.readiness_snapshots.created_at IS 'Timestamp when snapshot was created';
+
+-- =============================================
+-- GRANTS
+-- =============================================
+
+-- Grant permissions to authenticated users
+GRANT USAGE ON SCHEMA agrosoluce TO authenticated;
+GRANT ALL ON agrosoluce.readiness_snapshots TO authenticated;
+GRANT USAGE, SELECT ON SEQUENCE IF EXISTS agrosoluce.readiness_snapshots_snapshot_id_seq TO authenticated;
+
+-- Grant read access to anon users
+GRANT USAGE ON SCHEMA agrosoluce TO anon;
+GRANT SELECT ON agrosoluce.readiness_snapshots TO anon;
+
+-- =============================================
+-- MIGRATION COMPLETION
+-- =============================================
+
+-- Log successful completion
+INSERT INTO agrosoluce.migrations (migration_name, description, executed_at) 
+VALUES ('014_readiness_snapshots_completed', 'Readiness Snapshots Table migration completed successfully', NOW())
+ON CONFLICT (migration_name) DO NOTHING;
+
+
+
+-- =============================================
+-- Migration: 015_add_pilot_cohorts.sql
+-- =============================================
+
+-- Migration: Add Pilot Cohort Support
+-- Adds pilot_id and pilot_label columns to canonical_cooperative_directory table
+-- This allows scoping work to a defined set of cooperatives
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('015_add_pilot_cohorts', 'Add pilot cohort support: pilot_id and pilot_label columns to canonical_cooperative_directory')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- ADD PILOT COHORT COLUMNS
+-- =============================================
+
+-- Add pilot_id column (nullable string, allows any identifier)
+ALTER TABLE agrosoluce.canonical_cooperative_directory
+ADD COLUMN IF NOT EXISTS pilot_id VARCHAR(100);
+
+-- Add pilot_label column (optional label like "Pilot A")
+ALTER TABLE agrosoluce.canonical_cooperative_directory
+ADD COLUMN IF NOT EXISTS pilot_label VARCHAR(100);
+
+-- =============================================
+-- INDEXES FOR PERFORMANCE
+-- =============================================
+
+-- Index for filtering by pilot_id
+CREATE INDEX IF NOT EXISTS idx_canonical_dir_pilot_id ON agrosoluce.canonical_cooperative_directory(pilot_id);
+
+-- =============================================
+-- COMMENTS AND DOCUMENTATION
+-- =============================================
+
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.pilot_id IS 'Pilot cohort identifier. A cooperative can belong to zero or one pilot cohort.';
+COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.pilot_label IS 'Optional human-readable label for the pilot cohort (e.g., "Pilot A", "Q1 2024 Pilot")';
+
+-- =============================================
+-- MIGRATION COMPLETION
+-- =============================================
+
+-- Log successful completion
+INSERT INTO agrosoluce.migrations (migration_name, description, executed_at) 
+VALUES ('015_add_pilot_cohorts_completed', 'Pilot cohort support migration completed successfully', NOW())
+ON CONFLICT (migration_name) DO NOTHING;
+
+
+
+-- =============================================
+-- Migration: 016_farmer_declarations.sql
+-- =============================================
+
+-- Migration: Farmer Declarations
+-- Creates farmer_declarations table for self-reported farmer declarations
+-- All records are labeled as "Self-reported by farmer (unverified)"
+--
+-- Rules:
+-- - No farmer name fields
+-- - No verification flags
+-- - All records must be labeled "Self-reported by farmer (unverified)"
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('016_farmer_declarations', 'Farmer Declarations: self-reported declarations with farmer_reference, no names, no verification flags')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- FARMER DECLARATIONS TABLE
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS agrosoluce.farmer_declarations (
+    declaration_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    coop_id UUID NOT NULL REFERENCES agrosoluce.canonical_cooperative_directory(coop_id) ON DELETE CASCADE,
+    farmer_reference VARCHAR(255) NOT NULL, -- Internal/non-public reference (e.g., "FARMER-001", not a name)
+    declaration_type VARCHAR(100) NOT NULL, -- e.g., 'child_labor', 'land_use', 'organic_practices', etc.
+    declared_value TEXT NOT NULL, -- The actual declaration value (can be boolean, text, JSON, etc.)
+    declared_at TIMESTAMP WITH TIME ZONE NOT NULL, -- When the farmer made the declaration
+    collected_by UUID REFERENCES agrosoluce.user_profiles(id) ON DELETE SET NULL, -- Coop user who collected this
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Ensure one declaration per farmer_reference per declaration_type per declared_at date
+    CONSTRAINT unique_farmer_declaration UNIQUE (coop_id, farmer_reference, declaration_type, declared_at::DATE)
+);
+
+-- =============================================
+-- INDEXES FOR PERFORMANCE
+-- =============================================
+
+CREATE INDEX IF NOT EXISTS idx_farmer_declarations_coop_id ON agrosoluce.farmer_declarations(coop_id);
+CREATE INDEX IF NOT EXISTS idx_farmer_declarations_farmer_reference ON agrosoluce.farmer_declarations(farmer_reference);
+CREATE INDEX IF NOT EXISTS idx_farmer_declarations_type ON agrosoluce.farmer_declarations(declaration_type);
+CREATE INDEX IF NOT EXISTS idx_farmer_declarations_declared_at ON agrosoluce.farmer_declarations(declared_at DESC);
+CREATE INDEX IF NOT EXISTS idx_farmer_declarations_collected_by ON agrosoluce.farmer_declarations(collected_by);
+CREATE INDEX IF NOT EXISTS idx_farmer_declarations_created_at ON agrosoluce.farmer_declarations(created_at DESC);
+
+-- Composite index for common queries
+CREATE INDEX IF NOT EXISTS idx_farmer_declarations_coop_type ON agrosoluce.farmer_declarations(coop_id, declaration_type);
+CREATE INDEX IF NOT EXISTS idx_farmer_declarations_coop_farmer ON agrosoluce.farmer_declarations(coop_id, farmer_reference);
+
+-- =============================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- =============================================
+
+-- Enable RLS on farmer_declarations table
+ALTER TABLE agrosoluce.farmer_declarations ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Cooperative members can view declarations for their cooperative
+CREATE POLICY "Cooperative members can view their farmer declarations" 
+    ON agrosoluce.farmer_declarations
+    FOR SELECT 
+    USING (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd
+            JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE ccd.coop_id = farmer_declarations.coop_id
+            AND up.user_id = auth.uid()
+        )
+        OR
+        -- Allow if collected_by matches current user
+        collected_by IN (
+            SELECT id FROM agrosoluce.user_profiles WHERE user_id = auth.uid()
+        )
+    );
+
+-- Policy: Cooperative members can insert declarations for their cooperative
+CREATE POLICY "Cooperative members can create farmer declarations" 
+    ON agrosoluce.farmer_declarations
+    FOR INSERT 
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd
+            JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE ccd.coop_id = farmer_declarations.coop_id
+            AND up.user_id = auth.uid()
+        )
+        OR
+        -- Allow if collected_by matches current user
+        collected_by IN (
+            SELECT id FROM agrosoluce.user_profiles WHERE user_id = auth.uid()
+        )
+    );
+
+-- Policy: Cooperative members can update declarations for their cooperative
+CREATE POLICY "Cooperative members can update their farmer declarations" 
+    ON agrosoluce.farmer_declarations
+    FOR UPDATE 
+    USING (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd
+            JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE ccd.coop_id = farmer_declarations.coop_id
+            AND up.user_id = auth.uid()
+        )
+    );
+
+-- Policy: Cooperative members can delete declarations for their cooperative
+CREATE POLICY "Cooperative members can delete their farmer declarations" 
+    ON agrosoluce.farmer_declarations
+    FOR DELETE 
+    USING (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd
+            JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE ccd.coop_id = farmer_declarations.coop_id
+            AND up.user_id = auth.uid()
+        )
+    );
+
+-- =============================================
+-- COMMENTS AND DOCUMENTATION
+-- =============================================
+
+COMMENT ON TABLE agrosoluce.farmer_declarations IS 'Farmer declarations - Self-reported by farmer (unverified). No farmer names, no verification flags.';
+COMMENT ON COLUMN agrosoluce.farmer_declarations.declaration_id IS 'Unique identifier for the declaration record';
+COMMENT ON COLUMN agrosoluce.farmer_declarations.coop_id IS 'Reference to the cooperative (canonical_cooperative_directory)';
+COMMENT ON COLUMN agrosoluce.farmer_declarations.farmer_reference IS 'Internal/non-public reference identifier for the farmer (e.g., "FARMER-001"). NOT a name.';
+COMMENT ON COLUMN agrosoluce.farmer_declarations.declaration_type IS 'Type of declaration (e.g., child_labor, land_use, organic_practices)';
+COMMENT ON COLUMN agrosoluce.farmer_declarations.declared_value IS 'The actual declaration value (can be boolean, text, JSON, etc.)';
+COMMENT ON COLUMN agrosoluce.farmer_declarations.declared_at IS 'When the farmer made the declaration';
+COMMENT ON COLUMN agrosoluce.farmer_declarations.collected_by IS 'Cooperative user who collected this declaration';
+COMMENT ON COLUMN agrosoluce.farmer_declarations.created_at IS 'When this record was created in the system';
+
+-- =============================================
+-- GRANTS
+-- =============================================
+
+GRANT ALL ON agrosoluce.farmer_declarations TO authenticated;
+GRANT SELECT ON agrosoluce.farmer_declarations TO anon; -- Read-only for anonymous users if needed
+
+-- =============================================
+-- MIGRATION RECORD
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('016_farmer_declarations', 'Farmer Declarations: self-reported declarations with farmer_reference, no names, no verification flags')
+ON CONFLICT (migration_name) DO NOTHING;
+
+
+
+-- =============================================
+-- Migration: 017_add_farmer_declarations_to_buyer_view.sql
+-- =============================================
+
+-- Migration: Add Farmer Declarations to Buyer-Facing View
+-- Extends buyer_facing_summary view to include aggregate farmer declaration information
+-- Shows: total count, declaration types present, last declaration date
+-- Does NOT show: individual farmer references, declaration text values, gaps at farmer level
+-- All data labeled as "Aggregated farmer declarations (self-reported, unverified)"
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('017_add_farmer_declarations_to_buyer_view', 'Add aggregate farmer declarations to buyer-facing summary view')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- UPDATE BUYER-FACING SUMMARY VIEW
+-- =============================================
+
+-- Update the buyer_facing_summary view to include aggregate farmer declaration information
+CREATE OR REPLACE VIEW agrosoluce.buyer_facing_summary AS
+SELECT 
+    c.id,
+    c.name,
+    c.country,
+    c.region,
+    c.commodity,
+    c.annual_volume_tons,
+    -- Readiness badge calculation
+    CASE 
+        WHEN readiness.readiness_score >= 80 THEN 'Buyer-Ready'
+        WHEN readiness.readiness_score >= 50 THEN 'In Progress'
+        ELSE 'Not Ready'
+    END AS readiness_badge,
+    -- Evidence coverage percentages
+    COALESCE(
+        ROUND((farmer_stats.documented_farmers::NUMERIC / NULLIF(farmer_stats.total_farmers, 0) * 100), 1),
+        0
+    ) AS farmer_coverage_pct,
+    COALESCE(
+        ROUND((plot_stats.geo_referenced_plots::NUMERIC / NULLIF(plot_stats.total_plots, 0) * 100), 1),
+        0
+    ) AS plot_coverage_pct,
+    COALESCE(
+        ROUND((doc_stats.required_docs_uploaded::NUMERIC / NULLIF(doc_stats.total_required_docs, 0) * 100), 1),
+        0
+    ) AS document_coverage_pct,
+    -- Certifications summary
+    array_agg(DISTINCT cert.certification_type) FILTER (WHERE cert.status = 'active') AS certifications,
+    -- Active lots count
+    COUNT(DISTINCT p.id) FILTER (WHERE p.lot_status = 'active') AS active_lots_count,
+    -- Risk flags (high-level only)
+    c.compliance_flags->>'childLaborRisk' AS child_labor_risk,
+    c.compliance_flags->>'eudrReady' AS eudr_ready,
+    -- Status (only approved cooperatives visible to buyers)
+    c.status,
+    -- Aggregated farmer declarations (self-reported, unverified)
+    -- Total count of farmer declarations
+    COALESCE(declaration_stats.total_declarations, 0) AS farmer_declarations_total_count,
+    -- Array of distinct declaration types present
+    COALESCE(declaration_stats.declaration_types_present, ARRAY[]::VARCHAR[]) AS farmer_declarations_types_present,
+    -- Last declaration date (most recent declared_at)
+    declaration_stats.farmer_declarations_last_date AS farmer_declarations_last_date
+FROM agrosoluce.cooperatives c
+LEFT JOIN LATERAL (
+    SELECT 
+        COUNT(*) FILTER (WHERE EXISTS (
+            SELECT 1 FROM agrosoluce.farmer_declarations fd 
+            WHERE fd.farmer_id = f.id 
+            AND fd.declaration_type = 'child_labor'
+        )) AS documented_farmers,
+        COUNT(*) AS total_farmers
+    FROM agrosoluce.farmers f
+    WHERE f.cooperative_id = c.id AND f.is_active = true
+) farmer_stats ON true
+LEFT JOIN LATERAL (
+    SELECT 
+        COUNT(*) FILTER (WHERE field_location_latitude IS NOT NULL AND field_location_longitude IS NOT NULL) AS geo_referenced_plots,
+        COUNT(*) AS total_plots
+    FROM agrosoluce.field_declarations fd
+    WHERE fd.cooperative_id = c.id
+) plot_stats ON true
+LEFT JOIN LATERAL (
+    SELECT 
+        COUNT(*) FILTER (WHERE is_buyer_visible = true) AS required_docs_uploaded,
+        COUNT(*) AS total_required_docs
+    FROM agrosoluce.documents d
+    WHERE d.entity_type = 'cooperative' AND d.entity_id = c.id
+) doc_stats ON true
+-- Aggregate farmer declarations from new farmer_declarations table (migration 016)
+-- Join via canonical_cooperative_directory: cooperatives.id = canonical_cooperative_directory.coop_id
+LEFT JOIN LATERAL (
+    SELECT 
+        COUNT(*) AS total_declarations,
+        array_agg(DISTINCT fd.declaration_type) AS declaration_types_present,
+        MAX(fd.declared_at) AS farmer_declarations_last_date
+    FROM agrosoluce.farmer_declarations fd
+    WHERE fd.coop_id = c.id  -- cooperatives.id maps to canonical_cooperative_directory.coop_id
+) declaration_stats ON true
+LEFT JOIN agrosoluce.certifications cert ON cert.cooperative_id = c.id
+LEFT JOIN agrosoluce.products p ON p.cooperative_id = c.id
+LEFT JOIN LATERAL (
+    SELECT 
+        (
+            CASE WHEN farmer_stats.documented_farmers > 0 THEN 20 ELSE 0 END +
+            CASE WHEN plot_stats.geo_referenced_plots > 0 THEN 20 ELSE 0 END +
+            CASE WHEN doc_stats.required_docs_uploaded > 0 THEN 20 ELSE 0 END +
+            CASE WHEN COUNT(DISTINCT cert.id) > 0 THEN 20 ELSE 0 END +
+            CASE WHEN COUNT(DISTINCT p.id) FILTER (WHERE p.lot_status = 'active') > 0 THEN 20 ELSE 0 END
+        ) AS readiness_score
+) readiness ON true
+WHERE c.status = 'approved' -- Only show approved cooperatives to buyers
+GROUP BY 
+    c.id, c.name, c.country, c.region, c.commodity, c.annual_volume_tons,
+    c.compliance_flags, c.status,
+    farmer_stats.documented_farmers, farmer_stats.total_farmers,
+    plot_stats.geo_referenced_plots, plot_stats.total_plots,
+    doc_stats.required_docs_uploaded, doc_stats.total_required_docs,
+    readiness.readiness_score,
+    declaration_stats.total_declarations,
+    declaration_stats.declaration_types_present,
+    declaration_stats.farmer_declarations_last_date;
+
+-- =============================================
+-- GRANTS (Preserve existing public access)
+-- =============================================
+
+-- Ensure grants are preserved for buyer-facing view
+GRANT SELECT ON agrosoluce.buyer_facing_summary TO authenticated;
+GRANT SELECT ON agrosoluce.buyer_facing_summary TO anon;
+
+-- =============================================
+-- COMMENTS AND DOCUMENTATION
+-- =============================================
+
+COMMENT ON COLUMN agrosoluce.buyer_facing_summary.farmer_declarations_total_count IS 'Aggregated farmer declarations (self-reported, unverified): Total count of farmer declarations for this cooperative';
+COMMENT ON COLUMN agrosoluce.buyer_facing_summary.farmer_declarations_types_present IS 'Aggregated farmer declarations (self-reported, unverified): Array of distinct declaration types present (e.g., child_labor, land_use)';
+COMMENT ON COLUMN agrosoluce.buyer_facing_summary.farmer_declarations_last_date IS 'Aggregated farmer declarations (self-reported, unverified): Date of most recent declaration (declared_at)';
+
+-- =============================================
+-- MIGRATION RECORD
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('017_add_farmer_declarations_to_buyer_view', 'Add aggregate farmer declarations to buyer-facing summary view')
+ON CONFLICT (migration_name) DO NOTHING;
+
+
+
+-- =============================================
+-- Migration: 018_add_evidence_type.sql
+-- =============================================
+
+-- Migration: Add Evidence Type Typology
+-- Adds evidence_type column to documents table for evidence classification
+-- Phase 3 - Step 1: Evidence Typology layer
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('018_add_evidence_type', 'Add evidence_type column to documents table for evidence typology classification')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- ADD EVIDENCE_TYPE COLUMN
+-- =============================================
+
+-- Add evidence_type column to documents table
+ALTER TABLE agrosoluce.documents
+ADD COLUMN IF NOT EXISTS evidence_type VARCHAR(50) DEFAULT 'documented'
+    CHECK (evidence_type IN ('documented', 'declared', 'attested', 'contextual'));
+
+-- Update existing records to default to 'documented'
+UPDATE agrosoluce.documents
+SET evidence_type = 'documented'
+WHERE evidence_type IS NULL;
+
+-- Create index for filtering by evidence_type
+CREATE INDEX IF NOT EXISTS idx_documents_evidence_type ON agrosoluce.documents(evidence_type);
+
+-- =============================================
+-- COMMENTS
+-- =============================================
+
+COMMENT ON COLUMN agrosoluce.documents.evidence_type IS 'Evidence classification typology: documented, declared, attested, or contextual. Not a quality or compliance assessment.';
+
+-- =============================================
+-- MIGRATION RECORD
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('018_add_evidence_type', 'Add evidence_type column to documents table for evidence typology classification')
+ON CONFLICT (migration_name) DO NOTHING;
+
+
+
+-- =============================================
+-- Migration: 019_add_assessment_tables.sql
+-- =============================================
+
+-- Migration: Add Assessment Tables
+-- This migration creates tables for storing farm readiness assessments
+-- Uses the 'agrosoluce' schema to avoid conflicts with other projects
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+-- Insert this migration record
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('019_add_assessment_tables', 'Add assessment tables for AgroSoluce Farm Assessment Module')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- ASSESSMENT TABLES
+-- =============================================
+
+-- Assessment tables
+CREATE TABLE IF NOT EXISTS agrosoluce.assessments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  cooperative_id uuid NOT NULL REFERENCES agrosoluce.canonical_cooperative_directory(coop_id) ON DELETE CASCADE,
+  assessment_data jsonb NOT NULL,
+  overall_score integer NOT NULL CHECK (overall_score >= 0 AND overall_score <= 100),
+  section_scores jsonb NOT NULL,
+  recommendations jsonb NOT NULL,
+  toolkit_ready boolean DEFAULT false,
+  completed_at timestamp with time zone DEFAULT now(),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Assessment responses for detailed tracking
+CREATE TABLE IF NOT EXISTS agrosoluce.assessment_responses (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  assessment_id uuid REFERENCES agrosoluce.assessments(id) ON DELETE CASCADE,
+  question_id text NOT NULL,
+  response_value text NOT NULL,
+  score integer NOT NULL CHECK (score >= 0 AND score <= 3),
+  created_at timestamp with time zone DEFAULT now()
+);
+
+-- =============================================
+-- INDEXES FOR PERFORMANCE
+-- =============================================
+
+CREATE INDEX IF NOT EXISTS idx_assessments_cooperative_id ON agrosoluce.assessments(cooperative_id);
+CREATE INDEX IF NOT EXISTS idx_assessments_completed_at ON agrosoluce.assessments(completed_at);
+CREATE INDEX IF NOT EXISTS idx_assessments_toolkit_ready ON agrosoluce.assessments(toolkit_ready);
+CREATE INDEX IF NOT EXISTS idx_assessment_responses_assessment_id ON agrosoluce.assessment_responses(assessment_id);
+CREATE INDEX IF NOT EXISTS idx_assessment_responses_question_id ON agrosoluce.assessment_responses(question_id);
+
+-- =============================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- =============================================
+
+-- Enable RLS
+ALTER TABLE agrosoluce.assessments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE agrosoluce.assessment_responses ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist (for idempotent migrations)
+DROP POLICY IF EXISTS "Anyone can view assessments" ON agrosoluce.assessments;
+DROP POLICY IF EXISTS "Authenticated users can insert assessments" ON agrosoluce.assessments;
+DROP POLICY IF EXISTS "Authenticated users can update assessments" ON agrosoluce.assessments;
+DROP POLICY IF EXISTS "Anyone can view assessment responses" ON agrosoluce.assessment_responses;
+DROP POLICY IF EXISTS "Authenticated users can insert assessment responses" ON agrosoluce.assessment_responses;
+
+-- Policy: Anyone can view assessments (public assessment results)
+CREATE POLICY "Anyone can view assessments" 
+  ON agrosoluce.assessments
+  FOR SELECT 
+  USING (true);
+
+-- Policy: Authenticated users can insert assessments
+CREATE POLICY "Authenticated users can insert assessments" 
+  ON agrosoluce.assessments
+  FOR INSERT 
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- Policy: Authenticated users can update their own assessments
+CREATE POLICY "Authenticated users can update assessments" 
+  ON agrosoluce.assessments
+  FOR UPDATE 
+  USING (auth.role() = 'authenticated');
+
+-- Policy: Anyone can view assessment responses
+CREATE POLICY "Anyone can view assessment responses" 
+  ON agrosoluce.assessment_responses
+  FOR SELECT 
+  USING (true);
+
+-- Policy: Authenticated users can insert assessment responses
+CREATE POLICY "Authenticated users can insert assessment responses" 
+  ON agrosoluce.assessment_responses
+  FOR INSERT 
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- =============================================
+-- TRIGGERS
+-- =============================================
+
+-- Add updated_at trigger
+CREATE OR REPLACE FUNCTION agrosoluce.update_assessments_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Drop existing trigger if it exists (for idempotent migrations)
+DROP TRIGGER IF EXISTS update_assessments_updated_at ON agrosoluce.assessments;
+
+CREATE TRIGGER update_assessments_updated_at
+  BEFORE UPDATE ON agrosoluce.assessments
+  FOR EACH ROW
+  EXECUTE FUNCTION agrosoluce.update_assessments_updated_at();
+
+-- =============================================
+-- GRANTS
+-- =============================================
+
+GRANT ALL ON agrosoluce.assessments TO authenticated;
+GRANT SELECT ON agrosoluce.assessments TO anon; -- Read-only for anonymous users
+GRANT ALL ON agrosoluce.assessment_responses TO authenticated;
+GRANT SELECT ON agrosoluce.assessment_responses TO anon; -- Read-only for anonymous users
+
+-- =============================================
+-- COMMENTS FOR DOCUMENTATION
+-- =============================================
+
+COMMENT ON TABLE agrosoluce.assessments IS 'Stores farm readiness assessment results for cooperatives';
+COMMENT ON TABLE agrosoluce.assessment_responses IS 'Stores individual question responses for each assessment';
+COMMENT ON COLUMN agrosoluce.assessments.assessment_data IS 'JSONB containing all assessment responses and metadata';
+COMMENT ON COLUMN agrosoluce.assessments.section_scores IS 'JSONB object with section IDs as keys and scores (0-100) as values';
+COMMENT ON COLUMN agrosoluce.assessments.recommendations IS 'JSONB array of recommendation objects with priority, category, and action items';
+
+
+
+-- =============================================
+-- Migration: 020_rename_compliance_to_readiness.sql
+-- =============================================
+
+-- Migration: Rename Compliance to Readiness Terminology
+-- This migration updates database schema to use safer terminology:
+-- - compliance_score → readiness_score
+-- - cooperative_compliance_status → cooperative_readiness_status
+-- Updates all related views, functions, and indexes
+-- Uses the 'agrosoluce' schema to avoid conflicts with other projects
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+-- Insert this migration record
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('020_rename_compliance_to_readiness', 'Rename compliance terminology to readiness for child labor monitoring')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- STEP 1: CREATE CHILD_LABOR_ASSESSMENTS TABLE IF IT DOESN'T EXIST
+-- =============================================
+
+-- Create the child_labor_assessments table if it doesn't exist
+CREATE TABLE IF NOT EXISTS agrosoluce.child_labor_assessments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  cooperative_id UUID NOT NULL REFERENCES agrosoluce.cooperatives(id) ON DELETE CASCADE,
+  assessor_id UUID REFERENCES agrosoluce.user_profiles(id) ON DELETE SET NULL,
+  
+  -- Assessment Details
+  assessment_date DATE NOT NULL,
+  assessment_period_start DATE NOT NULL,
+  assessment_period_end DATE NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'in_progress', 'completed', 'archived')),
+  
+  -- School Enrollment Data
+  total_children_in_community INTEGER NOT NULL DEFAULT 0,
+  children_enrolled_school INTEGER NOT NULL DEFAULT 0,
+  school_enrollment_rate NUMERIC(5, 2) GENERATED ALWAYS AS (
+    CASE 
+      WHEN total_children_in_community > 0 
+      THEN (children_enrolled_school::NUMERIC / total_children_in_community::NUMERIC) * 100
+      ELSE 0
+    END
+  ) STORED,
+  
+  -- Labor Verification
+  minimum_working_age INTEGER NOT NULL DEFAULT 16,
+  total_workers_assessed INTEGER NOT NULL DEFAULT 0,
+  underage_workers_found INTEGER NOT NULL DEFAULT 0,
+  age_verification_method VARCHAR(50) CHECK (age_verification_method IN ('birth_certificate', 'school_records', 'community_verification', 'other')),
+  
+  -- Violations
+  child_labor_violations INTEGER NOT NULL DEFAULT 0,
+  hazardous_work_violations INTEGER NOT NULL DEFAULT 0,
+  worst_forms_violations INTEGER NOT NULL DEFAULT 0,
+  violation_severity VARCHAR(50) CHECK (violation_severity IN ('none', 'low', 'medium', 'high', 'critical')),
+  violation_details JSONB DEFAULT '[]'::jsonb,
+  
+  -- Readiness Score (renamed from compliance_score)
+  -- This is a self-assessment score, not a compliance determination
+  readiness_score INTEGER CHECK (readiness_score >= 0 AND readiness_score <= 100),
+  
+  -- Legacy field for backward compatibility during migration
+  compliance_score INTEGER CHECK (compliance_score >= 0 AND compliance_score <= 100),
+  
+  -- Supporting Evidence
+  evidence_documents TEXT[] DEFAULT ARRAY[]::TEXT[],
+  photographs TEXT[] DEFAULT ARRAY[]::TEXT[],
+  witness_statements JSONB DEFAULT '[]'::jsonb,
+  
+  -- Assessor Information
+  assessor_name VARCHAR(255) NOT NULL,
+  assessor_organization VARCHAR(255),
+  assessor_certification VARCHAR(255),
+  assessor_notes TEXT,
+  
+  -- Next Assessment
+  next_assessment_due DATE,
+  assessment_frequency_months INTEGER DEFAULT 6,
+  
+  -- Timestamps
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- =============================================
+-- STEP 2: MIGRATE EXISTING DATA
+-- =============================================
+
+-- If compliance_score exists but readiness_score doesn't, copy the data
+DO $$
+BEGIN
+  -- Check if compliance_score column exists and readiness_score doesn't
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_schema = 'agrosoluce' 
+    AND table_name = 'child_labor_assessments' 
+    AND column_name = 'compliance_score'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_schema = 'agrosoluce' 
+    AND table_name = 'child_labor_assessments' 
+    AND column_name = 'readiness_score'
+  ) THEN
+    -- Add readiness_score column
+    ALTER TABLE agrosoluce.child_labor_assessments 
+    ADD COLUMN readiness_score INTEGER CHECK (readiness_score >= 0 AND readiness_score <= 100);
+    
+    -- Copy data from compliance_score to readiness_score
+    UPDATE agrosoluce.child_labor_assessments 
+    SET readiness_score = compliance_score 
+    WHERE compliance_score IS NOT NULL;
+  END IF;
+  
+  -- If both columns exist, ensure readiness_score is populated
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_schema = 'agrosoluce' 
+    AND table_name = 'child_labor_assessments' 
+    AND column_name = 'readiness_score'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_schema = 'agrosoluce' 
+    AND table_name = 'child_labor_assessments' 
+    AND column_name = 'compliance_score'
+  ) THEN
+    -- Update readiness_score where it's NULL but compliance_score has a value
+    UPDATE agrosoluce.child_labor_assessments 
+    SET readiness_score = compliance_score 
+    WHERE readiness_score IS NULL AND compliance_score IS NOT NULL;
+  END IF;
+END $$;
+
+-- =============================================
+-- STEP 3: CREATE/UPDATE COOPERATIVE_READINESS_STATUS VIEW
+-- =============================================
+
+-- Drop the old view/table if it exists
+DROP VIEW IF EXISTS agrosoluce.cooperative_compliance_status CASCADE;
+DROP TABLE IF EXISTS agrosoluce.cooperative_compliance_status CASCADE;
+
+-- Create the new view with readiness terminology
+CREATE OR REPLACE VIEW agrosoluce.cooperative_readiness_status AS
+SELECT 
+  c.id AS cooperative_id,
+  c.name AS cooperative_name,
+  c.region,
+  c.country,
+  c.commodity,
+  
+  -- Latest assessment data
+  a.id AS latest_assessment_id,
+  a.assessment_date AS latest_assessment_date,
+  a.status AS latest_assessment_status,
+  
+  -- Readiness metrics (self-assessment, not compliance determination)
+  COALESCE(a.readiness_score, a.compliance_score, 0) AS readiness_score,
+  a.compliance_score AS legacy_compliance_score, -- Keep for backward compatibility
+  
+  -- Violation metrics
+  COALESCE(a.child_labor_violations, 0) AS child_labor_violations,
+  COALESCE(a.hazardous_work_violations, 0) AS hazardous_work_violations,
+  COALESCE(a.worst_forms_violations, 0) AS worst_forms_violations,
+  a.violation_severity,
+  
+  -- School enrollment metrics
+  a.total_children_in_community,
+  a.children_enrolled_school,
+  a.school_enrollment_rate,
+  
+  -- Assessment metadata
+  a.assessor_name,
+  a.assessor_organization,
+  a.next_assessment_due,
+  a.assessment_frequency_months,
+  
+  -- Timestamps
+  a.created_at AS assessment_created_at,
+  a.updated_at AS assessment_updated_at,
+  NOW() AS status_calculated_at
+  
+FROM agrosoluce.cooperatives c
+LEFT JOIN LATERAL (
+  SELECT *
+  FROM agrosoluce.child_labor_assessments
+  WHERE cooperative_id = c.id
+  AND status = 'completed'
+  ORDER BY assessment_date DESC
+  LIMIT 1
+) a ON true;
+
+-- Create a materialized view option for better performance (optional, can be refreshed periodically)
+-- Uncomment if needed:
+-- CREATE MATERIALIZED VIEW IF NOT EXISTS agrosoluce.cooperative_readiness_status_materialized AS
+-- SELECT * FROM agrosoluce.cooperative_readiness_status;
+
+-- =============================================
+-- STEP 4: CREATE INDEXES
+-- =============================================
+
+-- Indexes for child_labor_assessments
+CREATE INDEX IF NOT EXISTS idx_child_labor_assessments_cooperative_id 
+  ON agrosoluce.child_labor_assessments(cooperative_id);
+CREATE INDEX IF NOT EXISTS idx_child_labor_assessments_assessment_date 
+  ON agrosoluce.child_labor_assessments(assessment_date DESC);
+CREATE INDEX IF NOT EXISTS idx_child_labor_assessments_status 
+  ON agrosoluce.child_labor_assessments(status);
+CREATE INDEX IF NOT EXISTS idx_child_labor_assessments_readiness_score 
+  ON agrosoluce.child_labor_assessments(readiness_score DESC);
+CREATE INDEX IF NOT EXISTS idx_child_labor_assessments_compliance_score 
+  ON agrosoluce.child_labor_assessments(compliance_score DESC); -- Keep for backward compatibility
+
+-- =============================================
+-- STEP 5: UPDATE FUNCTIONS
+-- =============================================
+
+-- Drop old function if it exists
+DROP FUNCTION IF EXISTS agrosoluce.get_compliance_dashboard_stats();
+
+-- Create new function with readiness terminology
+CREATE OR REPLACE FUNCTION agrosoluce.get_readiness_dashboard_stats()
+RETURNS JSONB AS $$
+DECLARE
+  result JSONB;
+BEGIN
+  SELECT jsonb_build_object(
+    'totalAssessments', COUNT(*),
+    'averageReadinessScore', ROUND(AVG(COALESCE(readiness_score, compliance_score, 0))::NUMERIC, 2),
+    'totalCooperatives', COUNT(DISTINCT cooperative_id),
+    'assessmentsByStatus', jsonb_object_agg(status, count) FILTER (WHERE status IS NOT NULL),
+    'readinessDistribution', jsonb_build_object(
+      'excellent', COUNT(*) FILTER (WHERE COALESCE(readiness_score, compliance_score, 0) >= 90),
+      'good', COUNT(*) FILTER (WHERE COALESCE(readiness_score, compliance_score, 0) >= 75 AND COALESCE(readiness_score, compliance_score, 0) < 90),
+      'fair', COUNT(*) FILTER (WHERE COALESCE(readiness_score, compliance_score, 0) >= 60 AND COALESCE(readiness_score, compliance_score, 0) < 75),
+      'poor', COUNT(*) FILTER (WHERE COALESCE(readiness_score, compliance_score, 0) < 60)
+    ),
+    'violationsSummary', jsonb_build_object(
+      'totalViolations', SUM(child_labor_violations + hazardous_work_violations + worst_forms_violations),
+      'cooperativesWithViolations', COUNT(DISTINCT cooperative_id) FILTER (WHERE (child_labor_violations + hazardous_work_violations + worst_forms_violations) > 0)
+    )
+  ) INTO result
+  FROM (
+    SELECT 
+      status,
+      COUNT(*) as count,
+      cooperative_id,
+      COALESCE(readiness_score, compliance_score, 0) as score,
+      child_labor_violations,
+      hazardous_work_violations,
+      worst_forms_violations
+    FROM agrosoluce.child_labor_assessments
+    WHERE status = 'completed'
+    GROUP BY status, cooperative_id, readiness_score, compliance_score, child_labor_violations, hazardous_work_violations, worst_forms_violations
+  ) subq;
+  
+  RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create backward compatibility alias
+CREATE OR REPLACE FUNCTION agrosoluce.get_compliance_dashboard_stats()
+RETURNS JSONB AS $$
+BEGIN
+  RETURN agrosoluce.get_readiness_dashboard_stats();
+END;
+$$ LANGUAGE plpgsql;
+
+-- =============================================
+-- STEP 6: ROW LEVEL SECURITY (RLS)
+-- =============================================
+
+-- Enable RLS on child_labor_assessments
+ALTER TABLE agrosoluce.child_labor_assessments ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can view child labor assessments" ON agrosoluce.child_labor_assessments;
+DROP POLICY IF EXISTS "Cooperative users can insert child labor assessments" ON agrosoluce.child_labor_assessments;
+DROP POLICY IF EXISTS "Cooperative users can update their child labor assessments" ON agrosoluce.child_labor_assessments;
+
+-- Policy: Users can view assessments from their cooperative
+CREATE POLICY "Users can view child labor assessments"
+  ON agrosoluce.child_labor_assessments
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM agrosoluce.cooperatives c
+      JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+      WHERE c.id = child_labor_assessments.cooperative_id
+      AND up.user_id = auth.uid()
+    )
+    OR
+    -- Public can view completed assessments (read-only)
+    status = 'completed'
+    OR
+    -- Admins can view all
+    EXISTS (
+      SELECT 1 FROM agrosoluce.user_profiles
+      WHERE user_id = auth.uid() AND user_type = 'admin'
+    )
+  );
+
+-- Policy: Cooperative users can insert assessments
+CREATE POLICY "Cooperative users can insert child labor assessments"
+  ON agrosoluce.child_labor_assessments
+  FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM agrosoluce.cooperatives c
+      JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+      WHERE c.id = child_labor_assessments.cooperative_id
+      AND up.user_id = auth.uid()
+    )
+  );
+
+-- Policy: Cooperative users can update their assessments
+CREATE POLICY "Cooperative users can update their child labor assessments"
+  ON agrosoluce.child_labor_assessments
+  FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM agrosoluce.cooperatives c
+      JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+      WHERE c.id = child_labor_assessments.cooperative_id
+      AND up.user_id = auth.uid()
+    )
+  );
+
+-- =============================================
+-- STEP 7: TRIGGERS
+-- =============================================
+
+-- Create trigger to update updated_at timestamp
+CREATE OR REPLACE FUNCTION agrosoluce.update_child_labor_assessments_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS update_child_labor_assessments_updated_at ON agrosoluce.child_labor_assessments;
+
+CREATE TRIGGER update_child_labor_assessments_updated_at
+  BEFORE UPDATE ON agrosoluce.child_labor_assessments
+  FOR EACH ROW
+  EXECUTE FUNCTION agrosoluce.update_child_labor_assessments_updated_at();
+
+-- Trigger to sync compliance_score to readiness_score (for backward compatibility)
+CREATE OR REPLACE FUNCTION agrosoluce.sync_readiness_score()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- If readiness_score is NULL but compliance_score has a value, copy it
+  IF NEW.readiness_score IS NULL AND NEW.compliance_score IS NOT NULL THEN
+    NEW.readiness_score := NEW.compliance_score;
+  END IF;
+  -- If compliance_score is NULL but readiness_score has a value, copy it (for legacy support)
+  IF NEW.compliance_score IS NULL AND NEW.readiness_score IS NOT NULL THEN
+    NEW.compliance_score := NEW.readiness_score;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS sync_readiness_score_trigger ON agrosoluce.child_labor_assessments;
+
+CREATE TRIGGER sync_readiness_score_trigger
+  BEFORE INSERT OR UPDATE ON agrosoluce.child_labor_assessments
+  FOR EACH ROW
+  EXECUTE FUNCTION agrosoluce.sync_readiness_score();
+
+-- =============================================
+-- STEP 8: GRANTS
+-- =============================================
+
+GRANT SELECT ON agrosoluce.child_labor_assessments TO authenticated;
+GRANT SELECT ON agrosoluce.child_labor_assessments TO anon; -- Read-only for anonymous
+GRANT INSERT, UPDATE ON agrosoluce.child_labor_assessments TO authenticated;
+
+GRANT SELECT ON agrosoluce.cooperative_readiness_status TO authenticated;
+GRANT SELECT ON agrosoluce.cooperative_readiness_status TO anon; -- Read-only for anonymous
+
+-- =============================================
+-- STEP 9: COMMENTS FOR DOCUMENTATION
+-- =============================================
+
+COMMENT ON TABLE agrosoluce.child_labor_assessments IS 'Child labor monitoring assessments. readiness_score is a self-assessment metric, not a compliance determination.';
+COMMENT ON COLUMN agrosoluce.child_labor_assessments.readiness_score IS 'Self-assessment readiness score (0-100). This is NOT a compliance determination - it reflects documentation and self-reported data quality.';
+COMMENT ON COLUMN agrosoluce.child_labor_assessments.compliance_score IS 'Legacy field for backward compatibility. Use readiness_score instead.';
+COMMENT ON VIEW agrosoluce.cooperative_readiness_status IS 'View showing latest readiness status for each cooperative. Scores are self-assessments, not compliance determinations.';
+COMMENT ON FUNCTION agrosoluce.get_readiness_dashboard_stats() IS 'Returns dashboard statistics using readiness terminology. Scores are self-assessments, not compliance determinations.';
+
+-- =============================================
+-- MIGRATION COMPLETE
+-- =============================================
+
+-- Note: The compliance_score column is kept for backward compatibility.
+-- Applications should migrate to using readiness_score.
+-- The trigger sync_readiness_score_trigger keeps both columns in sync.
+
+
+
+-- =============================================
+-- Migration: 021_fix_rls_permissive_policies.sql
+-- =============================================
+
+-- Migration: Fix RLS Permissive Policies (Supabase Linter 0024)
+-- Addresses Security Advisor warnings for policies with WITH CHECK (true)
+-- on INSERT operations. Replaces permissive checks with proper validation.
+--
+-- Multi-project database: iterates over distinctive project schemas to avoid
+-- polluting shared 'public' and ensure each project's tables are fixed in
+-- their own schema (agrosoluce, edusoluce, vendorsoluce, cybercaution, etc.)
+--
+-- Reference: https://supabase.com/docs/guides/database/database-linter?lint=0024_permissive_rls_policy
+
+-- =============================================
+-- MIGRATION METADATA (per-project)
+-- =============================================
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'agrosoluce' AND table_name = 'migrations') THEN
+    INSERT INTO agrosoluce.migrations (migration_name, description)
+    VALUES ('021_fix_rls_permissive_policies', 'Fix RLS policies with overly permissive WITH CHECK (true) for INSERT operations')
+    ON CONFLICT (migration_name) DO NOTHING;
+  END IF;
+END $$;
+
+-- =============================================
+-- PROJECT SCHEMAS (distinctive, non-public)
+-- =============================================
+-- Only fix tables in project schemas; skip public to avoid cross-project conflicts
+
+DO $$
+DECLARE
+  project_schema text;
+  schemas text[] := ARRAY['agrosoluce', 'edusoluce', 'vendorsoluce', 'cybercaution', 'cybercorrect', 'technosoluce'];
+BEGIN
+  FOREACH project_schema IN ARRAY schemas
+  LOOP
+    -- Skip if schema doesn't exist
+    IF NOT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = project_schema) THEN
+      CONTINUE;
+    END IF;
+
+    -- =============================================
+    -- 1. data_subject_requests (per schema)
+    -- =============================================
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = project_schema AND table_name = 'data_subject_requests') THEN
+      EXECUTE format('DROP POLICY IF EXISTS "Users can insert data subject requests" ON %I.data_subject_requests', project_schema);
+
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = project_schema AND table_name = 'data_subject_requests' AND column_name = 'user_id') THEN
+        EXECUTE format(
+          'CREATE POLICY "Users can insert data subject requests" ON %I.data_subject_requests FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id)',
+          project_schema
+        );
+      ELSE
+        EXECUTE format(
+          'CREATE POLICY "Users can insert data subject requests" ON %I.data_subject_requests FOR INSERT TO authenticated WITH CHECK (auth.uid() IS NOT NULL)',
+          project_schema
+        );
+      END IF;
+    END IF;
+
+    -- =============================================
+    -- 2. notifications (per schema) - "System can insert"
+    -- =============================================
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = project_schema AND table_name = 'notifications') THEN
+      EXECUTE format('DROP POLICY IF EXISTS "System can insert notifications" ON %I.notifications', project_schema);
+      EXECUTE format(
+        'CREATE POLICY "System can insert notifications" ON %I.notifications FOR INSERT TO authenticated WITH CHECK (auth.uid() IS NOT NULL)',
+        project_schema
+      );
+    END IF;
+  END LOOP;
+END $$;
+
+-- =============================================
+-- 3 & 4. contact_submissions / vs_contact_submissions
+-- Per-schema: fix in each project schema where table exists
+-- =============================================
+
+DO $$
+DECLARE
+  project_schema text;
+  schemas text[] := ARRAY['agrosoluce', 'edusoluce', 'vendorsoluce', 'cybercaution', 'cybercorrect', 'technosoluce', 'public'];
+  check_expr text;
+  has_email boolean;
+  has_message boolean;
+BEGIN
+  FOREACH project_schema IN ARRAY schemas
+  LOOP
+    IF NOT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = project_schema) THEN
+      CONTINUE;
+    END IF;
+
+    -- contact_submissions
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = project_schema AND table_name = 'contact_submissions') THEN
+      EXECUTE format('DROP POLICY IF EXISTS "Anyone can insert contact submissions" ON %I.contact_submissions', project_schema);
+
+      SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = project_schema AND table_name = 'contact_submissions' AND column_name = 'email'),
+             EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = project_schema AND table_name = 'contact_submissions' AND column_name = 'message')
+      INTO has_email, has_message;
+
+      check_expr := CASE
+        WHEN has_email AND has_message THEN '(email IS NOT NULL AND trim(email) != '''') OR (message IS NOT NULL AND trim(message) != '''')'
+        WHEN has_email THEN '(email IS NOT NULL AND trim(email) != '''')'
+        WHEN has_message THEN '(message IS NOT NULL AND trim(message) != '''')'
+        ELSE NULL
+      END;
+
+      IF check_expr IS NOT NULL THEN
+        EXECUTE format(
+          'CREATE POLICY "Anyone can insert contact submissions" ON %I.contact_submissions FOR INSERT TO anon, authenticated WITH CHECK (%s)',
+          project_schema, check_expr
+        );
+      END IF;
+    END IF;
+
+    -- vs_contact_submissions (vendorsoluce-style, may exist in public or vendorsoluce)
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = project_schema AND table_name = 'vs_contact_submissions') THEN
+      EXECUTE format('DROP POLICY IF EXISTS "Anyone can insert contact submissions" ON %I.vs_contact_submissions', project_schema);
+
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = project_schema AND table_name = 'vs_contact_submissions' AND column_name = 'email')
+         OR EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = project_schema AND table_name = 'vs_contact_submissions' AND column_name = 'message') THEN
+        EXECUTE format(
+          'CREATE POLICY "Anyone can insert contact submissions" ON %I.vs_contact_submissions FOR INSERT TO anon, authenticated WITH CHECK ((email IS NOT NULL AND trim(email) != '''') OR (message IS NOT NULL AND trim(message) != ''''))',
+          project_schema
+        );
+      END IF;
+    END IF;
+  END LOOP;
+END $$;
+
+
+-- =============================================
+-- Migration: 022_create_vrac_tables.sql
+-- =============================================
+
+-- Migration: Create VRAC (Pharmacy Surveillance) Tables
+-- This migration creates tables for storing pharmacy surveillance data
+-- used for workforce health analysis and antimalarial tracking
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+-- Insert this migration record
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('022_create_vrac_tables', 'Create VRAC pharmacy surveillance tables for health monitoring')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- PHARMACY PROFILES TABLE
+-- =============================================
+
+-- Pharmacy profiles table
+CREATE TABLE IF NOT EXISTS agrosoluce.pharmacy_profiles (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  region TEXT NOT NULL,
+  location TEXT NOT NULL,
+  region_label TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+COMMENT ON TABLE agrosoluce.pharmacy_profiles IS 'Pharmacy locations and metadata for VRAC surveillance';
+COMMENT ON COLUMN agrosoluce.pharmacy_profiles.id IS 'Pharmacy identifier (tanda, prolife, olympique, attobrou)';
+COMMENT ON COLUMN agrosoluce.pharmacy_profiles.region IS 'Region code (gontougo, la_me, abidjan)';
+COMMENT ON COLUMN agrosoluce.pharmacy_profiles.region_label IS 'Human-readable region label with context';
+
+-- =============================================
+-- PRODUCT SALES TABLE
+-- =============================================
+
+-- Product sales table
+CREATE TABLE IF NOT EXISTS agrosoluce.vrac_product_sales (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pharmacy_id TEXT NOT NULL REFERENCES agrosoluce.pharmacy_profiles(id) ON DELETE CASCADE,
+  period_label TEXT NOT NULL,
+  period_start DATE NOT NULL,
+  period_end DATE NOT NULL,
+  year INTEGER NOT NULL,
+  code TEXT NOT NULL,
+  designation TEXT NOT NULL,
+  quantity_sold INTEGER NOT NULL,
+  stock INTEGER,
+  price DECIMAL(10,2),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  CONSTRAINT vrac_product_sales_quantity_check CHECK (quantity_sold >= 0)
+);
+
+COMMENT ON TABLE agrosoluce.vrac_product_sales IS 'Individual product sales records from pharmacy surveillance';
+COMMENT ON COLUMN agrosoluce.vrac_product_sales.period_label IS 'Human-readable period label (e.g., Aug–Dec 2025)';
+COMMENT ON COLUMN agrosoluce.vrac_product_sales.code IS 'Product code from pharmacy system';
+COMMENT ON COLUMN agrosoluce.vrac_product_sales.designation IS 'Product name/description';
+
+-- =============================================
+-- PHARMACY PERIOD AGGREGATES TABLE
+-- =============================================
+
+-- Pharmacy period aggregates table (for performance)
+CREATE TABLE IF NOT EXISTS agrosoluce.vrac_period_aggregates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pharmacy_id TEXT NOT NULL REFERENCES agrosoluce.pharmacy_profiles(id) ON DELETE CASCADE,
+  period_label TEXT NOT NULL,
+  period_start DATE NOT NULL,
+  period_end DATE NOT NULL,
+  year INTEGER NOT NULL,
+  total_quantity INTEGER NOT NULL,
+  antimalarial_quantity INTEGER NOT NULL,
+  antibiotic_quantity INTEGER NOT NULL,
+  analgesic_quantity INTEGER NOT NULL,
+  antimalarial_share DECIMAL(5,4) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(pharmacy_id, year, period_label),
+  CONSTRAINT vrac_period_aggregates_share_check CHECK (antimalarial_share >= 0 AND antimalarial_share <= 1)
+);
+
+COMMENT ON TABLE agrosoluce.vrac_period_aggregates IS 'Pre-calculated period aggregates for performance optimization';
+COMMENT ON COLUMN agrosoluce.vrac_period_aggregates.antimalarial_share IS 'Antimalarial share as decimal (0-1)';
+
+-- =============================================
+-- REGIONAL HEALTH INDEX TABLE
+-- =============================================
+
+-- Regional health index table (materialized view alternative)
+CREATE TABLE IF NOT EXISTS agrosoluce.vrac_regional_health_index (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pharmacy_id TEXT NOT NULL REFERENCES agrosoluce.pharmacy_profiles(id) ON DELETE CASCADE,
+  period_label TEXT NOT NULL,
+  year INTEGER NOT NULL,
+  antimalarial_quantity INTEGER NOT NULL,
+  total_quantity INTEGER NOT NULL,
+  antimalarial_share DECIMAL(5,4) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(pharmacy_id, year, period_label),
+  CONSTRAINT vrac_health_index_share_check CHECK (antimalarial_share >= 0 AND antimalarial_share <= 1)
+);
+
+COMMENT ON TABLE agrosoluce.vrac_regional_health_index IS 'Regional health metrics based on antimalarial sales';
+COMMENT ON COLUMN agrosoluce.vrac_regional_health_index.antimalarial_share IS 'Antimalarial share as decimal (0-1)';
+
+-- =============================================
+-- INDEXES FOR PERFORMANCE
+-- =============================================
+
+-- Indexes for product sales
+CREATE INDEX IF NOT EXISTS idx_vrac_product_sales_pharmacy_year ON agrosoluce.vrac_product_sales(pharmacy_id, year);
+CREATE INDEX IF NOT EXISTS idx_vrac_product_sales_period ON agrosoluce.vrac_product_sales(period_start, period_end);
+CREATE INDEX IF NOT EXISTS idx_vrac_product_sales_code ON agrosoluce.vrac_product_sales(code);
+
+-- Indexes for period aggregates
+CREATE INDEX IF NOT EXISTS idx_vrac_period_aggregates_pharmacy_year ON agrosoluce.vrac_period_aggregates(pharmacy_id, year);
+CREATE INDEX IF NOT EXISTS idx_vrac_period_aggregates_year ON agrosoluce.vrac_period_aggregates(year);
+
+-- Indexes for health index
+CREATE INDEX IF NOT EXISTS idx_vrac_health_index_pharmacy_year ON agrosoluce.vrac_regional_health_index(pharmacy_id, year);
+CREATE INDEX IF NOT EXISTS idx_vrac_health_index_year ON agrosoluce.vrac_regional_health_index(year);
+
+-- =============================================
+-- ROW LEVEL SECURITY (RLS)
+-- =============================================
+
+-- Enable RLS
+ALTER TABLE agrosoluce.pharmacy_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE agrosoluce.vrac_product_sales ENABLE ROW LEVEL SECURITY;
+ALTER TABLE agrosoluce.vrac_period_aggregates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE agrosoluce.vrac_regional_health_index ENABLE ROW LEVEL SECURITY;
+
+-- Public read access policies (data is non-sensitive surveillance data)
+CREATE POLICY "Public read access for pharmacy_profiles" 
+  ON agrosoluce.pharmacy_profiles 
+  FOR SELECT 
+  USING (true);
+
+CREATE POLICY "Public read access for vrac_product_sales" 
+  ON agrosoluce.vrac_product_sales 
+  FOR SELECT 
+  USING (true);
+
+CREATE POLICY "Public read access for vrac_period_aggregates" 
+  ON agrosoluce.vrac_period_aggregates 
+  FOR SELECT 
+  USING (true);
+
+CREATE POLICY "Public read access for vrac_regional_health_index" 
+  ON agrosoluce.vrac_regional_health_index 
+  FOR SELECT 
+  USING (true);
+
+-- =============================================
+-- PHARMACY PROFILES SEED DATA
+-- =============================================
+
+-- Insert pharmacy profiles
+INSERT INTO agrosoluce.pharmacy_profiles (id, name, region, location, region_label) VALUES
+  ('tanda', 'Grande Pharmacie de Tanda', 'gontougo', 'Tanda, Gontougo', 'Gontougo (cocoa)'),
+  ('prolife', 'Pharmacie Prolife', 'gontougo', 'Tabagne, Gontougo', 'Gontougo (cocoa)'),
+  ('olympique', 'Pharmacie Olympique', 'abidjan', 'Abidjan', 'Abidjan (urban)'),
+  ('attobrou', 'Pharmacie Attobrou', 'la_me', 'La Mé', 'La Mé (cocoa)')
+ON CONFLICT (id) DO NOTHING;
+
+-- =============================================
+-- UPDATED_AT TRIGGER FUNCTIONS
+-- =============================================
+
+-- Create trigger function for updated_at if it doesn't exist
+CREATE OR REPLACE FUNCTION agrosoluce.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Add triggers for updated_at columns
+DROP TRIGGER IF EXISTS update_pharmacy_profiles_updated_at ON agrosoluce.pharmacy_profiles;
+CREATE TRIGGER update_pharmacy_profiles_updated_at
+    BEFORE UPDATE ON agrosoluce.pharmacy_profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION agrosoluce.update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_vrac_product_sales_updated_at ON agrosoluce.vrac_product_sales;
+CREATE TRIGGER update_vrac_product_sales_updated_at
+    BEFORE UPDATE ON agrosoluce.vrac_product_sales
+    FOR EACH ROW
+    EXECUTE FUNCTION agrosoluce.update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_vrac_period_aggregates_updated_at ON agrosoluce.vrac_period_aggregates;
+CREATE TRIGGER update_vrac_period_aggregates_updated_at
+    BEFORE UPDATE ON agrosoluce.vrac_period_aggregates
+    FOR EACH ROW
+    EXECUTE FUNCTION agrosoluce.update_updated_at_column();
 
 

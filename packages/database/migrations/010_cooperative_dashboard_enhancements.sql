@@ -276,8 +276,8 @@ LEFT JOIN LATERAL (
             CASE WHEN farmer_stats.documented_farmers > 0 THEN 20 ELSE 0 END +
             CASE WHEN plot_stats.geo_referenced_plots > 0 THEN 20 ELSE 0 END +
             CASE WHEN doc_stats.required_docs_uploaded > 0 THEN 20 ELSE 0 END +
-            CASE WHEN COUNT(DISTINCT cert.id) > 0 THEN 20 ELSE 0 END +
-            CASE WHEN COUNT(DISTINCT p.id) FILTER (WHERE p.lot_status = 'active') > 0 THEN 20 ELSE 0 END
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.certifications WHERE cooperative_id = c.id AND status = 'active') > 0 THEN 20 ELSE 0 END +
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.products WHERE cooperative_id = c.id AND lot_status = 'active') > 0 THEN 20 ELSE 0 END
         ) AS readiness_score
 ) readiness ON true
 WHERE c.status = 'approved' -- Only show approved cooperatives to buyers
@@ -360,8 +360,8 @@ LEFT JOIN LATERAL (
             CASE WHEN farmer_stats.documented_farmers > 0 THEN 20 ELSE 0 END +
             CASE WHEN plot_stats.geo_referenced_plots > 0 THEN 20 ELSE 0 END +
             CASE WHEN doc_stats.uploaded_documents > 0 THEN 20 ELSE 0 END +
-            CASE WHEN EXISTS (SELECT 1 FROM agrosoluce.certifications WHERE cooperative_id = c.id AND status = 'active') THEN 20 ELSE 0 END +
-            CASE WHEN COUNT(DISTINCT p.id) FILTER (WHERE p.lot_status = 'active') > 0 THEN 20 ELSE 0 END
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.certifications WHERE cooperative_id = c.id AND status = 'active') > 0 THEN 20 ELSE 0 END +
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.products WHERE cooperative_id = c.id AND lot_status = 'active') > 0 THEN 20 ELSE 0 END
         ) AS readiness_score
 ) readiness ON true
 GROUP BY 
@@ -399,7 +399,7 @@ CREATE POLICY "Cooperative members can view their request lots" ON agrosoluce.bu
 CREATE POLICY "Cooperative members can view their documents" ON agrosoluce.documents
     FOR SELECT USING (
         (entity_type = 'cooperative' AND entity_id IN (
-            SELECT id FROM agrosoluce.cooperatives c
+            SELECT c.id FROM agrosoluce.cooperatives c
             JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
             WHERE up.user_id = auth.uid()
         ))
@@ -462,7 +462,7 @@ CREATE POLICY "Users can update their notifications" ON agrosoluce.notifications
 CREATE POLICY "Cooperative members can view their checklist" ON agrosoluce.readiness_checklist
     FOR SELECT USING (
         cooperative_id IN (
-            SELECT id FROM agrosoluce.cooperatives c
+            SELECT c.id FROM agrosoluce.cooperatives c
             JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
             WHERE up.user_id = auth.uid()
         )

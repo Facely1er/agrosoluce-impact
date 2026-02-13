@@ -86,15 +86,15 @@ LEFT JOIN LATERAL (
     FROM agrosoluce.documents d
     WHERE d.entity_type = 'cooperative' AND d.entity_id = c.id
 ) doc_stats ON true
--- Aggregate farmer declarations from new farmer_declarations table (migration 016)
--- Join via canonical_cooperative_directory: cooperatives.id = canonical_cooperative_directory.coop_id
+-- Aggregate farmer declarations (join via farmers when farmer_id exists; else via coop_id when declared_at exists)
 LEFT JOIN LATERAL (
     SELECT 
         COUNT(*) AS total_declarations,
         array_agg(DISTINCT fd.declaration_type) AS declaration_types_present,
-        MAX(fd.declared_at) AS farmer_declarations_last_date
+        MAX((fd.declaration_date)::timestamp with time zone) AS farmer_declarations_last_date
     FROM agrosoluce.farmer_declarations fd
-    WHERE fd.coop_id = c.id  -- cooperatives.id maps to canonical_cooperative_directory.coop_id
+    INNER JOIN agrosoluce.farmers f ON f.id = fd.farmer_id
+    WHERE f.cooperative_id = c.id
 ) declaration_stats ON true
 LEFT JOIN agrosoluce.certifications cert ON cert.cooperative_id = c.id
 LEFT JOIN agrosoluce.products p ON p.cooperative_id = c.id
@@ -104,8 +104,8 @@ LEFT JOIN LATERAL (
             CASE WHEN farmer_stats.documented_farmers > 0 THEN 20 ELSE 0 END +
             CASE WHEN plot_stats.geo_referenced_plots > 0 THEN 20 ELSE 0 END +
             CASE WHEN doc_stats.required_docs_uploaded > 0 THEN 20 ELSE 0 END +
-            CASE WHEN COUNT(DISTINCT cert.id) > 0 THEN 20 ELSE 0 END +
-            CASE WHEN COUNT(DISTINCT p.id) FILTER (WHERE p.lot_status = 'active') > 0 THEN 20 ELSE 0 END
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.certifications WHERE cooperative_id = c.id AND status = 'active') > 0 THEN 20 ELSE 0 END +
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.products WHERE cooperative_id = c.id AND lot_status = 'active') > 0 THEN 20 ELSE 0 END
         ) AS readiness_score
 ) readiness ON true
 WHERE c.status = 'approved' -- Only show approved cooperatives to buyers

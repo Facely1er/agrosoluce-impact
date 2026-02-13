@@ -71,7 +71,6 @@ COMMENT ON COLUMN agrosoluce.readiness_snapshots.created_at IS 'Timestamp when s
 -- Grant permissions to authenticated users
 GRANT USAGE ON SCHEMA agrosoluce TO authenticated;
 GRANT ALL ON agrosoluce.readiness_snapshots TO authenticated;
-GRANT USAGE, SELECT ON SEQUENCE IF EXISTS agrosoluce.readiness_snapshots_snapshot_id_seq TO authenticated;
 
 -- Grant read access to anon users
 GRANT USAGE ON SCHEMA agrosoluce TO anon;
