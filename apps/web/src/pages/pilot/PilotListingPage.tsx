@@ -154,7 +154,7 @@ export default function PilotListingPage() {
               No Pilot Programs Available
             </h3>
             <p className="text-gray-600 mb-6">
-              There are currently no active pilot programs. Check back later or explore the directory.
+              No active pilots at the moment. View the directory for cooperatives.
             </p>
             <Link
               to="/directory"

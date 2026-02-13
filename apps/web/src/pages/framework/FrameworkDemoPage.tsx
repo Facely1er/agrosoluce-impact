@@ -37,8 +37,7 @@ export default function FrameworkDemoPage() {
             Framework Compliance Demo
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
-            Explore the new agricultural health framework features including compliance tracking, 
-            expanded health indicators, and framework-compliant report generation.
+            Agricultural health framework: compliance status, health indicators, and framework-compliant report export.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <ExportReportButton
@@ -184,10 +183,10 @@ export default function FrameworkDemoPage() {
           <Card className="bg-gradient-to-r from-health-600 to-wellness-600 text-white">
             <CardContent className="p-12">
               <h2 className="text-3xl font-bold mb-4">
-                Learn More About Framework Compliance
+                Framework documentation
               </h2>
               <p className="text-xl mb-8 text-white/90">
-                Access comprehensive documentation, user guides, and accessibility reports
+                User guide, indicator definitions, and export formats.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Button variant="secondary" size="lg" className="bg-white text-health-600 hover:bg-gray-100">

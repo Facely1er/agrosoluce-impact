@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import { getRegionCoordinates } from '@/lib/utils/cooperativeUtils';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import { EUDR_COMMODITIES_IN_SCOPE } from '@/types';
-import { Layers, MapPin, Flame } from 'lucide-react';
+import { Layers, MapPin, Flame, Heart } from 'lucide-react';
 
 // Fix Leaflet default icon paths for Vite
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -27,6 +27,13 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 export type MapDisplayMode = 'markers' | 'heatmap' | 'both';
 
+/** Health metrics per region (VRAC pharmacy surveillance). Key = region display name (e.g. Gontougo, La Mé, Abidjan). */
+export interface RegionHealthInfo {
+  antimalarialSharePct: number;
+  antibioticSharePct?: number;
+  harvestRisk?: 'low' | 'medium' | 'high';
+}
+
 interface CanonicalDirectoryMapProps {
   records: CanonicalCooperativeDirectory[];
   /** When provided, "View cooperatives" in the popup uses client-side navigation instead of full page load */
@@ -35,6 +42,8 @@ interface CanonicalDirectoryMapProps {
   height?: string | number;
   /** Initial display mode: markers, heatmap (density circles), or both */
   displayMode?: MapDisplayMode;
+  /** Optional health data by region (VRAC). When set, region tooltips/popups show health metrics and circles can be colored by burden. */
+  regionHealth?: Record<string, RegionHealthInfo>;
 }
 
 // Component to update map bounds when records change
@@ -73,11 +82,44 @@ function getHeatStyle(count: number, maxCount: number) {
   return { radius, opacity, fillColor: '#2563eb', color: '#1d4ed8' };
 }
 
+// Color circle by health burden (antimalarial share %): green < 8%, yellow 8–15%, red > 15%
+function getHealthStyle(antimalarialSharePct: number): { fillColor: string; color: string } {
+  if (antimalarialSharePct >= 15) return { fillColor: '#dc2626', color: '#b91c1c' };
+  if (antimalarialSharePct >= 8) return { fillColor: '#ca8a04', color: '#a16207' };
+  return { fillColor: '#16a34a', color: '#15803d' };
+}
+
+function HealthTooltipContent({ region, health }: { region: string; health: RegionHealthInfo }) {
+  return (
+    <div className="text-left">
+      <span className="font-semibold">{region}</span>
+      <br />
+      <span className="text-xs text-amber-700">
+        <Heart className="inline h-3 w-3 mr-0.5" />
+        Antimalarial: {(health.antimalarialSharePct).toFixed(1)}%
+      </span>
+      {health.antibioticSharePct != null && (
+        <>
+          <br />
+          <span className="text-xs text-gray-600">Antibiotic: {(health.antibioticSharePct).toFixed(1)}%</span>
+        </>
+      )}
+      {health.harvestRisk && (
+        <>
+          <br />
+          <span className="text-xs text-gray-600">Harvest risk: {health.harvestRisk}</span>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function CanonicalDirectoryMap({
   records,
   onRegionClick,
   height = 'min(70vh, 720px)',
   displayMode: initialMode = 'both',
+  regionHealth,
 }: CanonicalDirectoryMapProps) {
   const [displayMode, setDisplayMode] = useState<MapDisplayMode>(initialMode);
 
@@ -118,29 +160,39 @@ export default function CanonicalDirectoryMap({
         {(displayMode === 'heatmap' || displayMode === 'both') &&
           regionEntries.map(([region, data]) => {
             const coords = getRegionCoordinates(region);
-            const style = getHeatStyle(data.count, maxCount);
+            const health = regionHealth?.[region];
+            const style = health
+              ? { ...getHealthStyle(health.antimalarialSharePct), radius: 20 + (data.count / Math.max(maxCount, 1)) * 60, opacity: 0.45 }
+              : getHeatStyle(data.count, maxCount);
+            const pathOpts = health
+              ? { fillColor: style.fillColor, color: style.color, fillOpacity: style.opacity ?? 0.45, weight: 2, opacity: 0.8 }
+              : { fillColor: style.fillColor, color: style.color, fillOpacity: style.opacity, weight: 2, opacity: 0.8 };
             return (
               <CircleMarker
                 key={`heat-${region}`}
                 center={coords}
                 radius={style.radius}
-                pathOptions={{
-                  fillColor: style.fillColor,
-                  color: style.color,
-                  fillOpacity: style.opacity,
-                  weight: 2,
-                  opacity: 0.8,
-                }}
+                pathOptions={pathOpts}
                 eventHandlers={{
                   click: () => onRegionClick?.(region),
                 }}
               >
                 <Tooltip permanent={false} direction="top" offset={[0, -style.radius]}>
-                  <span className="font-semibold">{region}</span>
-                  <br />
-                  <span>{data.count} coopérative{data.count !== 1 ? 's' : ''}</span>
-                  <br />
-                  <span className="text-gray-500 text-xs">Click to filter</span>
+                  {health ? (
+                    <>
+                      <HealthTooltipContent region={region} health={health} />
+                      <br />
+                      <span className="text-gray-500 text-xs">{data.count} coopérative{data.count !== 1 ? 's' : ''} · Click to filter</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-semibold">{region}</span>
+                      <br />
+                      <span>{data.count} coopérative{data.count !== 1 ? 's' : ''}</span>
+                      <br />
+                      <span className="text-gray-500 text-xs">Click to filter</span>
+                    </>
+                  )}
                 </Tooltip>
               </CircleMarker>
             );
@@ -196,6 +248,20 @@ export default function CanonicalDirectoryMap({
                   {commodityLabels && (
                     <div style={{ fontSize: '12px', color: '#666', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #eee' }}>
                       <strong>Commodities:</strong> {commodityLabels}
+                    </div>
+                  )}
+                  {regionHealth?.[region] && (
+                    <div style={{ fontSize: '12px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #eee' }}>
+                      <strong style={{ color: '#b45309' }}>Health (VRAC)</strong>
+                      <div style={{ color: '#666', marginTop: '4px' }}>
+                        Antimalarial share: {(regionHealth[region].antimalarialSharePct).toFixed(1)}%
+                        {regionHealth[region].antibioticSharePct != null && (
+                          <span> · Antibiotic: {(regionHealth[region].antibioticSharePct).toFixed(1)}%</span>
+                        )}
+                        {regionHealth[region].harvestRisk && (
+                          <span> · Harvest risk: {regionHealth[region].harvestRisk}</span>
+                        )}
+                      </div>
                     </div>
                   )}
                   <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid #eee' }}>
@@ -283,9 +349,29 @@ export default function CanonicalDirectoryMap({
       {/* Legend */}
       <div className="absolute bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg z-[1000] max-w-[260px] border border-gray-200">
         <h4 className="font-semibold text-secondary-600 mb-3 text-sm">
-          {displayMode === 'heatmap' ? 'Density (cooperatives per region)' : 'Légende'}
+          {regionHealth && displayMode === 'heatmap'
+            ? 'Health burden (antimalarial share %)'
+            : displayMode === 'heatmap'
+              ? 'Density (cooperatives per region)'
+              : 'Légende'}
         </h4>
-        {displayMode === 'heatmap' ? (
+        {regionHealth && displayMode === 'heatmap' ? (
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-full bg-red-600 border-2 border-white shadow" />
+              <span>High (≥15%)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-full bg-yellow-500 border-2 border-white shadow" />
+              <span>Medium (8–15%)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-full bg-green-600 border-2 border-white shadow" />
+              <span>Lower (&lt;8%)</span>
+            </div>
+            <p className="text-gray-500 mt-2 pt-2 border-t border-gray-100">VRAC pharmacy surveillance</p>
+          </div>
+        ) : displayMode === 'heatmap' ? (
           <div className="space-y-2 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-red-600 border-2 border-white shadow" />

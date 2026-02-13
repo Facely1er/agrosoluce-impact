@@ -1010,7 +1010,7 @@ export const translations: Record<Language, Translations> = {
       subtitle: 'Pharmacy surveillance (VRAC) in cocoa regions complements satellite and production data',
       description: 'Research indicates malaria reduces harvest efficiency by 40–60%; a 3–4 week lag to harvest impact is documented. Use regional health indicators for due diligence and supply chain risk assessment.',
       ctaCooperatives: 'View Cooperatives',
-      ctaHealthData: 'Explore Regional Health Data',
+      ctaHealthData: 'Regional health data',
       ctaBuyer: 'Buyer Portal',
       freeNote: 'Pharmacy surveillance • Research-backed lag • Due diligence',
     },
@@ -1048,12 +1048,12 @@ export const translations: Record<Language, Translations> = {
       },
       value: {
         tagline: 'Value We Bring',
-        title: 'Transforming Challenges into Opportunities',
+        title: 'Context and capabilities',
         subtitle: 'Visibility into documentation, compliance, and workforce health supports due diligence and impact measurement for cooperatives and buyers.',
       },
       outcomes: {
         title: 'Value Delivered',
-        subtitle: 'How we help cooperatives address challenges and work toward their goals',
+        subtitle: 'Capabilities: documentation, compliance, health indicators, and progress tracking',
         buyerConnections: {
           title: 'Market Access & Buyer Connections',
           feature: 'Support market access by connecting with buyers who value transparency, documentation readiness, and sustainable sourcing practices',
@@ -1130,10 +1130,10 @@ export const translations: Record<Language, Translations> = {
         },
       },
       cta: {
-        title: 'Join the Mission',
-        subtitle: 'Together, we can build sustainable, transparent supply chains that support farmers, forests, and future generations while meeting regulatory requirements',
-        buttonCooperatives: 'Explore Cooperatives',
-        buttonBuyer: 'Buyer Portal',
+        title: 'Access the platform',
+        subtitle: 'Directory, health and compliance data, and due diligence tools.',
+        buttonCooperatives: 'Directory',
+        buttonBuyer: 'Buyer portal',
       },
       quickLinks: {
         title: 'Learn More',
@@ -1141,17 +1141,17 @@ export const translations: Record<Language, Translations> = {
         forBuyers: {
           title: 'For Buyers',
           description: 'Directory, health indicators, and compliance coverage for supply chain due diligence',
-          learnMore: 'Learn more',
+          learnMore: 'View',
         },
         forPartners: {
           title: 'For NGOs & Partners',
           description: 'Pilot-level monitoring, health and compliance indicators, and progress tracking',
-          learnMore: 'Learn more',
+          learnMore: 'View',
         },
         whatWeDo: {
-          title: 'What We Do',
+          title: 'Platform scope',
           description: 'Cooperatives, health surveillance, compliance self-assessments, and documentation visibility',
-          learnMore: 'Learn more',
+          learnMore: 'View',
         },
       },
       carousel: {
@@ -1201,7 +1201,7 @@ export const translations: Record<Language, Translations> = {
         subtitle: 'The values that guide how we build AgroSoluce™',
         farmerFirst: {
           title: 'Farmer-first, not document-first',
-          description: 'We start from the farmer and structure reality at the cooperative level, ensuring farmer engagement is visible without exposing sensitive personal data.',
+          description: 'Data is structured at cooperative level; farmer engagement is visible without exposing sensitive personal data.',
         },
         progress: {
           title: 'Progress over perfection',
@@ -1213,12 +1213,12 @@ export const translations: Record<Language, Translations> = {
         },
         process: {
           title: 'Due diligence as a process, not a badge',
-          description: 'We support continuous due diligence efforts, enabling ongoing oversight and documentation building rather than one-off verification checks.',
+          description: 'Readiness snapshots and self-assessments support ongoing oversight and documentation building; not a substitute for one-off audits.',
         },
       },
       oneSentence: 'AgroSoluce™ makes farmer engagement, documentation coverage, and improvement efforts visible — responsibly, progressively, and without false compliance claims.',
       cta: {
-        explore: 'Explore Cooperatives',
+        explore: 'Directory',
         learnMore: 'Learn What We Do',
       },
     },
@@ -1273,7 +1273,7 @@ export const translations: Record<Language, Translations> = {
         },
       },
       footer: 'AgroSoluce™ provides the operational foundation required to perform due diligence responsibly — without false compliance claims.',
-      cta: 'Explore the Cooperative Directory',
+      cta: 'Cooperative directory',
     },
     whoItsFor: {
       title: 'Who AgroSoluce™ Is For',
@@ -1289,11 +1289,11 @@ export const translations: Record<Language, Translations> = {
         },
         buyers: {
           title: 'For Buyers & Sourcing Teams',
-          benefit1: 'Discover cooperatives transparently',
+          benefit1: 'Access directory with coverage and compliance data',
           benefit2: 'Understand what information exists today',
           benefit3: 'Identify where enhanced due diligence is needed',
           benefit4: 'Support engagement instead of exclusion',
-          cta: 'Explore Buyer Portal',
+          cta: 'Buyer portal',
         },
         partners: {
           title: 'For NGOs & Partners',
@@ -1311,7 +1311,7 @@ export const translations: Record<Language, Translations> = {
         tagline: 'For Buyers & Sourcing Teams',
         title: 'AgroSoluce™ for Buyers',
         subtitle: 'Responsible Sourcing Starts With Visibility — Not Assumptions',
-        description: 'AgroSoluce™ helps buyers understand what exists, what is missing, and where to focus due diligence — without forcing cooperatives into false compliance claims. We provide a structured, farmer-first view of cooperatives so sourcing decisions are based on transparency and progress, not guesswork.',
+        description: 'Directory and workspace data show documentation coverage, gaps, and compliance readiness. Self-reported; non-certifying. Use for due diligence and risk assessment; sourcing decisions remain with the buyer.',
       },
       problem: {
         title: 'The Buyer Problem',
@@ -1328,8 +1328,8 @@ export const translations: Record<Language, Translations> = {
       },
       features: {
         discover: {
-          title: '1. Discover Cooperatives Transparently',
-          description: 'Explore a structured directory of agricultural cooperatives with identity and sourcing context, crop and regional information, and stable, shareable profiles.',
+          title: '1. Cooperative directory',
+          description: 'Structured directory: identity, sourcing context, crop and region, coverage and compliance indicators.',
           point1: 'No hidden scoring. No black boxes.',
           point2: 'Clear visibility into cooperative identity and sourcing context',
           point3: 'Stable, shareable profiles for due diligence workflows',
@@ -1386,8 +1386,8 @@ export const translations: Record<Language, Translations> = {
         ],
       },
       cta: {
-        explore: 'Explore the Directory',
-        pilot: 'Join a Buyer Pilot',
+        explore: 'Directory',
+        pilot: 'Buyer pilot',
       },
       disclaimer: 'AgroSoluce™ supports due diligence processes. All information may include self-reported data and does not constitute certification or regulatory approval.',
     },
@@ -1472,7 +1472,7 @@ export const translations: Record<Language, Translations> = {
       },
       cta: {
         pilot: 'Start a Program Pilot',
-        explore: 'Explore Cooperatives',
+        explore: 'Directory',
       },
       disclaimer: 'AgroSoluce™ supports monitoring and due diligence efforts. It does not certify outcomes or replace independent verification.',
     },
@@ -1545,7 +1545,7 @@ export const translations: Record<Language, Translations> = {
       info: {
         title: 'About the Cooperative Space',
         description1: 'The Cooperative Space is designed to help cooperatives make their documentation and compliance efforts visible and transparent. By uploading evidence and tracking coverage, you enable buyers and partners to understand your current state and progress.',
-        description2: 'This platform does not replace audits or certifications. Instead, it provides a transparent view of what exists, what is missing, and where to focus improvement efforts. We start from the farmer, structure reality at the cooperative level, and support credible EUDR-aligned due diligence.',
+        description2: 'The platform does not replace audits or certifications. It displays documentation coverage, gaps, and progress. Data is structured at cooperative level; due diligence and sourcing decisions remain with the buyer.',
       },
       links: {
         lookingFor: 'Looking for something else?',
@@ -1563,13 +1563,13 @@ export const translations: Record<Language, Translations> = {
       enterPilotLabel: 'Enter pilot label (e.g., Pilot A)',
       languageNotes: 'Language Notes',
       backToDirectory: 'Back to Directory',
-      exploreDirectory: 'Explore Directory',
+      exploreDirectory: 'Directory',
       cooperativeIdRequired: 'Cooperative ID is required',
       loadingWorkspace: 'Loading workspace...',
       cooperativeWorkspace: 'Cooperative Workspace',
       manageComplianceJourney: 'Understand Workforce Health Impact on Agricultural Productivity',
       documentationEvidenceEnablement: 'Health Data, Farmer Management, and Regional Analytics',
-      workspaceDescription: 'This workspace provides cooperatives with tools to understand how regional health conditions affect agricultural productivity. Explore pharmacy surveillance data, manage farmer information, and discover insights from health-agriculture correlation research.',
+      workspaceDescription: 'Workspace for cooperative-level data: regional health (VRAC pharmacy surveillance), farmer information, and production context. Health–harvest time-lag documented in research.',
       publicAccess: 'Public Access',
       evidenceManagement: 'Evidence Management',
       evidenceManagementDesc: 'Upload and organize compliance documentation',
@@ -1592,9 +1592,9 @@ export const translations: Record<Language, Translations> = {
       enablementResourcesDesc: 'Access toolkits, templates, and guidance materials to help improve your documentation and compliance practices.',
       farmerEngagement: 'Farmer Engagement',
       farmerEngagementDesc: 'Track and manage farmer registrations, training programs, and engagement initiatives through the Farmers First dashboard.',
-      workspaceNote: 'This workspace integrates VRAC pharmacy surveillance data to reveal how workforce health affects agricultural productivity. By tracking antimalarial sales trends as a proxy for malaria burden, we provide unique insights that complement traditional agricultural monitoring.',
-      workspaceNoteDetail: 'Health data reveals patterns that satellite monitoring misses.',
-      workspaceNoteDetail2: 'Research shows malaria reduces harvest efficiency by 40-60%. We start from the farmer, connect regional health signals to productivity data, and provide actionable intelligence for supply chain management.',
+      workspaceNote: 'VRAC pharmacy surveillance data is integrated in this workspace. Antimalarial sales are used as a proxy for malaria burden; research indicates a 3–4 week lag to harvest impact.',
+      workspaceNoteDetail: 'Health proxy data complements satellite and production monitoring.',
+      workspaceNoteDetail2: 'Research indicates malaria reduces harvest efficiency by 40–60%. Regional health signals are linked to productivity data for due diligence and risk assessment.',
       tabs: {
         overview: 'Overview',
         healthData: 'Health Data',
@@ -1772,7 +1772,7 @@ export const translations: Record<Language, Translations> = {
     },
     pilot: {
       backToDirectory: 'Back to Directory',
-      exploreDirectory: 'Explore Directory',
+      exploreDirectory: 'Directory',
       pilotIdRequired: 'Pilot ID is required',
       emptyDashboard: 'This pilot dashboard is currently empty.',
       emptyDashboardDescription: 'This could mean the pilot is new, cooperatives haven\'t been assigned yet, or the pilot ID is incorrect.',
@@ -1792,7 +1792,7 @@ export const translations: Record<Language, Translations> = {
       features: {
         evidence: {
           title: 'Health Data Analytics',
-          description: 'Explore VRAC pharmacy surveillance data showing regional health trends and malaria burden indicators.',
+          description: 'VRAC pharmacy surveillance: regional health trends and antimalarial share as malaria burden proxy.',
         },
         coverage: {
           title: 'Production Insights',
@@ -1811,7 +1811,7 @@ export const translations: Record<Language, Translations> = {
         title: 'What You\'ll Have Access To',
         documentation: {
           title: 'Health Intelligence',
-          description: 'Access pharmacy surveillance data revealing workforce health patterns that affect productivity.',
+          description: 'Pharmacy surveillance (VRAC) as workforce health proxy; research documents lag to harvest impact.',
         },
         gapAnalysis: {
           title: 'Correlation Analysis',
@@ -1827,7 +1827,7 @@ export const translations: Record<Language, Translations> = {
         },
       },
       cta: {
-        title: 'Ready to Explore Health-Productivity Insights?',
+        title: 'Health–productivity data',
         subtitle: 'Register your cooperative to unlock workforce health analytics and regional insights.',
         register: 'Register Your Cooperative',
         learnMore: 'Learn More',

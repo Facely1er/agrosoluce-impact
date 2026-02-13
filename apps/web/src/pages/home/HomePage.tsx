@@ -653,12 +653,12 @@ export default function HomePage() {
               className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-6 text-lg shadow-xl hover:shadow-2xl transition-all group"
             >
               <Link to="/vrac">
-                Explore Health Intelligence Dashboard
+                Workforce Health (VRAC)
                 <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
             <p className="mt-4 text-sm text-gray-600">
-              Real-time pharmacy surveillance data from Côte d'Ivoire cocoa regions
+              Pharmacy surveillance (VRAC) from Côte d'Ivoire cocoa regions; antimalarial share and time-lag to harvest.
             </p>
           </div>
         </div>

@@ -42,7 +42,7 @@ export default function HealthImpactOverview() {
       title: 'Time-Lag Analysis',
       description: 'Correlation between malaria surges and harvest efficiency decline',
       link: '/vrac',
-      linkText: 'Explore Correlations',
+      linkText: 'View time-lag analysis',
     },
     {
       icon: BookOpen,
@@ -326,10 +326,10 @@ export default function HealthImpactOverview() {
           <Card className="bg-gradient-to-r from-primary-600 to-secondary-600 text-white">
             <CardContent className="p-12">
               <h2 className="text-3xl font-bold mb-4">
-                Ready to Explore Health-Impact Data?
+                Access health-impact data
               </h2>
               <p className="text-xl mb-8 text-white/90">
-                Access regional health analytics and cooperative workspaces to understand the full picture
+                Regional health analytics and cooperative workspaces; VRAC pharmacy data and time-lag analysis.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild variant="secondary" size="lg">

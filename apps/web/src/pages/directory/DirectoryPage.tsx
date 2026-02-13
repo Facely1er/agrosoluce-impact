@@ -6,9 +6,10 @@ import {
   getCanonicalDirectoryRecordsByStatus,
 } from '@/features/cooperatives/api/canonicalDirectoryApi';
 import CanonicalDirectoryCard from '@/features/cooperatives/components/CanonicalDirectoryCard';
-import CanonicalDirectoryMap from '@/features/cooperatives/components/CanonicalDirectoryMap';
+import CanonicalDirectoryMap, { type RegionHealthInfo } from '@/features/cooperatives/components/CanonicalDirectoryMap';
 import DirectoryVisualizationDashboard from '@/features/cooperatives/components/DirectoryVisualizationDashboard';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import { useVracData } from '@/hooks/useVracData';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import type { EudrCommodity } from '@/types';
 import type { CoverageBand } from '@/types';
@@ -62,12 +63,20 @@ function getCommoditiesFromRecord(record: CanonicalCooperativeDirectory): EudrCo
   return [];
 }
 
+// Map VRAC regionId/regionLabel to directory map region display name
+const VRAC_REGION_TO_DISPLAY: Record<string, string> = {
+  gontougo: 'Gontougo',
+  la_me: 'La Mé',
+  abidjan: 'Abidjan',
+};
+
 export default function DirectoryPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [records, setRecords] = useState<CanonicalCooperativeDirectory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const { healthIndex } = useVracData();
   
   // Context-first filter controls (product-first, region-aware, coverage-aware)
   // Default: Cocoa, CI (Côte d'Ivoire), All regions, All coverage levels
@@ -83,6 +92,35 @@ export default function DirectoryPage() {
   const [pilotFilter, setPilotFilter] = useState('');
   const [viewMode, setViewMode] = useState<'map' | 'grid' | 'list'>('map'); // Map is default landing view
   const [workspaceOnly, setWorkspaceOnly] = useState(false);
+
+  // Aggregate VRAC health by region (latest period per region, or average) for map overlay
+  const regionHealth = useMemo((): Record<string, RegionHealthInfo> | undefined => {
+    if (!healthIndex.length) return undefined;
+    const byRegion: Record<string, { shares: number[]; antibiotic?: number[]; risks: ('low' | 'medium' | 'high')[] }> = {};
+    for (const h of healthIndex) {
+      const regionKey = h.regionId || (h.regionLabel && h.regionLabel.replace(/\s*\(.*\)$/, '').trim()) || '';
+      const displayName = VRAC_REGION_TO_DISPLAY[regionKey.toLowerCase()] || regionKey || (h.regionLabel?.split(' ')[0]);
+      if (!displayName) continue;
+      if (!byRegion[displayName]) byRegion[displayName] = { shares: [], antibiotic: [], risks: [] };
+      byRegion[displayName].shares.push(h.antimalarialShare * 100);
+      if (h.antibioticShare != null) (byRegion[displayName].antibiotic ??= []).push(h.antibioticShare * 100);
+      if (h.harvestAlignedRisk) byRegion[displayName].risks.push(h.harvestAlignedRisk);
+    }
+    const out: Record<string, RegionHealthInfo> = {};
+    for (const [name, data] of Object.entries(byRegion)) {
+      const avgShare = data.shares.length ? data.shares.reduce((a, b) => a + b, 0) / data.shares.length : 0;
+      const avgAntibiotic = data.antibiotic?.length
+        ? data.antibiotic.reduce((a, b) => a + b, 0) / data.antibiotic.length
+        : undefined;
+      const worstRisk = data.risks.includes('high') ? 'high' : data.risks.includes('medium') ? 'medium' : data.risks[0];
+      out[name] = {
+        antimalarialSharePct: avgShare,
+        antibioticSharePct: avgAntibiotic,
+        harvestRisk: worstRisk,
+      };
+    }
+    return Object.keys(out).length ? out : undefined;
+  }, [healthIndex]);
 
   // Handle URL parameter for region filter (from map clicks)
   useEffect(() => {
@@ -507,6 +545,7 @@ export default function DirectoryPage() {
                 onRegionClick={handleRegionClick}
                 height="min(72vh, 760px)"
                 displayMode="both"
+                regionHealth={regionHealth}
               />
             </div>
             <div className="lg:col-span-1 overflow-y-auto max-h-[min(72vh,760px)]">

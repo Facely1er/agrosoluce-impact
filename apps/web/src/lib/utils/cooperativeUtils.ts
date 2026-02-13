@@ -191,7 +191,13 @@ export const regionCoordinates: Record<string, [number, number]> = {
   "WESTERN": [5.32, -4.03],
   "WORODOUGOU": [8.00, -6.50],
   "YAMOUSSOUKRO": [6.83, -5.28],
-  "ZANZAN": [8.30, -3.40]
+  "ZANZAN": [8.30, -3.40],
+  // VRAC pharmacy surveillance regions (health data overlay)
+  "GONTOUGOU": [8.25, -2.95],
+  "GONTOUGO": [8.25, -2.95],
+  "LA MÉ": [5.85, -4.05],
+  "LA ME": [5.85, -4.05],
+  "ABIDJAN": [5.32, -4.03],
 };
 
 export function getRegionCoordinates(regionName: string): [number, number] {

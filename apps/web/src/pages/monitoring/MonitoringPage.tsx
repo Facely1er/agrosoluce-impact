@@ -310,7 +310,7 @@ export default function MonitoringPage() {
                 <li className="flex items-start gap-3">
                   <ArrowRight className="h-5 w-5 text-secondary-600 dark:text-secondary-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Explore the monitoring dashboard to view assessment data across cooperatives
+                    Open the monitoring dashboard to view assessment data across cooperatives
                   </span>
                 </li>
                 <li className="flex items-start gap-3">

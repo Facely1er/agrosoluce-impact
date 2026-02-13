@@ -301,7 +301,7 @@ export default function PilotDashboardPage() {
                     <Building2 className="h-5 w-5 text-primary-600 group-hover:scale-110 transition-transform" />
                     <div>
                       <div className="font-medium text-primary-900">Browse Directory</div>
-                      <div className="text-xs text-primary-700">Explore all cooperatives</div>
+                      <div className="text-xs text-primary-700">View directory</div>
                     </div>
                   </Link>
                   <Link
@@ -311,7 +311,7 @@ export default function PilotDashboardPage() {
                     <TrendingUp className="h-5 w-5 text-green-600 group-hover:scale-110 transition-transform" />
                     <div>
                       <div className="font-medium text-green-900">For Partners</div>
-                      <div className="text-xs text-green-700">Learn about pilot programs</div>
+                      <div className="text-xs text-green-700">Pilot programs</div>
                     </div>
                   </Link>
                   <Link

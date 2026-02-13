@@ -43,12 +43,11 @@ export default function BuyerPortal() {
               Source Responsibly with Confidence
             </h1>
             <p className="text-xl md:text-2xl mb-2 text-white/95">
-              Discover, evaluate, and connect with EUDR-compliant cooperatives
+              Access cooperative directory, documentation coverage, and compliance data
             </p>
             <p className="text-lg text-white/85 max-w-3xl leading-relaxed">
-              AgroSoluce™ provides buyers with transparent access to cooperative documentation coverage, 
-              compliance readiness, and farmer engagement metrics. Make informed sourcing decisions 
-              based on real evidence, not promises.
+              Documentation coverage, compliance readiness, farmer engagement metrics, and workforce health 
+              indicators. Self-reported and non-certifying; use for due diligence and risk assessment.
             </p>
           </div>
         </div>
@@ -106,9 +105,9 @@ export default function BuyerPortal() {
                 <UsersRound className="h-8 w-8 text-primary-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">Explore Cooperatives</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">Cooperative directory</h3>
                 <p className="text-sm text-gray-600">
-                  Browse our directory
+                  Filter by region, coverage, commodity
                 </p>
               </div>
               <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
@@ -263,19 +262,18 @@ export default function BuyerPortal() {
             <Info className="h-6 w-6 text-blue-600 mt-0.5 flex-shrink-0" />
             <div>
               <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                About AgroSoluce™ for Buyers
+                Buyer portal
               </h3>
               <p className="text-blue-800 leading-relaxed mb-3">
-                AgroSoluce™ provides transparency into cooperative documentation and compliance status. 
-                We help you understand <strong>what exists, what's missing, and where to focus your due diligence</strong>. 
-                This platform does not replace audits or certifications, but rather makes visible the 
-                reality of farmer engagement, documentation coverage, and improvement efforts.
+                Cooperative documentation coverage, compliance readiness, and farmer engagement data are 
+                displayed at directory and workspace level. <strong>Data is self-reported; gaps and 
+                coverage are visible for due diligence.</strong> The platform does not replace audits 
+                or certifications.
               </p>
               <p className="text-blue-800 leading-relaxed">
-                <strong>What you get:</strong> Evidence-based insights, gap analysis, progress tracking, 
-                and intelligent matching. <strong>What you don't get:</strong> Guarantees, certifications, 
-                or audit replacements. We start from the farmer, structure reality at the cooperative level, 
-                and support credible EUDR-aligned due diligence.
+                <strong>Available:</strong> Coverage indicators, gap analysis, progress tracking, health 
+                indicators, matching by criteria. <strong>Not provided:</strong> Certifications or 
+                audit substitutes. Sourcing decisions remain with the buyer.
               </p>
             </div>
           </div>
@@ -288,12 +286,11 @@ export default function BuyerPortal() {
             className="bg-gradient-to-r from-primary-600 to-secondary-500 text-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all group"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold">Learn More</h3>
+              <h3 className="text-xl font-bold">Documentation</h3>
               <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
             </div>
             <p className="text-white/90 leading-relaxed">
-              Read our comprehensive guide for buyers on how AgroSoluce™ supports responsible sourcing 
-              and due diligence processes.
+              Buyer-facing documentation: directory, health and compliance data, and due diligence context.
             </p>
           </Link>
 
