@@ -68,6 +68,8 @@ Then wire it in `inferParserType()` and `parseVracContent()` in `vracSource.ts`.
 
 **Running with enrichment:** `npm run vrac:process:enrich` outputs `enriched.json` in addition to `processed.json`.
 
+**Client-side enrichment:** When the app loads `processed.json` (enriched.json not found), it runs `applyEnrichments()` in the browser. Enriched insights (antibiotic, harvest risk, category breakdown) are always available when `processed.json` exists — no need to run `vrac:process:enrich` for the UI.
+
 ### Adding a new enrichment layer
 
 1. Create `packages/data-insights/src/enrichment/myEnrichment.ts`:
