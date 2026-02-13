@@ -23,7 +23,8 @@
     "build:mobile": "npm run build --workspace apps/mobile",
 "preview:mobile": "npm run preview --workspace apps/mobile",
     "vrac:process": "tsx scripts/vrac/processVracData.ts",
-    "vrac:process:enrich": "tsx scripts/vrac/processVracData.ts --enrich"
+    "vrac:process:enrich": "tsx scripts/vrac/processVracData.ts --enrich",
+    "vrac:migrate": "tsx scripts/vrac/migrateVracToSupabase.ts"
   },
   "devDependencies": {
     "@agrosoluce/data-insights": "file:packages/data-insights",

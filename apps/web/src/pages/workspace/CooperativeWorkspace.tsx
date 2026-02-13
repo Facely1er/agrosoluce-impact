@@ -2348,6 +2348,68 @@ function EnablementTab({ cooperativeId }: { cooperativeId: string }) {
 
 function HealthDataTab({ cooperativeId }: { cooperativeId: string }) {
   const { t } = useI18n();
+  const [healthData, setHealthData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    async function loadHealthData() {
+      try {
+        setLoading(true);
+        // Import vracService dynamically to avoid circular dependencies
+        const { vracService } = await import('@/services/vrac/vracService');
+        const data = await vracService.getRegionalHealthIndex();
+        setHealthData(data);
+        setError(null);
+      } catch (e: any) {
+        console.error('Error loading health data:', e);
+        setError(e.message || 'Failed to load health data');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadHealthData();
+  }, []);
+  
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-start gap-3">
+            <Info className="h-6 w-6 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                VRAC Pharmacy Surveillance Data
+              </h3>
+              <p className="text-blue-800 leading-relaxed">
+                Loading regional health metrics...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="flex items-start gap-3">
+            <Info className="h-6 w-6 text-red-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <h3 className="text-lg font-semibold text-red-900 mb-2">
+                Error Loading Health Data
+              </h3>
+              <p className="text-red-800 leading-relaxed">
+                {error}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="space-y-6">
@@ -2359,7 +2421,7 @@ function HealthDataTab({ cooperativeId }: { cooperativeId: string }) {
               VRAC Pharmacy Surveillance Data
             </h3>
             <p className="text-blue-800 leading-relaxed">
-              This tab displays regional health metrics derived from pharmacy surveillance data (2020-2024). 
+              This tab displays regional health metrics derived from pharmacy surveillance data (2020-2025). 
               Antimalarial sales serve as a proxy for malaria burden, revealing health patterns that affect 
               agricultural productivity.
             </p>
@@ -2370,12 +2432,44 @@ function HealthDataTab({ cooperativeId }: { cooperativeId: string }) {
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h3 className="text-xl font-semibold text-gray-900 mb-4">Regional Health Index</h3>
         <p className="text-gray-600 mb-4">
-          Antimalarial share trends by region (Gontougo, La Mé, Abidjan) - Coming soon
+          Showing {healthData.length} health data points from pharmacy surveillance network
         </p>
-        <div className="bg-gray-50 rounded-lg p-8 text-center">
-          <Activity className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-500">Health data visualization in development</p>
-        </div>
+        
+        {healthData.length > 0 ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {healthData.slice(0, 6).map((record, idx) => (
+                <div key={idx} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="text-sm font-medium text-gray-700 mb-1">
+                    {record.pharmacyId} - {record.year}
+                  </div>
+                  <div className="text-xs text-gray-500 mb-2">{record.periodLabel}</div>
+                  <div className="text-2xl font-bold text-primary-600">
+                    {(record.antimalarialShare * 100).toFixed(1)}%
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Antimalarial share ({record.antimalarialQuantity} / {record.totalQuantity} units)
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-4 text-center">
+              <a
+                href="/vrac"
+                className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium"
+              >
+                View Full VRAC Analysis Dashboard
+                <Activity className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-gray-50 rounded-lg p-8 text-center">
+            <Activity className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-500">No health data available. Run migration: npm run vrac:migrate</p>
+          </div>
+        )}
       </div>
     </div>
   );
