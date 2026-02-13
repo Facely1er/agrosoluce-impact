@@ -5,12 +5,12 @@
  * Higher scores indicate greater household distress/crisis conditions.
  */
 
-import { MedicationCategory } from '../classification/medicationTaxonomy';
+import { MedicationCategory } from '../../classification/medicationTaxonomy';
 import {
   CATEGORY_WEIGHTS,
   getCategoryWeight,
   calculateComponentScore,
-} from '../classification/categoryWeights';
+} from '../../classification/categoryWeights';
 
 export type AlertLevel = 'green' | 'yellow' | 'red' | 'black';
 

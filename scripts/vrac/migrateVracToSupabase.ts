@@ -427,7 +427,7 @@ async function main() {
     console.log(`- Product sales records: ${data.periods.reduce((sum, p) => sum + p.products.length, 0)}`);
     console.log(`- Period aggregates: ${data.periods.length}`);
     console.log(`- Health index records: ${data.periods.length}`);
-    console.log(`- Category aggregates: ${data.periods.length * 8} (approx)`); // 8 categories per period
+    console.log(`- Category aggregates: ${data.periods.length * 8} (8 categories incl. 'other')`); // 7 medication categories + 'other'
     console.log(`- HWI scores: ${data.periods.length}`);
 
   } catch (error) {
