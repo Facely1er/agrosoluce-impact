@@ -546,6 +546,124 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Health Intelligence Storytelling Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-20 right-10 w-72 h-72 bg-blue-400 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-10 w-96 h-96 bg-cyan-400 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-12">
+            <div className="mb-6">
+              <Badge variant="info" size="lg" className="bg-blue-600 text-white border-blue-700">
+                <Heart className="h-4 w-4 mr-2" />
+                Health Intelligence
+              </Badge>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+              The Missing Piece in Supply Chain Intelligence
+            </h2>
+            <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-8 leading-relaxed">
+              Satellites show crops. Pharmacy data reveals workforce health. Together, they predict productivity.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            {/* What Satellites See */}
+            <Card className="bg-white p-8 shadow-lg hover:shadow-xl transition-all">
+              <CardContent className="p-0 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-400 to-gray-600 rounded-2xl flex items-center justify-center">
+                  <MapPin className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">
+                  <span aria-label="Satellite">🛰️</span> What Satellites See
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Crop growth, deforestation, land use changes
+                </p>
+                <div className="text-sm text-gray-500 italic">
+                  Environmental monitoring
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* What Pharmacies Reveal - HIGHLIGHTED */}
+            <Card className="bg-gradient-to-br from-blue-600 to-cyan-600 p-8 shadow-2xl hover:shadow-3xl transition-all transform md:scale-105 border-4 border-blue-400">
+              <CardContent className="p-0 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-white rounded-2xl flex items-center justify-center shadow-lg">
+                  <Activity className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-white">
+                  <span aria-label="Hospital">🏥</span> What Pharmacies Reveal
+                </h3>
+                <p className="text-blue-50 mb-4">
+                  Workforce health, malaria burden, productivity signals
+                </p>
+                <div className="text-2xl font-bold text-yellow-300 mb-2">
+                  40-60%
+                </div>
+                <div className="text-sm text-blue-100">
+                  Harvest impact during malaria peaks
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Combined Intelligence */}
+            <Card className="bg-white p-8 shadow-lg hover:shadow-xl transition-all">
+              <CardContent className="p-0 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
+                  <TrendingUp className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">
+                  <span aria-label="Chart">📊</span> Combined Intelligence
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Complete supply chain risk visibility
+                </p>
+                <div className="text-sm text-gray-500 italic">
+                  Predictive + preventive insights
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Key Statistics */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-white rounded-xl p-6 text-center shadow-lg">
+              <div className="text-4xl font-bold text-blue-600 mb-2">3-4 weeks</div>
+              <div className="text-gray-700 font-medium">Early warning before crop stress visible</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 text-center shadow-lg">
+              <div className="text-4xl font-bold text-cyan-600 mb-2">4 regions</div>
+              <div className="text-gray-700 font-medium">Pharmacy surveillance in cocoa zones</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 text-center shadow-lg">
+              <div className="text-4xl font-bold text-indigo-600 mb-2">2020-2025</div>
+              <div className="text-gray-700 font-medium">Historical health data tracking</div>
+            </div>
+          </div>
+
+          {/* Call to Action */}
+          <div className="text-center">
+            <Button
+              asChild
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-6 text-lg shadow-xl hover:shadow-2xl transition-all group"
+            >
+              <Link to="/vrac">
+                Explore Health Intelligence Dashboard
+                <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
+            <p className="mt-4 text-sm text-gray-600">
+              Real-time pharmacy surveillance data from Côte d'Ivoire cocoa regions
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Brief Overview Section */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

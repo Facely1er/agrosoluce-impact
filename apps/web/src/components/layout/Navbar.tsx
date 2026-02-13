@@ -31,7 +31,7 @@ export default function Navbar() {
     { to: '/', icon: Home, label: t.nav.home, exact: true },
     { to: '/directory', icon: UsersRound, label: t.nav.cooperatives, exact: false },
     { to: '/health-impact', icon: Activity, label: t.nav.healthImpact, exact: false },
-    { to: '/vrac', icon: TrendingUp, label: t.nav.regionalAnalysis, exact: false },
+    { to: '/vrac', icon: TrendingUp, label: t.nav.healthIntelligence, exact: false },
     { to: '/about', icon: Info, label: t.nav.about, exact: false },
     
     // SECONDARY NAVIGATION (Dropdown menu)

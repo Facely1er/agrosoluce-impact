@@ -94,9 +94,19 @@ function App() {
             <Route path="/health-impact" element={<HealthImpactOverview />} />
             <Route path="/workspace/:coop_id" element={<CooperativeWorkspace />} />
             
-            {/* VRAC Regional Analysis */}
+            {/* VRAC Health Intelligence / Pharmacy Surveillance */}
             <Route
               path="/vrac"
+              element={
+                <ErrorBoundary>
+                  <VracAnalysisPage />
+                </ErrorBoundary>
+              }
+            />
+            
+            {/* Health Intelligence (alias for VRAC) */}
+            <Route
+              path="/health"
               element={
                 <ErrorBoundary>
                   <VracAnalysisPage />
