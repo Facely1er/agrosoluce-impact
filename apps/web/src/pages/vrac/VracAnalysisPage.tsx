@@ -11,20 +11,14 @@ import {
   LineChart,
   Line,
 } from 'recharts';
-import { PHARMACIES, computeHealthIndex } from '@agrosoluce/data-insights';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import { Activity, TrendingUp, MapPin, Info, Download, Filter } from 'lucide-react';
-
-interface ProcessedPeriod {
-  pharmacyId: string;
-  periodLabel: string;
-  year: number;
-  products: Array<{ code: string; designation: string; quantitySold: number }>;
-  totalQuantity: number;
-}
+import { vracService } from '@/services/vrac/vracService';
+import type { PharmacyProfile, RegionalHealthIndex } from '@agrosoluce/types';
 
 export default function VracAnalysisPage() {
-  const [data, setData] = useState<{ periods: ProcessedPeriod[] } | null>(null);
+  const [pharmacies, setPharmacies] = useState<PharmacyProfile[]>([]);
+  const [healthIndex, setHealthIndex] = useState<RegionalHealthIndex[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,17 +28,25 @@ export default function VracAnalysisPage() {
   const [viewType, setViewType] = useState<'quantity' | 'share'>('quantity');
 
   useEffect(() => {
-    fetch('/data/vrac/processed.json')
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to load'))))
-      .then(setData)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+    async function loadData() {
+      try {
+        setLoading(true);
+        const [pharmaciesData, healthIndexData] = await Promise.all([
+          vracService.getPharmacyProfiles(),
+          vracService.getRegionalHealthIndex(),
+        ]);
+        setPharmacies(pharmaciesData);
+        setHealthIndex(healthIndexData);
+        setError(null);
+      } catch (e: any) {
+        console.error('Error loading VRAC data:', e);
+        setError(e.message || 'Failed to load VRAC data from database');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
   }, []);
-
-  const healthIndex = useMemo(() => {
-    if (!data?.periods) return [];
-    return computeHealthIndex(data.periods);
-  }, [data]);
 
   // Get available years
   const availableYears = useMemo(() => {
@@ -167,15 +169,30 @@ export default function VracAnalysisPage() {
     );
   }
 
-  if (error || !data) {
+  if (error) {
     return (
       <div className="min-h-screen py-8 px-4">
         <div className="max-w-2xl mx-auto text-center py-12">
           <p className="text-red-600 dark:text-red-400 mb-4">
-            {error || 'No data available. Run: npm run vrac:process'}
+            {error}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            VRAC pharmacy data must be processed before viewing the analysis dashboard.
+            VRAC pharmacy data must be migrated to database. Run: npm run vrac:migrate
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!healthIndex.length) {
+    return (
+      <div className="min-h-screen py-8 px-4">
+        <div className="max-w-2xl mx-auto text-center py-12">
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            No VRAC data available in database.
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Run migration script: npm run vrac:migrate
           </p>
         </div>
       </div>
@@ -264,7 +281,7 @@ export default function VracAnalysisPage() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="all">All Pharmacies</option>
-                {PHARMACIES.map((pharmacy) => (
+                {pharmacies.map((pharmacy) => (
                   <option key={pharmacy.id} value={pharmacy.id}>
                     {pharmacy.name}
                   </option>
@@ -291,7 +308,7 @@ export default function VracAnalysisPage() {
             <p className="text-sm text-blue-800 dark:text-blue-200">
               <strong>Showing:</strong> {filteredHealthIndex.length} data points
               {selectedYear !== 'all' && ` from ${selectedYear}`}
-              {selectedPharmacy !== 'all' && ` for ${PHARMACIES.find(p => p.id === selectedPharmacy)?.name || selectedPharmacy}`}
+              {selectedPharmacy !== 'all' && ` for ${pharmacies.find(p => p.id === selectedPharmacy)?.name || selectedPharmacy}`}
             </p>
           </div>
         </div>
@@ -305,7 +322,7 @@ export default function VracAnalysisPage() {
               </h2>
             </div>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-              {PHARMACIES.map((p) => (
+              {pharmacies.map((p) => (
                 <li key={p.id}>
                   <span className="font-medium">{p.name}</span> — {p.regionLabel}
                 </li>
@@ -320,7 +337,7 @@ export default function VracAnalysisPage() {
               </h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              {data.periods.length} pharmacy-periods from Aug–Dec 2022 to Aug–Dec 2025.
+              {healthIndex.length} pharmacy-periods from Aug–Dec 2022 to Aug–Dec 2025.
               ARTEFAN and PLUFENTRINE sales are used as the antimalarial proxy.
             </p>
           </div>
