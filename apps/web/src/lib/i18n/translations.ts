@@ -1797,7 +1797,7 @@ export const translations: Record<Language, Translations> = {
           description: 'Track harvest efficiency metrics and understand health-productivity correlations.',
         },
         compliance: {
-          title: 'Regional Analysis',
+          title: 'Health-Productivity Correlation',
           description: 'Access time-lag correlation analysis and academic research on health-agriculture relationships.',
         },
         farmersFirst: {
@@ -2718,7 +2718,7 @@ export const translations: Record<Language, Translations> = {
           description: 'Suivez les métriques d\'efficacité de récolte et comprenez les corrélations santé-productivité.',
         },
         compliance: {
-          title: 'Analyse Régionale',
+          title: 'Corrélation Santé-Productivité',
           description: 'Accédez à l\'analyse de corrélation temporelle et recherches académiques sur les relations santé-agriculture.',
         },
         farmersFirst: {
