@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -13,40 +13,23 @@ import {
 } from 'recharts';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import { Activity, TrendingUp, MapPin, Info, Download, Filter, AlertTriangle, TrendingDown, Heart } from 'lucide-react';
-import { vracService } from '@/services/vrac/vracService';
-import type { PharmacyProfile, RegionalHealthIndex } from '@agrosoluce/types';
+import { useVracData } from '@/hooks/useVracData';
+import { AntibioticTrendChart, HarvestRiskBadges, CategoryBreakdownChart } from '@/components/vrac';
 
 export default function VracAnalysisPage() {
-  const [pharmacies, setPharmacies] = useState<PharmacyProfile[]>([]);
-  const [healthIndex, setHealthIndex] = useState<RegionalHealthIndex[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { pharmacies, healthIndex, loading, error, source, refetch } = useVracData();
 
   // Filter states
   const [selectedYear, setSelectedYear] = useState<number | 'all'>('all');
   const [selectedPharmacy, setSelectedPharmacy] = useState<string | 'all'>('all');
   const [viewType, setViewType] = useState<'quantity' | 'share'>('quantity');
+  const [categoryView, setCategoryView] = useState<'stacked' | 'pie'>('stacked');
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        const [pharmaciesData, healthIndexData] = await Promise.all([
-          vracService.getPharmacyProfiles(),
-          vracService.getRegionalHealthIndex(),
-        ]);
-        setPharmacies(pharmaciesData);
-        setHealthIndex(healthIndexData);
-        setError(null);
-      } catch (e: any) {
-        console.error('Error loading VRAC data:', e);
-        setError(e.message || 'Failed to load VRAC data from database');
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, []);
+  const hasEnrichedData =
+    source === 'enriched' ||
+    healthIndex.some((h) => h.antibioticShare != null) ||
+    healthIndex.some((h) => h.harvestAlignedRisk != null) ||
+    healthIndex.some((h) => (h.categoryBreakdown?.length ?? 0) > 0);
 
   // Get available years
   const availableYears = useMemo(() => {
@@ -97,23 +80,44 @@ export default function VracAnalysisPage() {
   const exportToCSV = () => {
     if (!filteredHealthIndex.length) return;
 
-    const headers = [
-      'Pharmacy',
-      'Period',
-      'Year',
-      'Antimalarial Quantity',
-      'Total Quantity',
-      'Antimalarial Share (%)',
-    ];
+    const hasExtra = filteredHealthIndex.some((h) => h.antibioticShare != null || h.harvestAlignedRisk != null);
+    const headers = hasExtra
+      ? [
+          'Pharmacy',
+          'Period',
+          'Year',
+          'Antimalarial Quantity',
+          'Total Quantity',
+          'Antimalarial Share (%)',
+          'Antibiotic Share (%)',
+          'Harvest Risk',
+        ]
+      : [
+          'Pharmacy',
+          'Period',
+          'Year',
+          'Antimalarial Quantity',
+          'Total Quantity',
+          'Antimalarial Share (%)',
+        ];
 
-    const rows = filteredHealthIndex.map((item) => [
-      item.pharmacyId,
-      item.periodLabel,
-      item.year.toString(),
-      item.antimalarialQuantity.toString(),
-      item.totalQuantity.toString(),
-      (item.antimalarialShare * 100).toFixed(2),
-    ]);
+    const rows = filteredHealthIndex.map((item) => {
+      const base = [
+        item.pharmacyId,
+        item.periodLabel,
+        item.year.toString(),
+        item.antimalarialQuantity.toString(),
+        item.totalQuantity.toString(),
+        (item.antimalarialShare * 100).toFixed(2),
+      ];
+      if (hasExtra) {
+        base.push(
+          item.antibioticShare != null ? (item.antibioticShare * 100).toFixed(2) : '',
+          item.harvestAlignedRisk ?? ''
+        );
+      }
+      return base;
+    });
 
     const csvContent = [headers, ...rows].map((row) => row.join(',')).join('\n');
 
@@ -173,12 +177,17 @@ export default function VracAnalysisPage() {
     return (
       <div className="min-h-screen py-8 px-4">
         <div className="max-w-2xl mx-auto text-center py-12">
-          <p className="text-red-600 dark:text-red-400 mb-4">
-            {error}
+          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Run <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">npm run vrac:process</code> to generate
+            processed.json, or <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">npm run vrac:process:enrich</code> for enriched data.
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            VRAC pharmacy data must be migrated to database. Run: npm run vrac:migrate
-          </p>
+          <button
+            onClick={refetch}
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -188,11 +197,9 @@ export default function VracAnalysisPage() {
     return (
       <div className="min-h-screen py-8 px-4">
         <div className="max-w-2xl mx-auto text-center py-12">
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            No VRAC data available in database.
-          </p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">No VRAC data available.</p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Run migration script: npm run vrac:migrate
+            Run <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">npm run vrac:process</code>
           </p>
         </div>
       </div>
@@ -373,11 +380,16 @@ export default function VracAnalysisPage() {
             </div>
           </div>
 
-          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm text-blue-800 dark:text-blue-200">
               <strong>Showing:</strong> {filteredHealthIndex.length} data points
               {selectedYear !== 'all' && ` from ${selectedYear}`}
-              {selectedPharmacy !== 'all' && ` for ${pharmacies.find(p => p.id === selectedPharmacy)?.name || selectedPharmacy}`}
+              {selectedPharmacy !== 'all' && ` for ${pharmacies.find((p) => p.id === selectedPharmacy)?.name || selectedPharmacy}`}
+              {source && (
+                <span className="ml-2 text-blue-600 dark:text-blue-300">
+                  (Source: {source})
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -513,6 +525,37 @@ export default function VracAnalysisPage() {
             </ResponsiveContainer>
           </div>
         </div>
+
+        {/* Enriched Insights - Antibiotic, Harvest Risk, Category Breakdown */}
+        {hasEnrichedData && (
+          <div className="space-y-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              Enriched Insights
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <AntibioticTrendChart data={filteredHealthIndex} pharmacyLabels={pharmacyLabels} />
+              <HarvestRiskBadges data={filteredHealthIndex} pharmacyLabels={pharmacyLabels} />
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Category view:
+              </label>
+              <select
+                value={categoryView}
+                onChange={(e) => setCategoryView(e.target.value as 'stacked' | 'pie')}
+                className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm"
+              >
+                <option value="stacked">By Period</option>
+                <option value="pie">Overall Mix</option>
+              </select>
+            </div>
+            <CategoryBreakdownChart
+              data={filteredHealthIndex}
+              pharmacyLabels={pharmacyLabels}
+              view={categoryView}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
           {/* Key Insights Panel */}
