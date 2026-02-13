@@ -104,6 +104,16 @@ function App() {
               }
             />
             
+            {/* Health Intelligence (alias for VRAC) */}
+            <Route
+              path="/health"
+              element={
+                <ErrorBoundary>
+                  <VracAnalysisPage />
+                </ErrorBoundary>
+              }
+            />
+            
             {/* Household Welfare Index */}
             <Route
               path="/hwi"

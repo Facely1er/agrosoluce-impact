@@ -19,6 +19,7 @@ export interface Translations {
     workforceHealth?: string;
     healthImpact: string;
     regionalAnalysis: string;
+    healthIntelligence: string;
     complianceTools: string;
     pilotPrograms: string;
     main: string;
@@ -926,6 +927,7 @@ export const translations: Record<Language, Translations> = {
       workforceHealth: 'Workforce Health',
       healthImpact: 'Health & Impact',
       regionalAnalysis: 'Regional Analysis',
+      healthIntelligence: 'Health Intelligence',
       complianceTools: 'Compliance Tools',
       pilotPrograms: 'Pilot Programs',
       partners: 'Partners & NGOs',
@@ -1846,6 +1848,7 @@ export const translations: Record<Language, Translations> = {
       workforceHealth: 'Santé des Travailleurs',
       healthImpact: 'Santé & Impact',
       regionalAnalysis: 'Analyse Régionale',
+      healthIntelligence: 'Intelligence Santé',
       complianceTools: 'Outils de Conformité',
       pilotPrograms: 'Programmes Pilotes',
       partners: 'Partenaires & ONG',
