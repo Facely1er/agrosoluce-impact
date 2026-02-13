@@ -4501,5 +4501,3 @@ CREATE TRIGGER update_vrac_period_aggregates_updated_at
     BEFORE UPDATE ON agrosoluce.vrac_period_aggregates
     FOR EACH ROW
     EXECUTE FUNCTION agrosoluce.update_updated_at_column();
-
-

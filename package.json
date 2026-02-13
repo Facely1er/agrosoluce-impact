@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@agrosoluce/data-insights": "file:packages/data-insights",
+    "@supabase/supabase-js": "^2.95.3",
     "dotenv": "^17.3.1",
     "turbo": "^1.10.0"
   },
