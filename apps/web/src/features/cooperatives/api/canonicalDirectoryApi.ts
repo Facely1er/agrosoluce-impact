@@ -7,6 +7,44 @@ const SCHEMA = 'agrosoluce';
 import { formatCooperativeName } from '@/lib/utils/cooperativeUtils';
 import type { CanonicalCooperativeDirectory, RecordStatus, EudrCommodity } from '@/types';
 
+/** Static fallback: load from public JSON when Supabase is not configured or returns no data */
+const STATIC_DIRECTORY_URL = '/cooperatives_cote_ivoire.json';
+const STATIC_FALLBACK_MAX = 2000;
+
+function transformStaticCooperative(raw: any): CanonicalCooperativeDirectory {
+  const name = formatCooperativeName(raw.name);
+  const region = (raw.region || '').trim();
+  return {
+    coop_id: String(raw.id ?? raw.registrationNumber ?? Math.random().toString(36).slice(2)),
+    name,
+    country: raw.metadata?.country || "Côte d'Ivoire",
+    countryCode: 'CI',
+    region,
+    regionName: region || undefined,
+    department: raw.departement || raw.department,
+    primary_crop: raw.secteur?.includes('CACAO') || raw.secteur?.includes('CACAO') ? 'cocoa' : undefined,
+    commodities: ['cocoa'] as EudrCommodity[],
+    source_registry: raw.metadata?.source,
+    record_status: (raw.status === 'active' || raw.status === 'verified') ? 'active' : 'active',
+    pilot_id: null,
+    pilot_label: undefined,
+    coverageBand: undefined,
+    created_at: raw.metadata?.importedAt,
+  };
+}
+
+async function getCanonicalDirectoryRecordsStaticFallback(): Promise<CanonicalCooperativeDirectory[]> {
+  try {
+    const res = await fetch(STATIC_DIRECTORY_URL);
+    if (!res.ok) return [];
+    const json = await res.json();
+    const list = Array.isArray(json.cooperatives) ? json.cooperatives : [];
+    return list.slice(0, STATIC_FALLBACK_MAX).map(transformStaticCooperative);
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Fetch all canonical cooperative directory records
  */
@@ -15,7 +53,8 @@ export async function getCanonicalDirectoryRecords(): Promise<{
   error: Error | null;
 }> {
   if (!supabase) {
-    return { data: null, error: new Error('Supabase not configured') };
+    const fallback = await getCanonicalDirectoryRecordsStaticFallback();
+    return { data: fallback.length > 0 ? fallback : null, error: fallback.length > 0 ? null : new Error('Supabase not configured') };
   }
 
   try {

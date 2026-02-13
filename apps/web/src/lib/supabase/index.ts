@@ -1,13 +1,15 @@
 // Export Supabase client and utilities
-export { 
-  supabase, 
-  getCurrentUser, 
-  signOut, 
+export {
+  supabase,
+  getCurrentUser,
+  signOut,
   schemaManager,
   isSupabaseConfigured,
   getSupabaseConfigStatus,
-  getSupabaseClient
+  getSupabaseClient,
+  verifySupabaseConfiguration,
 } from './client';
+export type { SupabaseVerifyResult } from './client';
 
 // Re-export types from main types file
 export type {

@@ -9,7 +9,9 @@ export interface Translations {
   // Navigation
   nav: {
     home: string;
+    map: string;
     cooperatives: string;
+    directory: string;
     buyers: string;
     cooperativeSpace: string;
     compliance: string;
@@ -921,7 +923,9 @@ export const translations: Record<Language, Translations> = {
   en: {
     nav: {
       home: 'Home',
+      map: 'Map',
       cooperatives: 'Cooperatives',
+      directory: 'Directory',
       buyers: 'Buyers',
       cooperativeSpace: 'Cooperative Space',
       compliance: 'Monitoring',
@@ -1843,7 +1847,9 @@ export const translations: Record<Language, Translations> = {
   fr: {
     nav: {
       home: 'Accueil',
+      map: 'Carte',
       cooperatives: 'Coopératives',
+      directory: 'Répertoire',
       buyers: 'Acheteurs',
       cooperativeSpace: 'Espace Coopérative',
       compliance: 'Suivi',

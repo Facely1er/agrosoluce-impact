@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { Home, UsersRound, Briefcase, User, Shield, Menu, X, Globe, Info, Handshake, Sun, Moon, Activity, TrendingUp, Target, BarChart3 } from 'lucide-react';
+import { Home, MapPin, UsersRound, Briefcase, User, Shield, Menu, X, Globe, Info, Handshake, Sun, Moon, Activity, TrendingUp, Target, BarChart3 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 import type { Language } from '@/lib/i18n/translations';
@@ -29,7 +29,8 @@ export default function Navbar() {
   }> = [
     // PRIMARY NAVIGATION (Always visible)
     { to: '/', icon: Home, label: t.nav.home, exact: true },
-    { to: '/directory', icon: UsersRound, label: t.nav.cooperatives, exact: false },
+    { to: '/map', icon: MapPin, label: t.nav.map, exact: false },
+    { to: '/directory', icon: UsersRound, label: t.nav.directory, exact: false },
     { to: '/health-impact', icon: Activity, label: t.nav.healthImpact, exact: false },
     { to: '/vrac', icon: TrendingUp, label: t.nav.healthIntelligence, exact: false },
     { to: '/analytics', icon: BarChart3, label: t.nav.analytics, exact: false },

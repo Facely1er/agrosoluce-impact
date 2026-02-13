@@ -34,6 +34,7 @@ const MonitoringPage = lazy(() => import('./pages/monitoring/MonitoringPage'));
 const VracAnalysisPage = lazy(() => import('./pages/vrac/VracAnalysisPage'));
 const HouseholdWelfareIndex = lazy(() => import('./pages/hwi/HouseholdWelfareIndex'));
 const AnalyticsDashboardPage = lazy(() => import('./pages/analytics/AnalyticsDashboardPage'));
+const MapPage = lazy(() => import('./pages/map/MapPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // Redirect components for deprecated routes
@@ -91,7 +92,9 @@ function App() {
             <Route path="/directory" element={<DirectoryPage />} />
             <Route path="/directory/:coop_id" element={<DirectoryDetailPage />} />
             
-            {/* Health & Impact Analysis (Primary Feature) */}
+            {/* Map — core feature (Cooperatives + Health layers, heatmap) */}
+            <Route path="/map" element={<MapPage />} />
+            {/* Health & Impact Analysis */}
             <Route path="/health-impact" element={<HealthImpactOverview />} />
             <Route path="/analytics" element={<AnalyticsDashboardPage />} />
             <Route path="/workspace/:coop_id" element={<CooperativeWorkspace />} />

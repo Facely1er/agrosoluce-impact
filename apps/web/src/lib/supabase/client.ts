@@ -26,6 +26,72 @@ export const getSupabaseConfigStatus = () => {
   };
 };
 
+export interface SupabaseVerifyResult {
+  configured: boolean;
+  connected?: boolean;
+  message: string;
+  details?: { urlSet: boolean; keySet: boolean; error?: string };
+}
+
+/** Verify Supabase is correctly configured (env vars + optional connectivity check). */
+export async function verifySupabaseConfiguration(): Promise<SupabaseVerifyResult> {
+  const urlSet = !!supabaseUrl;
+  const keySet = !!supabaseAnonKey;
+
+  if (!urlSet || !keySet) {
+    return {
+      configured: false,
+      message: 'Supabase environment variables are missing.',
+      details: {
+        urlSet,
+        keySet,
+      },
+    };
+  }
+
+  if (!supabase) {
+    return {
+      configured: true,
+      connected: false,
+      message: 'Supabase client failed to initialize.',
+      details: { urlSet, keySet, error: 'Client is null after createClient.' },
+    };
+  }
+
+  try {
+    // Minimal query to verify connectivity and schema access (agrosoluce.canonical_cooperative_directory)
+    const { error } = await supabase
+      .schema(defaultSchema)
+      .from('canonical_cooperative_directory')
+      .select('coop_id')
+      .limit(1);
+
+    if (error) {
+      return {
+        configured: true,
+        connected: false,
+        message: `Supabase connection failed: ${error.message}`,
+        details: { urlSet, keySet, error: error.message },
+      };
+    }
+
+    return {
+      configured: true,
+      connected: true,
+      message: 'Supabase is correctly configured and reachable.',
+      details: { urlSet, keySet },
+    };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    return {
+      configured: true,
+      connected: false,
+      message: `Supabase check failed: ${errorMessage}`,
+      details: { urlSet, keySet, error: errorMessage },
+    };
+  }
+}
+
 // Log configuration in development
 if (import.meta.env.DEV) {
   const configStatus = getSupabaseConfigStatus();
