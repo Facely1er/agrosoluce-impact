@@ -32,6 +32,7 @@ const AssessmentForm = lazy(() => import('./components/compliance').then(m => ({
 const AssessmentPage = lazy(() => import('./pages/assessment'));
 const MonitoringPage = lazy(() => import('./pages/monitoring/MonitoringPage'));
 const VracAnalysisPage = lazy(() => import('./pages/vrac/VracAnalysisPage'));
+const HouseholdWelfareIndex = lazy(() => import('./pages/hwi/HouseholdWelfareIndex'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // Redirect components for deprecated routes
@@ -99,6 +100,16 @@ function App() {
               element={
                 <ErrorBoundary>
                   <VracAnalysisPage />
+                </ErrorBoundary>
+              }
+            />
+            
+            {/* Household Welfare Index */}
+            <Route
+              path="/hwi"
+              element={
+                <ErrorBoundary>
+                  <HouseholdWelfareIndex />
                 </ErrorBoundary>
               }
             />

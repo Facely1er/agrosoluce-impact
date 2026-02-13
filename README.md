@@ -146,8 +146,13 @@ npm run preview          # Preview production build
 npm run lint             # Lint code
 npm run typecheck        # Type check TypeScript
 
-# Database
-npm run migrate:check    # Check migration status
+# Data Processing
+npm run vrac:process     # Process VRAC data
+npm run vrac:migrate     # Migrate VRAC data to Supabase (includes HWI)
+npm run hwi:calculate    # Recalculate HWI scores from existing data
+```
+
+### Clean & Rebuild
 npm run migrate:run      # Run database migrations
 npm run migrate:data     # Migrate cooperative data
 ```
