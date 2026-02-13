@@ -2789,6 +2789,8 @@ ON CONFLICT (migration_name) DO NOTHING;
 
 
 
+
+
 -- Migration: Create VRAC (Pharmacy Surveillance) Tables
 -- This migration creates tables for storing pharmacy surveillance data
 -- used for workforce health analysis and antimalarial tracking
@@ -2865,7 +2867,7 @@ CREATE TABLE IF NOT EXISTS agrosoluce.vrac_period_aggregates (
   antimalarial_quantity INTEGER NOT NULL,
   antibiotic_quantity INTEGER NOT NULL,
   analgesic_quantity INTEGER NOT NULL,
-  antimalarial_share DECIMAL(5,4) NOT NULL,
+  antimalarial_share DECIMAL(4,4) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(pharmacy_id, year, period_label),
@@ -2887,7 +2889,7 @@ CREATE TABLE IF NOT EXISTS agrosoluce.vrac_regional_health_index (
   year INTEGER NOT NULL,
   antimalarial_quantity INTEGER NOT NULL,
   total_quantity INTEGER NOT NULL,
-  antimalarial_share DECIMAL(5,4) NOT NULL,
+  antimalarial_share DECIMAL(4,4) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(pharmacy_id, year, period_label),
   CONSTRAINT vrac_health_index_share_check CHECK (antimalarial_share >= 0 AND antimalarial_share <= 1)
@@ -2937,53 +2939,3 @@ CREATE POLICY "Public read access for vrac_product_sales"
 CREATE POLICY "Public read access for vrac_period_aggregates" 
   ON agrosoluce.vrac_period_aggregates 
   FOR SELECT 
-  USING (true);
-
-CREATE POLICY "Public read access for vrac_regional_health_index" 
-  ON agrosoluce.vrac_regional_health_index 
-  FOR SELECT 
-  USING (true);
-
--- =============================================
--- PHARMACY PROFILES SEED DATA
--- =============================================
-
--- Insert pharmacy profiles
-INSERT INTO agrosoluce.pharmacy_profiles (id, name, region, location, region_label) VALUES
-  ('tanda', 'Grande Pharmacie de Tanda', 'gontougo', 'Tanda, Gontougo', 'Gontougo (cocoa)'),
-  ('prolife', 'Pharmacie Prolife', 'gontougo', 'Tabagne, Gontougo', 'Gontougo (cocoa)'),
-  ('olympique', 'Pharmacie Olympique', 'abidjan', 'Abidjan', 'Abidjan (urban)'),
-  ('attobrou', 'Pharmacie Attobrou', 'la_me', 'La Mé', 'La Mé (cocoa)')
-ON CONFLICT (id) DO NOTHING;
-
--- =============================================
--- UPDATED_AT TRIGGER FUNCTIONS
--- =============================================
-
--- Create trigger function for updated_at if it doesn't exist
-CREATE OR REPLACE FUNCTION agrosoluce.update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Add triggers for updated_at columns
-DROP TRIGGER IF EXISTS update_pharmacy_profiles_updated_at ON agrosoluce.pharmacy_profiles;
-CREATE TRIGGER update_pharmacy_profiles_updated_at
-    BEFORE UPDATE ON agrosoluce.pharmacy_profiles
-    FOR EACH ROW
-    EXECUTE FUNCTION agrosoluce.update_updated_at_column();
-
-DROP TRIGGER IF EXISTS update_vrac_product_sales_updated_at ON agrosoluce.vrac_product_sales;
-CREATE TRIGGER update_vrac_product_sales_updated_at
-    BEFORE UPDATE ON agrosoluce.vrac_product_sales
-    FOR EACH ROW
-    EXECUTE FUNCTION agrosoluce.update_updated_at_column();
-
-DROP TRIGGER IF EXISTS update_vrac_period_aggregates_updated_at ON agrosoluce.vrac_period_aggregates;
-CREATE TRIGGER update_vrac_period_aggregates_updated_at
-    BEFORE UPDATE ON agrosoluce.vrac_period_aggregates
-    FOR EACH ROW
-    EXECUTE FUNCTION agrosoluce.update_updated_at_column();

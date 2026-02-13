@@ -78,14 +78,15 @@ The VRAC project build and UI integration with agrosoluce data features is **com
 #### Step 1: Apply Database Schema
 
 **Option A - Using Supabase SQL Editor (Recommended):**
-1. Go to: https://supabase.com/dashboard/project/nuwfdvwqiynzhbbsqagw/sql
+1. Go to: https://supabase.com/dashboard/project/YOUR_PROJECT_ID/sql
 2. Click "New Query"
 3. Copy content from: `packages/database/migrations/022_create_vrac_tables.sql`
 4. Click "Run"
 
 **Option B - Using psql CLI:**
 ```bash
-psql "postgresql://postgres:K1551d0ug0u@db.nuwfdvwqiynzhbbsqagw.supabase.co:5432/postgres" \
+# Get connection string from .env file
+psql "postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT_ID.supabase.co:5432/postgres" \
   -f packages/database/migrations/022_create_vrac_tables.sql
 ```
 

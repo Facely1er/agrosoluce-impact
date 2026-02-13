@@ -5,8 +5,8 @@
 ### Option A: Using psql Command Line
 
 ```bash
-# Replace with your actual connection string
-CONN_STRING="postgresql://postgres:K1551d0ug0u@db.nuwfdvwqiynzhbbsqagw.supabase.co:5432/postgres"
+# Replace with your actual connection string from .env
+CONN_STRING="postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT_ID.supabase.co:5432/postgres"
 
 # Apply VRAC tables migration
 psql "$CONN_STRING" -f packages/database/migrations/022_create_vrac_tables.sql
@@ -14,7 +14,7 @@ psql "$CONN_STRING" -f packages/database/migrations/022_create_vrac_tables.sql
 
 ### Option B: Using Supabase SQL Editor
 
-1. Go to https://supabase.com/dashboard/project/nuwfdvwqiynzhbbsqagw/sql
+1. Go to https://supabase.com/dashboard/project/YOUR_PROJECT_ID/sql (replace YOUR_PROJECT_ID with your Supabase project ID)
 2. Click "New Query"
 3. Copy and paste the entire content of: `packages/database/migrations/022_create_vrac_tables.sql`
 4. Click "Run" (bottom right)
