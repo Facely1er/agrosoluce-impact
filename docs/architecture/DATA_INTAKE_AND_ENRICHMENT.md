@@ -2,6 +2,8 @@
 
 Overview of the modular data pipeline for health/agriculture/environment impact analysis.
 
+**For definitions of how data is managed and how metrics are calculated (formulas, thresholds, interpretation), see [Data Management and Interpretation Methodologies](./DATA_METHODOLOGIES.md).**
+
 ## Structure
 
 ```

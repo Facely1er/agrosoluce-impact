@@ -12,6 +12,7 @@ import {
   Line,
 } from 'recharts';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageHeader from '@/components/layout/PageHeader';
 import { Activity, TrendingUp, MapPin, Info, Download, Filter, AlertTriangle, TrendingDown, Heart } from 'lucide-react';
 import { useVracData } from '@/hooks/useVracData';
 import { AntibioticTrendChart, HarvestRiskBadges, CategoryBreakdownChart } from '@/components/vrac';
@@ -211,27 +212,12 @@ export default function VracAnalysisPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumbs items={[{ label: 'Home', path: '/' }, { label: 'Health Intelligence', path: '/vrac' }]} />
 
-        <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-600 rounded-xl shadow-2xl p-8 md:p-12 mb-8 text-white relative overflow-hidden">
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-4">
-              <Activity className="h-8 w-8 text-white/90" />
-              <span className="text-sm font-semibold text-white/80 uppercase tracking-wider">
-                Health Intelligence • Pharmacy Surveillance
-              </span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-              Workforce Health Analysis
-            </h1>
-            <p className="text-xl text-white/90 mb-4 max-w-3xl">
-              See What Satellites Can't: Workforce Health Signals
-            </p>
-            <p className="text-base text-white/80 max-w-3xl">
-              Antimalarial sales predict harvest efficiency 3-4 weeks before crop data shows impact.
-              Real-time pharmacy surveillance from Côte d'Ivoire cocoa regions provides early warning
-              of productivity challenges.
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          badge="Health Intelligence • Pharmacy Surveillance"
+          icon={Activity}
+          title="Workforce Health Analysis"
+          subtitle="Antimalarial sales (VRAC) from Côte d'Ivoire cocoa regions as a proxy for workforce health burden. Research shows a 3–4 week lag before harvest efficiency impact; use trends for early warning and supply chain risk assessment."
+        />
 
         {/* Health Alert Cards */}
         {healthIndex.length > 0 && (
@@ -253,7 +239,7 @@ export default function VracAnalysisPage() {
                 Elevated Activity
               </p>
               <p className="text-sm text-amber-800 dark:text-amber-200">
-                Antimalarial sales in Gontougo region showing elevated levels in recent monitoring periods
+                Antimalarial share in Gontougo above recent baseline in one or more periods; interpret with harvest calendar and regional context.
               </p>
             </div>
 

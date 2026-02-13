@@ -1,7 +1,9 @@
 // API functions for Canonical Cooperative Directory
-// Connects frontend to Supabase database
-
+// Table lives in agrosoluce schema. We use .schema('agrosoluce') on every call so it works
+// even if the deployed client default schema is not applied (e.g. cache, old build).
 import { supabase } from '@/lib/supabase/client';
+
+const SCHEMA = 'agrosoluce';
 import { formatCooperativeName } from '@/lib/utils/cooperativeUtils';
 import type { CanonicalCooperativeDirectory, RecordStatus, EudrCommodity } from '@/types';
 
@@ -18,6 +20,7 @@ export async function getCanonicalDirectoryRecords(): Promise<{
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .order('name', { ascending: true });
@@ -50,6 +53,7 @@ export async function getCanonicalDirectoryRecordsByStatus(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .eq('record_status', status)
@@ -83,6 +87,7 @@ export async function getCanonicalDirectoryRecordsByCountry(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .eq('country', country)
@@ -116,6 +121,7 @@ export async function getCanonicalDirectoryRecordsByPrimaryCrop(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .eq('primary_crop', primaryCrop)
@@ -149,6 +155,7 @@ export async function getCanonicalDirectoryRecordById(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .eq('coop_id', coopId)
@@ -185,6 +192,7 @@ export async function searchCanonicalDirectoryRecords(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .ilike('name', `%${query}%`)
@@ -218,6 +226,7 @@ export async function createCanonicalDirectoryRecord(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .insert({
         name: record.name,
@@ -262,6 +271,7 @@ export async function updateCanonicalDirectoryRecord(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .update(updates)
       .eq('coop_id', coopId)
@@ -299,6 +309,7 @@ export async function deleteCanonicalDirectoryRecord(
 
   try {
     const { error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .delete()
       .eq('coop_id', coopId);
@@ -330,6 +341,7 @@ export async function getCanonicalDirectoryRecordsByPilotId(
 
   try {
     const { data, error } = await supabase
+      .schema(SCHEMA)
       .from('canonical_cooperative_directory')
       .select('*')
       .eq('pilot_id', pilotId)

@@ -2,6 +2,11 @@ import { useMemo, useState, useEffect } from 'react';
 import { computeHealthIndex, PHARMACIES } from '@agrosoluce/data-insights';
 import type { PharmacyId } from '@agrosoluce/types';
 import { MapPin, Download, TrendingUp, AlertCircle } from 'lucide-react';
+import {
+  ANALYTICS_DATA_RANGE,
+  HEALTH_INDEX_METHODOLOGY,
+  CORRELATION_STRENGTH_METHODOLOGY,
+} from '@/data/analyticsMethodology';
 
 interface ProcessedPeriod {
   pharmacyId: PharmacyId;
@@ -284,13 +289,28 @@ export function RegionalHealthComparison() {
         })}
       </div>
 
-      {/* Methodology Note */}
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-900">
-          <strong>Methodology:</strong> Regional health indices are calculated by averaging
-          antimalarial share across all pharmacies within each region. Correlation strength is based
-          on proximity to cocoa-growing areas and documented harvest impact studies.
-        </p>
+      {/* Methodology & substantiation */}
+      <div className="mt-6 space-y-4">
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-900 mb-2">
+            <strong>Health index:</strong> {HEALTH_INDEX_METHODOLOGY.metric} {HEALTH_INDEX_METHODOLOGY.taxonomy} Source: {HEALTH_INDEX_METHODOLOGY.source}
+          </p>
+          <p className="text-sm text-blue-800">
+            <strong>Data range:</strong> {ANALYTICS_DATA_RANGE.health.label}. Regional averages use all periods per region; sample size (data points) shown per region.
+          </p>
+          <p className="text-xs text-blue-700 mt-2">
+            {HEALTH_INDEX_METHODOLOGY.limitation}
+          </p>
+        </div>
+        <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <p className="text-sm font-semibold text-gray-800 mb-2">Correlation strength</p>
+          <p className="text-sm text-gray-700 mb-2">{CORRELATION_STRENGTH_METHODOLOGY.description}</p>
+          <ul className="text-xs text-gray-600 space-y-1">
+            {Object.entries(CORRELATION_STRENGTH_METHODOLOGY.classification).map(([k, v]) => (
+              <li key={k}><strong>{k}:</strong> {v}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

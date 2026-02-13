@@ -8,7 +8,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, BarChart3, AlertTriangle, Award, Plus, BookOpen, Trophy } from 'lucide-react';
+import { CheckCircle2, BarChart3, AlertTriangle, Award, Plus, BookOpen, Trophy, Shield } from 'lucide-react';
+import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageHeader from '@/components/layout/PageHeader';
+import PageFooterNote from '@/components/layout/PageFooterNote';
 import {
   CooperativeReadinessStatus,
   MonitoringDashboard,
@@ -226,30 +229,28 @@ const ChildLaborDashboard: React.FC<ChildLaborDashboardProps> = ({
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
-      {/* Header */}
-      <div className="border-b border-gray-200 pb-4 flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Child Labor Monitoring Dashboard
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Tracking documentation and self-assessments across {dashboardData.totalCooperatives} cooperatives
-          </p>
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3 max-w-2xl">
-            <p className="text-xs text-yellow-800">
-              <strong>Important:</strong> This dashboard displays self-assessment data. Assessments are non-certifying and do not replace audits or verification. This does not make compliance determinations. Final sourcing decisions and compliance determinations remain the responsibility of buyers and operators.
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-secondary-50 dark:from-gray-900 via-primary-50 dark:via-gray-900 to-white dark:to-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <Breadcrumbs items={[
+          { label: 'Home', path: '/' },
+          { label: 'Compliance', path: '/monitoring' },
+          { label: 'Child Labor Dashboard', path: '/compliance/child-labor' }
+        ]} />
+        <PageHeader
+          badge="Compliance & Monitoring"
+          icon={Shield}
+          title="Child Labor Monitoring Dashboard"
+          subtitle={`Tracking documentation and self-assessments across ${dashboardData.totalCooperatives} cooperatives`}
+        />
+        <div className="flex flex-wrap gap-4 mb-6">
+          <button
+            onClick={() => navigate('/compliance/assessments/new')}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <Plus className="h-5 w-5" />
+            <span>New Assessment</span>
+          </button>
         </div>
-        <button
-          onClick={() => navigate('/compliance/assessments/new')}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          <Plus className="h-5 w-5" />
-          <span>New Assessment</span>
-        </button>
-      </div>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -444,6 +445,11 @@ const ChildLaborDashboard: React.FC<ChildLaborDashboardProps> = ({
           <p>No cooperative assessment data found. Add sample data to see results.</p>
         </div>
       )}
+
+        <PageFooterNote variant="gray">
+          This dashboard displays self-assessment data. Assessments are non-certifying and do not replace audits or verification. This does not make compliance determinations. Final sourcing decisions and compliance determinations remain the responsibility of buyers and operators.
+        </PageFooterNote>
+      </div>
     </div>
   );
 };

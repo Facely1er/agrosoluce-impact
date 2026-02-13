@@ -5,7 +5,9 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, ArrowRight, Users, BarChart3, Info } from 'lucide-react';
+import { Building2, ArrowRight, Users, BarChart3, Info, Target } from 'lucide-react';
+import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageHeader from '@/components/layout/PageHeader';
 import { getCanonicalDirectoryRecords } from '@/features/cooperatives/api/canonicalDirectoryApi';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import { useI18n } from '@/lib/i18n/I18nProvider';
@@ -73,7 +75,7 @@ export default function PilotListingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12">
+      <div className="min-h-screen bg-gradient-to-br from-secondary-50 dark:from-gray-900 via-primary-50 dark:via-gray-900 to-white dark:to-gray-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -85,7 +87,7 @@ export default function PilotListingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12">
+      <div className="min-h-screen bg-gradient-to-br from-secondary-50 dark:from-gray-900 via-primary-50 dark:via-gray-900 to-white dark:to-gray-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
             <p className="text-red-800">Error loading pilots: {error}</p>
@@ -102,18 +104,19 @@ export default function PilotListingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-secondary-50 dark:from-gray-900 via-primary-50 dark:via-gray-900 to-white dark:to-gray-800 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Pilot Programs
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Explore our pilot programs that group cooperatives together for monitoring, 
-            evaluation, and impact measurement.
-          </p>
-        </div>
+        <Breadcrumbs items={[
+          { label: 'Home', path: '/' },
+          { label: 'Pilot Programs', path: '/pilot' }
+        ]} />
+        <PageHeader
+          badge="Monitoring & Impact"
+          icon={Target}
+          title="Pilot Programs"
+          subtitle="Cooperatives grouped into pilots for monitoring, evaluation, and impact measurement — including health indicators, compliance readiness, and documentation coverage."
+          centered
+        />
 
         {/* Info Cards */}
         <div className="grid md:grid-cols-2 gap-6 mb-12">

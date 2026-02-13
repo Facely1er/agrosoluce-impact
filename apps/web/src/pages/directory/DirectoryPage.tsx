@@ -7,6 +7,7 @@ import {
 } from '@/features/cooperatives/api/canonicalDirectoryApi';
 import CanonicalDirectoryCard from '@/features/cooperatives/components/CanonicalDirectoryCard';
 import CanonicalDirectoryMap from '@/features/cooperatives/components/CanonicalDirectoryMap';
+import DirectoryVisualizationDashboard from '@/features/cooperatives/components/DirectoryVisualizationDashboard';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import type { EudrCommodity } from '@/types';
@@ -308,69 +309,46 @@ export default function DirectoryPage() {
     );
   }
 
+  const handleRegionClick = (region: string) => {
+    setSearchParams({ region }, { replace: true });
+    setSelectedRegion(region);
+    setViewMode('grid');
+  };
+
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
+    <div className="min-h-screen py-6 bg-gradient-to-br from-secondary-50 via-primary-50 to-white">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumbs items={[
           { label: 'Home', path: '/' },
           { label: 'Directory', path: '/directory' }
         ]} />
 
-        {/* Header */}
-        <div className="bg-gradient-to-r from-secondary-500 to-secondary-600 rounded-xl shadow-lg p-8 mb-8 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent"></div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
-                <ClipboardList className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                  Canonical Cooperative Directory
-                </h1>
-                <p className="text-white/90 text-lg">
-                  Verified cooperative records with documentation coverage and compliance metrics
-                </p>
-              </div>
+        {/* Compact header */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-secondary-100 p-2 rounded-lg">
+              <ClipboardList className="h-6 w-6 text-secondary-600" />
             </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                Cooperative Directory
+              </h1>
+              <p className="text-sm text-gray-600">
+                Cooperatives by region, coverage, and commodity; health and compliance data where available.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <span className="font-semibold text-primary-600">{stats.active.toLocaleString()}</span> active
+            <span className="text-gray-400">·</span>
+            <span className="font-semibold text-secondary-600">{stats.countries}</span> countries
+            <span className="text-gray-400">·</span>
+            <span className="font-semibold text-blue-600">{stats.commodities}</span> commodities
           </div>
         </div>
 
-        {/* Stats Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-primary-500">
-            <div className="text-3xl font-bold text-primary-600 mb-1">
-              {stats.total.toLocaleString()}
-            </div>
-            <div className="text-gray-600 text-sm">Enregistrements dans le répertoire</div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-green-500">
-            <div className="text-3xl font-bold text-green-600 mb-1">
-              {stats.active.toLocaleString()}
-            </div>
-            <div className="text-gray-600 text-sm">Actifs</div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-secondary-500">
-            <div className="text-3xl font-bold text-secondary-600 mb-1">
-              {stats.countries}
-            </div>
-            <div className="text-gray-600 text-sm">Pays</div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-blue-500">
-            <div className="text-3xl font-bold text-blue-600 mb-1">
-              {stats.commodities}
-            </div>
-            <div className="text-gray-600 text-sm">Commodités</div>
-          </div>
-        </div>
-
-        {/* Context-first filters bar (product-first, region-aware, coverage-aware) */}
-        <section className="mb-4 space-y-2 bg-white rounded-lg shadow-md p-6">
-          <p className="text-xs text-gray-600 mb-4">
-            Filter cooperatives by EUDR commodity, geography, and documentation coverage to support sourcing and due-diligence planning.
-          </p>
-
+        {/* Filters bar - compact, supports interactive map search */}
+        <section className="mb-4 bg-white rounded-lg shadow-md p-4 border border-gray-100">
           <div className="flex flex-wrap gap-3 items-center text-xs">
             {/* Commodity */}
             <label className="flex items-center gap-1">
@@ -473,76 +451,95 @@ export default function DirectoryPage() {
           </div>
         </section>
 
-        {/* Results */}
-        <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Résultats ({filteredRecords.length})
-            </h2>
+        {/* View mode toggle - always visible */}
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div className="flex items-center gap-1 bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+            <button
+              onClick={() => setViewMode('map')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'map' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+              }`}
+              title="Map view"
+            >
+              <MapPin className="h-4 w-4" /> Map
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'grid' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+              }`}
+              title="Grid view"
+            >
+              <Grid3x3 className="h-4 w-4" /> Grid
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'list' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+              }`}
+              title="List view"
+            >
+              <List className="h-4 w-4" /> List
+            </button>
           </div>
+          <div className="flex items-center gap-3 text-sm text-gray-600">
+            <span className="font-semibold text-gray-900">{filteredRecords.length}</span> results
+            {viewMode !== 'map' && (
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={workspaceOnly}
+                  onChange={(e) => setWorkspaceOnly(e.target.checked)}
+                  className="rounded"
+                />
+                <span>Workspace only</span>
+              </label>
+            )}
+          </div>
+        </div>
 
-          {/* Context-first display: product/region/coverage shown before cooperative names */}
-          {filteredRecords.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <Building2 className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-xs text-gray-500 mt-4">
-                No cooperatives match the current filters. Try broadening commodity, region, or coverage level.
-              </p>
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="mt-4 text-secondary-600 hover:text-secondary-700 underline text-sm"
-                >
-                  Réinitialiser les filtres
-                </button>
-              )}
+        {/* Map + Dashboard (prominent when map view) or Results (grid/list) */}
+        {viewMode === 'map' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <div className="lg:col-span-2 rounded-xl overflow-hidden border border-gray-200 shadow-lg bg-white">
+              <CanonicalDirectoryMap
+                records={filteredRecords.filter(coop => !workspaceOnly || coop.coop_id)}
+                onRegionClick={handleRegionClick}
+                height="min(72vh, 760px)"
+                displayMode="both"
+              />
             </div>
-          ) : (
-            <>
-              {/* View mode toggle */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
+            <div className="lg:col-span-1 overflow-y-auto max-h-[min(72vh,760px)]">
+              <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-4 sticky top-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">Visualization dashboard</h2>
+                <DirectoryVisualizationDashboard
+                  records={filteredRecords.filter(coop => !workspaceOnly || coop.coop_id)}
+                  onRegionClick={handleRegionClick}
+                />
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Grid / List results */}
+        {viewMode !== 'map' && (
+          <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-gray-100">
+            {filteredRecords.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <Building2 className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                <p className="text-sm text-gray-500 mt-4">
+                  No cooperatives match the current filters. Try broadening commodity, region, or coverage.
+                </p>
+                {hasActiveFilters && (
                   <button
-                    onClick={() => setViewMode('map')}
-                    className={`p-2 rounded ${viewMode === 'map' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
-                    title="Map view"
+                    onClick={clearFilters}
+                    className="mt-4 text-secondary-600 hover:text-secondary-700 underline text-sm"
                   >
-                    <MapPin className="h-4 w-4" />
+                    Reset filters
                   </button>
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded ${viewMode === 'grid' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
-                    title="Grid view"
-                  >
-                    <Grid3x3 className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-2 rounded ${viewMode === 'list' ? 'bg-secondary-100 text-secondary-700' : 'text-gray-500 hover:bg-gray-100'}`}
-                    title="List view"
-                  >
-                    <List className="h-4 w-4" />
-                  </button>
-                </div>
-                {viewMode !== 'map' && (
-                  <label className="flex items-center gap-2 text-xs text-gray-600">
-                    <input
-                      type="checkbox"
-                      checked={workspaceOnly}
-                      onChange={(e) => setWorkspaceOnly(e.target.checked)}
-                      className="rounded"
-                    />
-                    <span>Show only cooperatives with workspace</span>
-                  </label>
                 )}
               </div>
-
-              {/* Results display */}
-              {viewMode === 'map' ? (
-                <div className="bg-white rounded-lg overflow-hidden">
-                  <CanonicalDirectoryMap records={filteredRecords.filter(coop => !workspaceOnly || coop.coop_id)} />
-                </div>
-              ) : viewMode === 'grid' ? (
+            ) : viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredRecords
                     .filter(coop => !workspaceOnly || coop.coop_id) // Filter by workspace if enabled
@@ -611,9 +608,8 @@ export default function DirectoryPage() {
                     })}
                 </ul>
               )}
-            </>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

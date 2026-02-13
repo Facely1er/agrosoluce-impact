@@ -4,7 +4,7 @@
 -- This file contains all migrations in order.
 -- Execute this file in Supabase SQL Editor.
 -- 
--- Generated: 2026-02-13T14:35:23.256Z
+-- Generated: 2026-02-13T16:01:46.279Z
 -- =============================================
 
 -- =============================================
@@ -2044,7 +2044,7 @@ SELECT
     c.certifications AS cooperative_certifications,
     COUNT(DISTINCT b.id) AS total_batches,
     SUM(b.quantity) AS total_production_quantity,
-    MAX(b.harvest_date) AS last_harvest_date,
+    MAX(b.harvest_date) AS last_batch_harvest_date,
     -- Calculate farmer productivity score
     CASE 
         WHEN f.farm_size_hectares > 0 AND f.yield_per_hectare > 0 
@@ -2220,7 +2220,7 @@ CREATE POLICY "Anyone can view certification standards" ON agrosoluce.certificat
 CREATE POLICY "Users can view enrichment logs for their entities" ON agrosoluce.enrichment_log
     FOR SELECT USING (
         (entity_type = 'cooperative' AND entity_id IN (
-            SELECT id FROM agrosoluce.cooperatives c
+            SELECT c.id FROM agrosoluce.cooperatives c
             JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
             WHERE up.user_id = auth.uid()
         ))
@@ -2551,8 +2551,8 @@ LEFT JOIN LATERAL (
             CASE WHEN farmer_stats.documented_farmers > 0 THEN 20 ELSE 0 END +
             CASE WHEN plot_stats.geo_referenced_plots > 0 THEN 20 ELSE 0 END +
             CASE WHEN doc_stats.required_docs_uploaded > 0 THEN 20 ELSE 0 END +
-            CASE WHEN COUNT(DISTINCT cert.id) > 0 THEN 20 ELSE 0 END +
-            CASE WHEN COUNT(DISTINCT p.id) FILTER (WHERE p.lot_status = 'active') > 0 THEN 20 ELSE 0 END
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.certifications WHERE cooperative_id = c.id AND status = 'active') > 0 THEN 20 ELSE 0 END +
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.products WHERE cooperative_id = c.id AND lot_status = 'active') > 0 THEN 20 ELSE 0 END
         ) AS readiness_score
 ) readiness ON true
 WHERE c.status = 'approved' -- Only show approved cooperatives to buyers
@@ -2635,8 +2635,8 @@ LEFT JOIN LATERAL (
             CASE WHEN farmer_stats.documented_farmers > 0 THEN 20 ELSE 0 END +
             CASE WHEN plot_stats.geo_referenced_plots > 0 THEN 20 ELSE 0 END +
             CASE WHEN doc_stats.uploaded_documents > 0 THEN 20 ELSE 0 END +
-            CASE WHEN EXISTS (SELECT 1 FROM agrosoluce.certifications WHERE cooperative_id = c.id AND status = 'active') THEN 20 ELSE 0 END +
-            CASE WHEN COUNT(DISTINCT p.id) FILTER (WHERE p.lot_status = 'active') > 0 THEN 20 ELSE 0 END
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.certifications WHERE cooperative_id = c.id AND status = 'active') > 0 THEN 20 ELSE 0 END +
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.products WHERE cooperative_id = c.id AND lot_status = 'active') > 0 THEN 20 ELSE 0 END
         ) AS readiness_score
 ) readiness ON true
 GROUP BY 
@@ -2674,7 +2674,7 @@ CREATE POLICY "Cooperative members can view their request lots" ON agrosoluce.bu
 CREATE POLICY "Cooperative members can view their documents" ON agrosoluce.documents
     FOR SELECT USING (
         (entity_type = 'cooperative' AND entity_id IN (
-            SELECT id FROM agrosoluce.cooperatives c
+            SELECT c.id FROM agrosoluce.cooperatives c
             JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
             WHERE up.user_id = auth.uid()
         ))
@@ -2737,7 +2737,7 @@ CREATE POLICY "Users can update their notifications" ON agrosoluce.notifications
 CREATE POLICY "Cooperative members can view their checklist" ON agrosoluce.readiness_checklist
     FOR SELECT USING (
         cooperative_id IN (
-            SELECT id FROM agrosoluce.cooperatives c
+            SELECT c.id FROM agrosoluce.cooperatives c
             JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
             WHERE up.user_id = auth.uid()
         )
@@ -2994,7 +2994,6 @@ COMMENT ON COLUMN agrosoluce.canonical_cooperative_directory.created_at IS 'Time
 -- Grant permissions to authenticated users
 GRANT USAGE ON SCHEMA agrosoluce TO authenticated;
 GRANT ALL ON agrosoluce.canonical_cooperative_directory TO authenticated;
-GRANT USAGE, SELECT ON SEQUENCE IF EXISTS agrosoluce.canonical_cooperative_directory_coop_id_seq TO authenticated;
 
 -- Grant read access to anon users for active records
 GRANT USAGE ON SCHEMA agrosoluce TO anon;
@@ -3097,7 +3096,6 @@ COMMENT ON COLUMN agrosoluce.coverage_metrics.last_updated IS 'Timestamp when co
 -- Grant permissions to authenticated users
 GRANT USAGE ON SCHEMA agrosoluce TO authenticated;
 GRANT ALL ON agrosoluce.coverage_metrics TO authenticated;
-GRANT USAGE, SELECT ON SEQUENCE IF EXISTS agrosoluce.coverage_metrics_id_seq TO authenticated;
 
 -- Grant read access to anon users
 GRANT USAGE ON SCHEMA agrosoluce TO anon;
@@ -3191,7 +3189,6 @@ COMMENT ON COLUMN agrosoluce.readiness_snapshots.created_at IS 'Timestamp when s
 -- Grant permissions to authenticated users
 GRANT USAGE ON SCHEMA agrosoluce TO authenticated;
 GRANT ALL ON agrosoluce.readiness_snapshots TO authenticated;
-GRANT USAGE, SELECT ON SEQUENCE IF EXISTS agrosoluce.readiness_snapshots_snapshot_id_seq TO authenticated;
 
 -- Grant read access to anon users
 GRANT USAGE ON SCHEMA agrosoluce TO anon;
@@ -3283,139 +3280,57 @@ VALUES ('016_farmer_declarations', 'Farmer Declarations: self-reported declarati
 ON CONFLICT (migration_name) DO NOTHING;
 
 -- =============================================
--- FARMER DECLARATIONS TABLE
+-- FARMER DECLARATIONS TABLE (016 schema)
+-- Skip table/index/policy creation when table already exists from 010 (has farmer_id).
 -- =============================================
 
-CREATE TABLE IF NOT EXISTS agrosoluce.farmer_declarations (
-    declaration_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    coop_id UUID NOT NULL REFERENCES agrosoluce.canonical_cooperative_directory(coop_id) ON DELETE CASCADE,
-    farmer_reference VARCHAR(255) NOT NULL, -- Internal/non-public reference (e.g., "FARMER-001", not a name)
-    declaration_type VARCHAR(100) NOT NULL, -- e.g., 'child_labor', 'land_use', 'organic_practices', etc.
-    declared_value TEXT NOT NULL, -- The actual declaration value (can be boolean, text, JSON, etc.)
-    declared_at TIMESTAMP WITH TIME ZONE NOT NULL, -- When the farmer made the declaration
-    collected_by UUID REFERENCES agrosoluce.user_profiles(id) ON DELETE SET NULL, -- Coop user who collected this
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
-    -- Ensure one declaration per farmer_reference per declaration_type per declared_at date
-    CONSTRAINT unique_farmer_declaration UNIQUE (coop_id, farmer_reference, declaration_type, declared_at::DATE)
-);
+DO $$
+BEGIN
+  -- If farmer_declarations already exists from migration 010 (has farmer_id), just record migration and skip.
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'agrosoluce' AND table_name = 'farmer_declarations' AND column_name = 'farmer_id') THEN
+    RETURN;
+  END IF;
 
--- =============================================
--- INDEXES FOR PERFORMANCE
--- =============================================
-
-CREATE INDEX IF NOT EXISTS idx_farmer_declarations_coop_id ON agrosoluce.farmer_declarations(coop_id);
-CREATE INDEX IF NOT EXISTS idx_farmer_declarations_farmer_reference ON agrosoluce.farmer_declarations(farmer_reference);
-CREATE INDEX IF NOT EXISTS idx_farmer_declarations_type ON agrosoluce.farmer_declarations(declaration_type);
-CREATE INDEX IF NOT EXISTS idx_farmer_declarations_declared_at ON agrosoluce.farmer_declarations(declared_at DESC);
-CREATE INDEX IF NOT EXISTS idx_farmer_declarations_collected_by ON agrosoluce.farmer_declarations(collected_by);
-CREATE INDEX IF NOT EXISTS idx_farmer_declarations_created_at ON agrosoluce.farmer_declarations(created_at DESC);
-
--- Composite index for common queries
-CREATE INDEX IF NOT EXISTS idx_farmer_declarations_coop_type ON agrosoluce.farmer_declarations(coop_id, declaration_type);
-CREATE INDEX IF NOT EXISTS idx_farmer_declarations_coop_farmer ON agrosoluce.farmer_declarations(coop_id, farmer_reference);
-
--- =============================================
--- ROW LEVEL SECURITY (RLS) POLICIES
--- =============================================
-
--- Enable RLS on farmer_declarations table
-ALTER TABLE agrosoluce.farmer_declarations ENABLE ROW LEVEL SECURITY;
-
--- Policy: Cooperative members can view declarations for their cooperative
-CREATE POLICY "Cooperative members can view their farmer declarations" 
-    ON agrosoluce.farmer_declarations
-    FOR SELECT 
-    USING (
-        EXISTS (
-            SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd
-            JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id
-            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
-            WHERE ccd.coop_id = farmer_declarations.coop_id
-            AND up.user_id = auth.uid()
-        )
-        OR
-        -- Allow if collected_by matches current user
-        collected_by IN (
-            SELECT id FROM agrosoluce.user_profiles WHERE user_id = auth.uid()
-        )
+  -- Table does not exist or has 016 schema (coop_id); create only when table does not exist.
+  IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'agrosoluce' AND table_name = 'farmer_declarations') THEN
+    CREATE TABLE agrosoluce.farmer_declarations (
+        declaration_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        coop_id UUID NOT NULL REFERENCES agrosoluce.canonical_cooperative_directory(coop_id) ON DELETE CASCADE,
+        farmer_reference VARCHAR(255) NOT NULL,
+        declaration_type VARCHAR(100) NOT NULL,
+        declared_value TEXT NOT NULL,
+        declared_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        collected_by UUID REFERENCES agrosoluce.user_profiles(id) ON DELETE SET NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        CONSTRAINT unique_farmer_declaration UNIQUE (coop_id, farmer_reference, declaration_type, declared_at)
     );
-
--- Policy: Cooperative members can insert declarations for their cooperative
-CREATE POLICY "Cooperative members can create farmer declarations" 
-    ON agrosoluce.farmer_declarations
-    FOR INSERT 
-    WITH CHECK (
-        EXISTS (
-            SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd
-            JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id
-            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
-            WHERE ccd.coop_id = farmer_declarations.coop_id
-            AND up.user_id = auth.uid()
-        )
-        OR
-        -- Allow if collected_by matches current user
-        collected_by IN (
-            SELECT id FROM agrosoluce.user_profiles WHERE user_id = auth.uid()
-        )
+    CREATE INDEX IF NOT EXISTS idx_farmer_declarations_coop_id ON agrosoluce.farmer_declarations(coop_id);
+    CREATE INDEX IF NOT EXISTS idx_farmer_declarations_farmer_reference ON agrosoluce.farmer_declarations(farmer_reference);
+    CREATE INDEX IF NOT EXISTS idx_farmer_declarations_type ON agrosoluce.farmer_declarations(declaration_type);
+    CREATE INDEX IF NOT EXISTS idx_farmer_declarations_declared_at ON agrosoluce.farmer_declarations(declared_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_farmer_declarations_collected_by ON agrosoluce.farmer_declarations(collected_by);
+    CREATE INDEX IF NOT EXISTS idx_farmer_declarations_created_at ON agrosoluce.farmer_declarations(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_farmer_declarations_coop_type ON agrosoluce.farmer_declarations(coop_id, declaration_type);
+    CREATE INDEX IF NOT EXISTS idx_farmer_declarations_coop_farmer ON agrosoluce.farmer_declarations(coop_id, farmer_reference);
+    ALTER TABLE agrosoluce.farmer_declarations ENABLE ROW LEVEL SECURITY;
+    CREATE POLICY "Cooperative members can view their farmer declarations" ON agrosoluce.farmer_declarations FOR SELECT USING (
+        EXISTS (SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id WHERE ccd.coop_id = farmer_declarations.coop_id AND up.user_id = auth.uid())
+        OR collected_by IN (SELECT id FROM agrosoluce.user_profiles WHERE user_id = auth.uid())
     );
-
--- Policy: Cooperative members can update declarations for their cooperative
-CREATE POLICY "Cooperative members can update their farmer declarations" 
-    ON agrosoluce.farmer_declarations
-    FOR UPDATE 
-    USING (
-        EXISTS (
-            SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd
-            JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id
-            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
-            WHERE ccd.coop_id = farmer_declarations.coop_id
-            AND up.user_id = auth.uid()
-        )
+    CREATE POLICY "Cooperative members can create farmer declarations" ON agrosoluce.farmer_declarations FOR INSERT WITH CHECK (
+        EXISTS (SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id WHERE ccd.coop_id = farmer_declarations.coop_id AND up.user_id = auth.uid())
+        OR collected_by IN (SELECT id FROM agrosoluce.user_profiles WHERE user_id = auth.uid())
     );
-
--- Policy: Cooperative members can delete declarations for their cooperative
-CREATE POLICY "Cooperative members can delete their farmer declarations" 
-    ON agrosoluce.farmer_declarations
-    FOR DELETE 
-    USING (
-        EXISTS (
-            SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd
-            JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id
-            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
-            WHERE ccd.coop_id = farmer_declarations.coop_id
-            AND up.user_id = auth.uid()
-        )
+    CREATE POLICY "Cooperative members can update their farmer declarations" ON agrosoluce.farmer_declarations FOR UPDATE USING (
+        EXISTS (SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id WHERE ccd.coop_id = farmer_declarations.coop_id AND up.user_id = auth.uid())
     );
-
--- =============================================
--- COMMENTS AND DOCUMENTATION
--- =============================================
-
-COMMENT ON TABLE agrosoluce.farmer_declarations IS 'Farmer declarations - Self-reported by farmer (unverified). No farmer names, no verification flags.';
-COMMENT ON COLUMN agrosoluce.farmer_declarations.declaration_id IS 'Unique identifier for the declaration record';
-COMMENT ON COLUMN agrosoluce.farmer_declarations.coop_id IS 'Reference to the cooperative (canonical_cooperative_directory)';
-COMMENT ON COLUMN agrosoluce.farmer_declarations.farmer_reference IS 'Internal/non-public reference identifier for the farmer (e.g., "FARMER-001"). NOT a name.';
-COMMENT ON COLUMN agrosoluce.farmer_declarations.declaration_type IS 'Type of declaration (e.g., child_labor, land_use, organic_practices)';
-COMMENT ON COLUMN agrosoluce.farmer_declarations.declared_value IS 'The actual declaration value (can be boolean, text, JSON, etc.)';
-COMMENT ON COLUMN agrosoluce.farmer_declarations.declared_at IS 'When the farmer made the declaration';
-COMMENT ON COLUMN agrosoluce.farmer_declarations.collected_by IS 'Cooperative user who collected this declaration';
-COMMENT ON COLUMN agrosoluce.farmer_declarations.created_at IS 'When this record was created in the system';
-
--- =============================================
--- GRANTS
--- =============================================
-
-GRANT ALL ON agrosoluce.farmer_declarations TO authenticated;
-GRANT SELECT ON agrosoluce.farmer_declarations TO anon; -- Read-only for anonymous users if needed
-
--- =============================================
--- MIGRATION RECORD
--- =============================================
-
-INSERT INTO agrosoluce.migrations (migration_name, description) 
-VALUES ('016_farmer_declarations', 'Farmer Declarations: self-reported declarations with farmer_reference, no names, no verification flags')
-ON CONFLICT (migration_name) DO NOTHING;
+    CREATE POLICY "Cooperative members can delete their farmer declarations" ON agrosoluce.farmer_declarations FOR DELETE USING (
+        EXISTS (SELECT 1 FROM agrosoluce.canonical_cooperative_directory ccd JOIN agrosoluce.cooperatives c ON c.id = ccd.coop_id JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id WHERE ccd.coop_id = farmer_declarations.coop_id AND up.user_id = auth.uid())
+    );
+    GRANT ALL ON agrosoluce.farmer_declarations TO authenticated;
+    GRANT SELECT ON agrosoluce.farmer_declarations TO anon;
+  END IF;
+END $$;
 
 
 
@@ -3511,15 +3426,15 @@ LEFT JOIN LATERAL (
     FROM agrosoluce.documents d
     WHERE d.entity_type = 'cooperative' AND d.entity_id = c.id
 ) doc_stats ON true
--- Aggregate farmer declarations from new farmer_declarations table (migration 016)
--- Join via canonical_cooperative_directory: cooperatives.id = canonical_cooperative_directory.coop_id
+-- Aggregate farmer declarations (join via farmers when farmer_id exists; else via coop_id when declared_at exists)
 LEFT JOIN LATERAL (
     SELECT 
         COUNT(*) AS total_declarations,
         array_agg(DISTINCT fd.declaration_type) AS declaration_types_present,
-        MAX(fd.declared_at) AS farmer_declarations_last_date
+        MAX((fd.declaration_date)::timestamp with time zone) AS farmer_declarations_last_date
     FROM agrosoluce.farmer_declarations fd
-    WHERE fd.coop_id = c.id  -- cooperatives.id maps to canonical_cooperative_directory.coop_id
+    INNER JOIN agrosoluce.farmers f ON f.id = fd.farmer_id
+    WHERE f.cooperative_id = c.id
 ) declaration_stats ON true
 LEFT JOIN agrosoluce.certifications cert ON cert.cooperative_id = c.id
 LEFT JOIN agrosoluce.products p ON p.cooperative_id = c.id
@@ -3529,8 +3444,8 @@ LEFT JOIN LATERAL (
             CASE WHEN farmer_stats.documented_farmers > 0 THEN 20 ELSE 0 END +
             CASE WHEN plot_stats.geo_referenced_plots > 0 THEN 20 ELSE 0 END +
             CASE WHEN doc_stats.required_docs_uploaded > 0 THEN 20 ELSE 0 END +
-            CASE WHEN COUNT(DISTINCT cert.id) > 0 THEN 20 ELSE 0 END +
-            CASE WHEN COUNT(DISTINCT p.id) FILTER (WHERE p.lot_status = 'active') > 0 THEN 20 ELSE 0 END
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.certifications WHERE cooperative_id = c.id AND status = 'active') > 0 THEN 20 ELSE 0 END +
+            CASE WHEN (SELECT COUNT(*) FROM agrosoluce.products WHERE cooperative_id = c.id AND lot_status = 'active') > 0 THEN 20 ELSE 0 END
         ) AS readiness_score
 ) readiness ON true
 WHERE c.status = 'approved' -- Only show approved cooperatives to buyers
@@ -4379,7 +4294,7 @@ CREATE TABLE IF NOT EXISTS agrosoluce.vrac_period_aggregates (
   antimalarial_quantity INTEGER NOT NULL,
   antibiotic_quantity INTEGER NOT NULL,
   analgesic_quantity INTEGER NOT NULL,
-  antimalarial_share DECIMAL(5,4) NOT NULL,
+  antimalarial_share DECIMAL(4,4) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(pharmacy_id, year, period_label),
@@ -4401,7 +4316,7 @@ CREATE TABLE IF NOT EXISTS agrosoluce.vrac_regional_health_index (
   year INTEGER NOT NULL,
   antimalarial_quantity INTEGER NOT NULL,
   total_quantity INTEGER NOT NULL,
-  antimalarial_share DECIMAL(5,4) NOT NULL,
+  antimalarial_share DECIMAL(4,4) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(pharmacy_id, year, period_label),
   CONSTRAINT vrac_health_index_share_check CHECK (antimalarial_share >= 0 AND antimalarial_share <= 1)
@@ -4501,3 +4416,841 @@ CREATE TRIGGER update_vrac_period_aggregates_updated_at
     BEFORE UPDATE ON agrosoluce.vrac_period_aggregates
     FOR EACH ROW
     EXECUTE FUNCTION agrosoluce.update_updated_at_column();
+
+
+-- =============================================
+-- Migration: 023_hwi_schema.sql
+-- =============================================
+
+-- Migration: Create HWI (Household Welfare Index) Tables and Views
+-- This migration creates tables and views for the comprehensive HWI system
+-- tracking 7 medication categories for ESG monitoring
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description) 
+VALUES ('023_hwi_schema', 'Create Household Welfare Index tables, views, and functions')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- CATEGORY AGGREGATES TABLE
+-- =============================================
+
+-- Track all 7 medication categories per period
+CREATE TABLE IF NOT EXISTS agrosoluce.vrac_category_aggregates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pharmacy_id TEXT NOT NULL REFERENCES agrosoluce.pharmacy_profiles(id) ON DELETE CASCADE,
+  period_label TEXT NOT NULL,
+  year INTEGER NOT NULL,
+  category TEXT NOT NULL,
+  quantity INTEGER NOT NULL,
+  share NUMERIC(7,6) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(pharmacy_id, year, period_label, category),
+  CONSTRAINT vrac_category_aggregates_quantity_check CHECK (quantity >= 0),
+  CONSTRAINT vrac_category_aggregates_share_check CHECK (share >= 0 AND share <= 1)
+);
+
+COMMENT ON TABLE agrosoluce.vrac_category_aggregates IS 'Medication category aggregates for HWI calculation';
+COMMENT ON COLUMN agrosoluce.vrac_category_aggregates.category IS 'Category: antimalarial, pediatric_ors_zinc, prenatal_vitamins, contraceptives, micronutrients, arv, antibiotics, other';
+COMMENT ON COLUMN agrosoluce.vrac_category_aggregates.share IS 'Share of total quantity (0-1)';
+
+-- =============================================
+-- HOUSEHOLD WELFARE INDEX TABLE
+-- =============================================
+
+-- Store HWI composite scores
+CREATE TABLE IF NOT EXISTS agrosoluce.household_welfare_index (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pharmacy_id TEXT NOT NULL REFERENCES agrosoluce.pharmacy_profiles(id) ON DELETE CASCADE,
+  departement TEXT NOT NULL,
+  region TEXT,
+  period_label TEXT NOT NULL,
+  year INTEGER NOT NULL,
+  hwi_score NUMERIC(5,2) NOT NULL,
+  workforce_health_score NUMERIC(5,2),
+  child_welfare_score NUMERIC(5,2),
+  womens_health_score NUMERIC(5,2),
+  womens_empowerment_score NUMERIC(5,2),
+  nutrition_score NUMERIC(5,2),
+  chronic_illness_score NUMERIC(5,2),
+  acute_illness_score NUMERIC(5,2),
+  alert_level TEXT NOT NULL,
+  total_quantity INTEGER NOT NULL,
+  category_breakdown JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(pharmacy_id, year, period_label),
+  CONSTRAINT hwi_score_check CHECK (hwi_score >= 0 AND hwi_score <= 100),
+  CONSTRAINT hwi_alert_level_check CHECK (alert_level IN ('green', 'yellow', 'red', 'black'))
+);
+
+COMMENT ON TABLE agrosoluce.household_welfare_index IS 'Household Welfare Index scores and component breakdown';
+COMMENT ON COLUMN agrosoluce.household_welfare_index.hwi_score IS 'Composite HWI score (0-100, higher = worse conditions)';
+COMMENT ON COLUMN agrosoluce.household_welfare_index.alert_level IS 'Alert classification: green (0-25), yellow (25-50), red (50-75), black (75-100)';
+COMMENT ON COLUMN agrosoluce.household_welfare_index.category_breakdown IS 'JSON object with category shares';
+
+-- =============================================
+-- INDEXES FOR PERFORMANCE
+-- =============================================
+
+-- Indexes for category aggregates
+CREATE INDEX IF NOT EXISTS idx_vrac_category_aggregates_pharmacy_year 
+  ON agrosoluce.vrac_category_aggregates(pharmacy_id, year);
+CREATE INDEX IF NOT EXISTS idx_vrac_category_aggregates_category 
+  ON agrosoluce.vrac_category_aggregates(category);
+CREATE INDEX IF NOT EXISTS idx_vrac_category_aggregates_year 
+  ON agrosoluce.vrac_category_aggregates(year);
+
+-- Indexes for HWI
+CREATE INDEX IF NOT EXISTS idx_hwi_pharmacy_year 
+  ON agrosoluce.household_welfare_index(pharmacy_id, year);
+CREATE INDEX IF NOT EXISTS idx_hwi_alert_level 
+  ON agrosoluce.household_welfare_index(alert_level);
+CREATE INDEX IF NOT EXISTS idx_hwi_departement 
+  ON agrosoluce.household_welfare_index(departement);
+CREATE INDEX IF NOT EXISTS idx_hwi_year 
+  ON agrosoluce.household_welfare_index(year);
+CREATE INDEX IF NOT EXISTS idx_hwi_score 
+  ON agrosoluce.household_welfare_index(hwi_score);
+
+-- =============================================
+-- VIEWS
+-- =============================================
+
+-- View: Latest HWI scores per pharmacy
+CREATE OR REPLACE VIEW agrosoluce.v_hwi_latest AS
+SELECT DISTINCT ON (pharmacy_id)
+  h.*,
+  p.name as pharmacy_name,
+  p.region as pharmacy_region,
+  p.location
+FROM agrosoluce.household_welfare_index h
+JOIN agrosoluce.pharmacy_profiles p ON h.pharmacy_id = p.id
+ORDER BY pharmacy_id, year DESC, period_label DESC;
+
+COMMENT ON VIEW agrosoluce.v_hwi_latest IS 'Most recent HWI scores for each pharmacy';
+
+-- View: Active alerts (non-green)
+CREATE OR REPLACE VIEW agrosoluce.v_hwi_active_alerts AS
+SELECT 
+  h.*,
+  p.name as pharmacy_name,
+  p.region as pharmacy_region,
+  p.location
+FROM agrosoluce.household_welfare_index h
+JOIN agrosoluce.pharmacy_profiles p ON h.pharmacy_id = p.id
+WHERE h.alert_level != 'green'
+ORDER BY 
+  CASE h.alert_level
+    WHEN 'black' THEN 1
+    WHEN 'red' THEN 2
+    WHEN 'yellow' THEN 3
+    ELSE 4
+  END,
+  h.hwi_score DESC;
+
+COMMENT ON VIEW agrosoluce.v_hwi_active_alerts IS 'All non-green alert level HWI scores, ordered by severity';
+
+-- View: HWI timeseries by departement
+CREATE OR REPLACE VIEW agrosoluce.v_hwi_timeseries_by_dept AS
+SELECT 
+  departement,
+  year,
+  period_label,
+  COUNT(*) as pharmacy_count,
+  AVG(hwi_score) as avg_hwi_score,
+  MIN(hwi_score) as min_hwi_score,
+  MAX(hwi_score) as max_hwi_score,
+  AVG(workforce_health_score) as avg_workforce_health,
+  AVG(child_welfare_score) as avg_child_welfare,
+  AVG(womens_health_score) as avg_womens_health,
+  AVG(womens_empowerment_score) as avg_womens_empowerment,
+  AVG(nutrition_score) as avg_nutrition,
+  AVG(chronic_illness_score) as avg_chronic_illness,
+  AVG(acute_illness_score) as avg_acute_illness,
+  SUM(total_quantity) as total_quantity_all_pharmacies
+FROM agrosoluce.household_welfare_index
+GROUP BY departement, year, period_label
+ORDER BY year DESC, period_label DESC;
+
+COMMENT ON VIEW agrosoluce.v_hwi_timeseries_by_dept IS 'HWI aggregates by departement and time period';
+
+-- View: Category trends over time
+CREATE OR REPLACE VIEW agrosoluce.v_category_trends AS
+SELECT 
+  ca.category,
+  ca.year,
+  ca.period_label,
+  COUNT(DISTINCT ca.pharmacy_id) as pharmacy_count,
+  SUM(ca.quantity) as total_quantity,
+  AVG(ca.share) as avg_share,
+  MIN(ca.share) as min_share,
+  MAX(ca.share) as max_share
+FROM agrosoluce.vrac_category_aggregates ca
+GROUP BY ca.category, ca.year, ca.period_label
+ORDER BY ca.year DESC, ca.period_label DESC, ca.category;
+
+COMMENT ON VIEW agrosoluce.v_category_trends IS 'Category-level trends across all pharmacies';
+
+-- =============================================
+-- FUNCTIONS
+-- =============================================
+
+-- Function: Get HWI summary for a departement and year
+CREATE OR REPLACE FUNCTION agrosoluce.get_hwi_summary(
+  dept_name TEXT DEFAULT NULL,
+  target_year INTEGER DEFAULT NULL
+)
+RETURNS TABLE (
+  year INTEGER,
+  avg_score NUMERIC,
+  alert_distribution JSONB,
+  component_averages JSONB
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    h.year,
+    ROUND(AVG(h.hwi_score), 2) as avg_score,
+    jsonb_build_object(
+      'green', COUNT(*) FILTER (WHERE h.alert_level = 'green'),
+      'yellow', COUNT(*) FILTER (WHERE h.alert_level = 'yellow'),
+      'red', COUNT(*) FILTER (WHERE h.alert_level = 'red'),
+      'black', COUNT(*) FILTER (WHERE h.alert_level = 'black')
+    ) as alert_distribution,
+    jsonb_build_object(
+      'workforce_health', ROUND(AVG(h.workforce_health_score), 2),
+      'child_welfare', ROUND(AVG(h.child_welfare_score), 2),
+      'womens_health', ROUND(AVG(h.womens_health_score), 2),
+      'womens_empowerment', ROUND(AVG(h.womens_empowerment_score), 2),
+      'nutrition', ROUND(AVG(h.nutrition_score), 2),
+      'chronic_illness', ROUND(AVG(h.chronic_illness_score), 2),
+      'acute_illness', ROUND(AVG(h.acute_illness_score), 2)
+    ) as component_averages
+  FROM agrosoluce.household_welfare_index h
+  WHERE (dept_name IS NULL OR h.departement = dept_name)
+    AND (target_year IS NULL OR h.year = target_year)
+  GROUP BY h.year
+  ORDER BY h.year DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+COMMENT ON FUNCTION agrosoluce.get_hwi_summary IS 'Get HWI summary statistics for a departement and/or year';
+
+-- Function: Get alert distribution
+CREATE OR REPLACE FUNCTION agrosoluce.get_alert_distribution(
+  target_year INTEGER DEFAULT NULL
+)
+RETURNS TABLE (
+  alert_level TEXT,
+  count BIGINT,
+  percentage NUMERIC
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH counts AS (
+    SELECT 
+      h.alert_level,
+      COUNT(*) as count
+    FROM agrosoluce.household_welfare_index h
+    WHERE target_year IS NULL OR h.year = target_year
+    GROUP BY h.alert_level
+  ),
+  total AS (
+    SELECT SUM(count) as total_count FROM counts
+  )
+  SELECT 
+    c.alert_level,
+    c.count,
+    ROUND((c.count::NUMERIC / t.total_count) * 100, 2) as percentage
+  FROM counts c, total t
+  ORDER BY 
+    CASE c.alert_level
+      WHEN 'green' THEN 1
+      WHEN 'yellow' THEN 2
+      WHEN 'red' THEN 3
+      WHEN 'black' THEN 4
+    END;
+END;
+$$ LANGUAGE plpgsql;
+
+COMMENT ON FUNCTION agrosoluce.get_alert_distribution IS 'Get distribution of alert levels by count and percentage';
+
+-- =============================================
+-- ROW LEVEL SECURITY (RLS)
+-- =============================================
+
+-- Enable RLS
+ALTER TABLE agrosoluce.vrac_category_aggregates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE agrosoluce.household_welfare_index ENABLE ROW LEVEL SECURITY;
+
+-- Public read access policies (surveillance data is non-sensitive)
+CREATE POLICY "Public read access for vrac_category_aggregates" 
+  ON agrosoluce.vrac_category_aggregates 
+  FOR SELECT 
+  USING (true);
+
+CREATE POLICY "Public read access for household_welfare_index" 
+  ON agrosoluce.household_welfare_index 
+  FOR SELECT 
+  USING (true);
+
+-- =============================================
+-- UPDATED_AT TRIGGERS
+-- =============================================
+
+-- Triggers for updated_at columns
+DROP TRIGGER IF EXISTS update_vrac_category_aggregates_updated_at ON agrosoluce.vrac_category_aggregates;
+CREATE TRIGGER update_vrac_category_aggregates_updated_at
+  BEFORE UPDATE ON agrosoluce.vrac_category_aggregates
+  FOR EACH ROW
+  EXECUTE FUNCTION agrosoluce.update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_household_welfare_index_updated_at ON agrosoluce.household_welfare_index;
+CREATE TRIGGER update_household_welfare_index_updated_at
+  BEFORE UPDATE ON agrosoluce.household_welfare_index
+  FOR EACH ROW
+  EXECUTE FUNCTION agrosoluce.update_updated_at_column();
+
+
+-- =============================================
+-- Migration: 023_supabase_performance_security_lints.sql
+-- =============================================
+
+-- Migration: Supabase Performance & Security Lints
+-- Fixes issues from Supabase Database Linter (RLS, function search_path, permissive policies, auth initplan, multiple policies).
+-- References: CSV exports (19) RLS enabled no policy, (18) function search_path + RLS always true, (20) auth_rls_initplan + multiple permissive.
+
+-- =============================================
+-- MIGRATION METADATA
+-- =============================================
+
+INSERT INTO agrosoluce.migrations (migration_name, description)
+VALUES ('023_supabase_performance_security_lints', 'Supabase linter fixes: RLS policies, function search_path, permissive policies, auth initplan, consolidate SELECT policies')
+ON CONFLICT (migration_name) DO NOTHING;
+
+-- =============================================
+-- 1. RLS ENABLED NO POLICY (lint 0008)
+-- Add policies for tables that have RLS but no policies
+-- =============================================
+
+-- onboarding_steps: access via cooperative_onboarding -> cooperative
+CREATE POLICY "Cooperative members can view their onboarding steps" ON agrosoluce.onboarding_steps
+    FOR SELECT USING (
+        onboarding_id IN (
+            SELECT o.id FROM agrosoluce.cooperative_onboarding o
+            JOIN agrosoluce.cooperatives c ON c.id = o.cooperative_id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+CREATE POLICY "Cooperative members can insert onboarding steps" ON agrosoluce.onboarding_steps
+    FOR INSERT WITH CHECK (
+        onboarding_id IN (
+            SELECT o.id FROM agrosoluce.cooperative_onboarding o
+            JOIN agrosoluce.cooperatives c ON c.id = o.cooperative_id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+CREATE POLICY "Cooperative members can update their onboarding steps" ON agrosoluce.onboarding_steps
+    FOR UPDATE USING (
+        onboarding_id IN (
+            SELECT o.id FROM agrosoluce.cooperative_onboarding o
+            JOIN agrosoluce.cooperatives c ON c.id = o.cooperative_id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- training_champions: cooperative_id
+CREATE POLICY "Cooperative members can view their training champions" ON agrosoluce.training_champions
+    FOR SELECT USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+CREATE POLICY "Cooperative members can insert training champions" ON agrosoluce.training_champions
+    FOR INSERT WITH CHECK (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+CREATE POLICY "Cooperative members can update their training champions" ON agrosoluce.training_champions
+    FOR UPDATE USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- training_completions: via training_sessions -> cooperative_id
+CREATE POLICY "Cooperative members can view their training completions" ON agrosoluce.training_completions
+    FOR SELECT USING (
+        training_session_id IN (
+            SELECT ts.id FROM agrosoluce.training_sessions ts
+            JOIN agrosoluce.cooperatives c ON c.id = ts.cooperative_id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+CREATE POLICY "Cooperative members can insert training completions" ON agrosoluce.training_completions
+    FOR INSERT WITH CHECK (
+        training_session_id IN (
+            SELECT ts.id FROM agrosoluce.training_sessions ts
+            JOIN agrosoluce.cooperatives c ON c.id = ts.cooperative_id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- value_metrics: cooperative_id
+CREATE POLICY "Cooperative members can view their value metrics" ON agrosoluce.value_metrics
+    FOR SELECT USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+CREATE POLICY "Cooperative members can insert value metrics" ON agrosoluce.value_metrics
+    FOR INSERT WITH CHECK (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+CREATE POLICY "Cooperative members can update their value metrics" ON agrosoluce.value_metrics
+    FOR UPDATE USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- =============================================
+-- 2. FUNCTION SEARCH_PATH MUTABLE (lint 0011)
+-- Set search_path on functions to prevent injection
+-- =============================================
+
+ALTER FUNCTION agrosoluce.update_updated_at_column() SET search_path = agrosoluce;
+ALTER FUNCTION agrosoluce.calculate_cooperative_enrichment_score(uuid) SET search_path = agrosoluce;
+ALTER FUNCTION agrosoluce.auto_enrich_cooperative(uuid) SET search_path = agrosoluce;
+ALTER FUNCTION agrosoluce.update_enrichment_scores() SET search_path = agrosoluce;
+ALTER FUNCTION agrosoluce.update_assessments_updated_at() SET search_path = agrosoluce;
+ALTER FUNCTION agrosoluce.get_readiness_dashboard_stats() SET search_path = agrosoluce;
+ALTER FUNCTION agrosoluce.get_compliance_dashboard_stats() SET search_path = agrosoluce;
+ALTER FUNCTION agrosoluce.update_child_labor_assessments_updated_at() SET search_path = agrosoluce;
+ALTER FUNCTION agrosoluce.sync_readiness_score() SET search_path = agrosoluce;
+
+-- =============================================
+-- 3. RLS POLICY ALWAYS TRUE (lint 0024) – fix permissive INSERT/UPDATE
+-- =============================================
+
+-- ag_buyer_requests
+DROP POLICY IF EXISTS "Buyers can create requests" ON agrosoluce.ag_buyer_requests;
+CREATE POLICY "Buyers can create requests" ON agrosoluce.ag_buyer_requests
+    FOR INSERT WITH CHECK ((SELECT auth.uid()) IS NOT NULL);
+
+DROP POLICY IF EXISTS "Buyers can update their requests" ON agrosoluce.ag_buyer_requests;
+CREATE POLICY "Buyers can update their requests" ON agrosoluce.ag_buyer_requests
+    FOR UPDATE USING ((SELECT auth.role()) = 'authenticated')
+    WITH CHECK ((SELECT auth.role()) = 'authenticated');
+
+-- ag_request_matches
+DROP POLICY IF EXISTS "System can create matches" ON agrosoluce.ag_request_matches;
+CREATE POLICY "System can create matches" ON agrosoluce.ag_request_matches
+    FOR INSERT WITH CHECK ((SELECT auth.role()) = 'authenticated');
+
+DROP POLICY IF EXISTS "System can update matches" ON agrosoluce.ag_request_matches;
+CREATE POLICY "System can update matches" ON agrosoluce.ag_request_matches
+    FOR UPDATE USING ((SELECT auth.role()) = 'authenticated')
+    WITH CHECK ((SELECT auth.role()) = 'authenticated');
+
+-- feedback_submissions
+DROP POLICY IF EXISTS "Anyone can submit feedback" ON agrosoluce.feedback_submissions;
+CREATE POLICY "Anyone can submit feedback" ON agrosoluce.feedback_submissions
+    FOR INSERT WITH CHECK ((SELECT auth.uid()) IS NOT NULL OR (SELECT auth.role()) = 'anon');
+
+-- monthly_progress: restrict INSERT to cooperative members
+DROP POLICY IF EXISTS "Cooperative members can submit progress" ON agrosoluce.monthly_progress;
+CREATE POLICY "Cooperative members can submit progress" ON agrosoluce.monthly_progress
+    FOR INSERT WITH CHECK (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- satisfaction_surveys: restrict INSERT to cooperative members
+DROP POLICY IF EXISTS "Cooperative members can submit surveys" ON agrosoluce.satisfaction_surveys;
+CREATE POLICY "Cooperative members can submit surveys" ON agrosoluce.satisfaction_surveys
+    FOR INSERT WITH CHECK (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- =============================================
+-- 4. AUTH RLS INITPLAN (lint 0003) – use (select auth.uid()) / (select auth.role())
+-- =============================================
+
+-- cooperative_onboarding
+DROP POLICY IF EXISTS "Cooperative members can view their onboarding" ON agrosoluce.cooperative_onboarding;
+CREATE POLICY "Cooperative members can view their onboarding" ON agrosoluce.cooperative_onboarding
+    FOR SELECT USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+DROP POLICY IF EXISTS "Cooperative members can update their onboarding" ON agrosoluce.cooperative_onboarding;
+CREATE POLICY "Cooperative members can update their onboarding" ON agrosoluce.cooperative_onboarding
+    FOR UPDATE USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- training_sessions
+DROP POLICY IF EXISTS "Cooperative members can view their training" ON agrosoluce.training_sessions;
+CREATE POLICY "Cooperative members can view their training" ON agrosoluce.training_sessions
+    FOR SELECT USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- satisfaction_surveys (view)
+DROP POLICY IF EXISTS "Cooperative members can view their surveys" ON agrosoluce.satisfaction_surveys;
+CREATE POLICY "Cooperative members can view their surveys" ON agrosoluce.satisfaction_surveys
+    FOR SELECT USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- baseline_measurements
+DROP POLICY IF EXISTS "Cooperative members can view their baseline" ON agrosoluce.baseline_measurements;
+CREATE POLICY "Cooperative members can view their baseline" ON agrosoluce.baseline_measurements
+    FOR SELECT USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- monthly_progress (view)
+DROP POLICY IF EXISTS "Cooperative members can view their progress" ON agrosoluce.monthly_progress;
+CREATE POLICY "Cooperative members can view their progress" ON agrosoluce.monthly_progress
+    FOR SELECT USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- enrichment_log
+DROP POLICY IF EXISTS "Users can view enrichment logs for their entities" ON agrosoluce.enrichment_log;
+CREATE POLICY "Users can view enrichment logs for their entities" ON agrosoluce.enrichment_log
+    FOR SELECT USING (
+        (entity_type = 'cooperative' AND entity_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        ))
+        OR
+        (entity_type = 'farmer' AND entity_id IN (
+            SELECT f.id FROM agrosoluce.farmers f
+            JOIN agrosoluce.cooperatives c ON f.cooperative_id = c.id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        ))
+    );
+
+-- buyer_request_lots
+DROP POLICY IF EXISTS "Cooperative members can view their request lots" ON agrosoluce.buyer_request_lots;
+CREATE POLICY "Cooperative members can view their request lots" ON agrosoluce.buyer_request_lots
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.ag_buyer_requests br
+            JOIN agrosoluce.ag_request_matches arm ON arm.request_id = br.id
+            JOIN agrosoluce.cooperatives c ON c.id = arm.cooperative_id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE br.id = buyer_request_lots.request_id
+            AND up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- documents
+DROP POLICY IF EXISTS "Cooperative members can view their documents" ON agrosoluce.documents;
+CREATE POLICY "Cooperative members can view their documents" ON agrosoluce.documents
+    FOR SELECT USING (
+        (entity_type = 'cooperative' AND entity_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        ))
+        OR
+        (entity_type = 'farmer' AND entity_id IN (
+            SELECT f.id FROM agrosoluce.farmers f
+            JOIN agrosoluce.cooperatives c ON f.cooperative_id = c.id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        ))
+    );
+
+DROP POLICY IF EXISTS "Cooperative members can upload documents" ON agrosoluce.documents;
+CREATE POLICY "Cooperative members can upload documents" ON agrosoluce.documents
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.user_profiles
+            WHERE id = documents.uploaded_by AND user_id = (SELECT auth.uid())
+        )
+    );
+
+-- farmer_declarations (010 schema: farmer_id)
+DROP POLICY IF EXISTS "Cooperative members can view farmer declarations" ON agrosoluce.farmer_declarations;
+CREATE POLICY "Cooperative members can view farmer declarations" ON agrosoluce.farmer_declarations
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.farmers f
+            JOIN agrosoluce.cooperatives c ON f.cooperative_id = c.id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE f.id = farmer_declarations.farmer_id
+            AND up.user_id = (SELECT auth.uid())
+        )
+    );
+
+DROP POLICY IF EXISTS "Cooperative members can create farmer declarations" ON agrosoluce.farmer_declarations;
+CREATE POLICY "Cooperative members can create farmer declarations" ON agrosoluce.farmer_declarations
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.farmers f
+            JOIN agrosoluce.cooperatives c ON f.cooperative_id = c.id
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE f.id = farmer_declarations.farmer_id
+            AND up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- notifications
+DROP POLICY IF EXISTS "Users can view their notifications" ON agrosoluce.notifications;
+CREATE POLICY "Users can view their notifications" ON agrosoluce.notifications
+    FOR SELECT USING (
+        user_profile_id IN (
+            SELECT id FROM agrosoluce.user_profiles WHERE user_id = (SELECT auth.uid())
+        )
+    );
+
+DROP POLICY IF EXISTS "Users can update their notifications" ON agrosoluce.notifications;
+CREATE POLICY "Users can update their notifications" ON agrosoluce.notifications
+    FOR UPDATE USING (
+        user_profile_id IN (
+            SELECT id FROM agrosoluce.user_profiles WHERE user_id = (SELECT auth.uid())
+        )
+    );
+
+DROP POLICY IF EXISTS "System can insert notifications" ON agrosoluce.notifications;
+CREATE POLICY "System can insert notifications" ON agrosoluce.notifications
+    FOR INSERT WITH CHECK ((SELECT auth.uid()) IS NOT NULL);
+
+-- readiness_checklist
+DROP POLICY IF EXISTS "Cooperative members can view their checklist" ON agrosoluce.readiness_checklist;
+CREATE POLICY "Cooperative members can view their checklist" ON agrosoluce.readiness_checklist
+    FOR SELECT USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+-- =============================================
+-- 5. CANONICAL_COOPERATIVE_DIRECTORY, COVERAGE_METRICS, READINESS_SNAPSHOTS
+-- Use (select auth.role()) and consolidate multiple SELECT policies (lint 0006)
+-- =============================================
+
+-- canonical_cooperative_directory: one SELECT policy (authenticated see all, anon see active)
+DROP POLICY IF EXISTS "Anyone can view active canonical directory records" ON agrosoluce.canonical_cooperative_directory;
+DROP POLICY IF EXISTS "Authenticated users can view all canonical directory records" ON agrosoluce.canonical_cooperative_directory;
+CREATE POLICY "View canonical directory records" ON agrosoluce.canonical_cooperative_directory
+    FOR SELECT USING (
+        record_status = 'active' OR (SELECT auth.role()) = 'authenticated'
+    );
+
+DROP POLICY IF EXISTS "Authenticated users can insert canonical directory records" ON agrosoluce.canonical_cooperative_directory;
+CREATE POLICY "Authenticated users can insert canonical directory records" ON agrosoluce.canonical_cooperative_directory
+    FOR INSERT WITH CHECK ((SELECT auth.role()) = 'authenticated');
+
+DROP POLICY IF EXISTS "Authenticated users can update canonical directory records" ON agrosoluce.canonical_cooperative_directory;
+CREATE POLICY "Authenticated users can update canonical directory records" ON agrosoluce.canonical_cooperative_directory
+    FOR UPDATE USING ((SELECT auth.role()) = 'authenticated');
+
+DROP POLICY IF EXISTS "Admins can delete canonical directory records" ON agrosoluce.canonical_cooperative_directory;
+CREATE POLICY "Admins can delete canonical directory records" ON agrosoluce.canonical_cooperative_directory
+    FOR DELETE USING (
+        EXISTS (
+            SELECT 1 FROM agrosoluce.user_profiles
+            WHERE user_id = (SELECT auth.uid()) AND user_type = 'admin'
+        )
+    );
+
+-- coverage_metrics: one SELECT policy
+DROP POLICY IF EXISTS "Authenticated users can view coverage metrics" ON agrosoluce.coverage_metrics;
+DROP POLICY IF EXISTS "Anon users can view coverage metrics" ON agrosoluce.coverage_metrics;
+CREATE POLICY "View coverage metrics" ON agrosoluce.coverage_metrics
+    FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Authenticated users can insert coverage metrics" ON agrosoluce.coverage_metrics;
+CREATE POLICY "Authenticated users can insert coverage metrics" ON agrosoluce.coverage_metrics
+    FOR INSERT WITH CHECK ((SELECT auth.role()) = 'authenticated');
+
+DROP POLICY IF EXISTS "Authenticated users can update coverage metrics" ON agrosoluce.coverage_metrics;
+CREATE POLICY "Authenticated users can update coverage metrics" ON agrosoluce.coverage_metrics
+    FOR UPDATE USING ((SELECT auth.role()) = 'authenticated');
+
+-- readiness_snapshots: one SELECT policy
+DROP POLICY IF EXISTS "Authenticated users can view readiness snapshots" ON agrosoluce.readiness_snapshots;
+DROP POLICY IF EXISTS "Anon users can view readiness snapshots" ON agrosoluce.readiness_snapshots;
+CREATE POLICY "View readiness snapshots" ON agrosoluce.readiness_snapshots
+    FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Authenticated users can insert readiness snapshots" ON agrosoluce.readiness_snapshots;
+CREATE POLICY "Authenticated users can insert readiness snapshots" ON agrosoluce.readiness_snapshots
+    FOR INSERT WITH CHECK ((SELECT auth.role()) = 'authenticated');
+
+-- =============================================
+-- 6. REMAINING AUTH INITPLAN: assessments, assessment_responses, child_labor_assessments
+-- =============================================
+
+-- assessments
+DROP POLICY IF EXISTS "Authenticated users can insert assessments" ON agrosoluce.assessments;
+CREATE POLICY "Authenticated users can insert assessments" ON agrosoluce.assessments
+    FOR INSERT WITH CHECK ((SELECT auth.role()) = 'authenticated');
+
+DROP POLICY IF EXISTS "Authenticated users can update assessments" ON agrosoluce.assessments;
+CREATE POLICY "Authenticated users can update assessments" ON agrosoluce.assessments
+    FOR UPDATE USING ((SELECT auth.role()) = 'authenticated');
+
+-- assessment_responses
+DROP POLICY IF EXISTS "Authenticated users can insert assessment responses" ON agrosoluce.assessment_responses;
+CREATE POLICY "Authenticated users can insert assessment responses" ON agrosoluce.assessment_responses
+    FOR INSERT WITH CHECK ((SELECT auth.role()) = 'authenticated');
+
+-- child_labor_assessments
+DROP POLICY IF EXISTS "Users can view child labor assessments" ON agrosoluce.child_labor_assessments;
+CREATE POLICY "Users can view child labor assessments" ON agrosoluce.child_labor_assessments
+    FOR SELECT USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+DROP POLICY IF EXISTS "Cooperative users can insert child labor assessments" ON agrosoluce.child_labor_assessments;
+CREATE POLICY "Cooperative users can insert child labor assessments" ON agrosoluce.child_labor_assessments
+    FOR INSERT WITH CHECK (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+DROP POLICY IF EXISTS "Cooperative users can update their child labor assessments" ON agrosoluce.child_labor_assessments;
+CREATE POLICY "Cooperative users can update their child labor assessments" ON agrosoluce.child_labor_assessments
+    FOR UPDATE USING (
+        cooperative_id IN (
+            SELECT c.id FROM agrosoluce.cooperatives c
+            JOIN agrosoluce.user_profiles up ON c.user_profile_id = up.id
+            WHERE up.user_id = (SELECT auth.uid())
+        )
+    );
+
+
+-- =============================================
+-- Migration: 024_edusoluce_auth_rls_initplan.sql
+-- =============================================
+
+-- Migration: Auth RLS Initplan for edusoluce (and other project schemas)
+-- Fixes lint 0003: replace auth.uid() with (select auth.uid()) in RLS policies
+-- so they are not re-evaluated per row (better performance).
+-- Tables: data_subject_requests, notifications
+
+INSERT INTO agrosoluce.migrations (migration_name, description)
+VALUES ('024_edusoluce_auth_rls_initplan', 'Fix auth_rls_initplan for edusoluce (and other schemas): data_subject_requests, notifications')
+ON CONFLICT (migration_name) DO NOTHING;
+
+DO $$
+DECLARE
+  project_schema text;
+  schemas text[] := ARRAY['edusoluce', 'agrosoluce', 'vendorsoluce', 'cybercaution', 'cybercorrect', 'technosoluce'];
+BEGIN
+  FOREACH project_schema IN ARRAY schemas
+  LOOP
+    IF NOT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = project_schema) THEN
+      CONTINUE;
+    END IF;
+
+    -- data_subject_requests: use (select auth.uid()) for initplan
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = project_schema AND table_name = 'data_subject_requests') THEN
+      EXECUTE format('DROP POLICY IF EXISTS "Users can insert data subject requests" ON %I.data_subject_requests', project_schema);
+
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = project_schema AND table_name = 'data_subject_requests' AND column_name = 'user_id') THEN
+        EXECUTE format(
+          'CREATE POLICY "Users can insert data subject requests" ON %I.data_subject_requests FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id)',
+          project_schema
+        );
+      ELSE
+        EXECUTE format(
+          'CREATE POLICY "Users can insert data subject requests" ON %I.data_subject_requests FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) IS NOT NULL)',
+          project_schema
+        );
+      END IF;
+    END IF;
+
+    -- notifications: use (select auth.uid()) for initplan
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = project_schema AND table_name = 'notifications') THEN
+      EXECUTE format('DROP POLICY IF EXISTS "System can insert notifications" ON %I.notifications', project_schema);
+      EXECUTE format(
+        'CREATE POLICY "System can insert notifications" ON %I.notifications FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) IS NOT NULL)',
+        project_schema
+      );
+    END IF;
+  END LOOP;
+END $$;
+
+

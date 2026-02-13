@@ -18,64 +18,48 @@ import {
   Activity
 } from 'lucide-react';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageHeader from '@/components/layout/PageHeader';
 
 export default function MonitoringPage() {
   return (
     <div className="min-h-screen py-8 bg-gradient-to-br from-secondary-50 dark:from-gray-900 via-primary-50 dark:via-gray-900 to-white dark:to-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
         <Breadcrumbs items={[
           { label: 'Home', path: '/' },
           { label: 'Monitoring', path: '/monitoring' }
         ]} />
 
-        {/* Hero Section */}
-        <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-600 rounded-xl shadow-2xl p-8 md:p-12 mb-8 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32"></div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-4">
-              <Shield className="h-8 w-8 text-white/90" />
-              <span className="text-sm font-semibold text-white/80 uppercase tracking-wider">Compliance & Monitoring</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-              Child Labor Monitoring & Compliance
-            </h1>
-            <p className="text-xl md:text-2xl text-white/90 mb-6 max-w-3xl">
-              Track documentation, self-assessments, and improvement efforts across agricultural cooperatives
-            </p>
-            <p className="text-base text-white/80 max-w-3xl mb-6 leading-relaxed">
-              AgroSoluce™ supports learning, monitoring, and improvement — not marketing narratives. 
-              Our monitoring platform helps cooperatives, buyers, and partners track child labor prevention 
-              efforts, documentation coverage, and compliance readiness across supply chains.
-            </p>
-            <div className="flex flex-wrap gap-4 mt-6">
-              <Link
-                to="/compliance/child-labor"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-all border border-white/30 font-medium"
-              >
-                <BarChart3 className="h-5 w-5" />
-                View Dashboard
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                to="/compliance/assessments/new"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all border border-white/20 font-medium"
-              >
-                <FileCheck className="h-5 w-5" />
-                New Assessment
-              </Link>
-              <Link
-                to="/vrac"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all border border-white/20 font-medium"
-              >
-                <Activity className="h-5 w-5" />
-                Workforce Health
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
+        <PageHeader
+          badge="Compliance & Monitoring"
+          icon={Shield}
+          title="Child Labor Monitoring & Compliance"
+          subtitle="Documentation coverage, self-assessments, and workforce health signals in one place. Track child labor prevention, readiness scores, and regional health proxies (e.g. antimalarial trends) to support due diligence and impact analysis."
+        />
+
+        <div className="flex flex-wrap gap-4 mb-8">
+          <Link
+            to="/compliance/child-labor"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all border border-primary-700 font-medium shadow-md"
+          >
+            <BarChart3 className="h-5 w-5" />
+            View Dashboard
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            to="/compliance/assessments/new"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-gray-700 font-medium"
+          >
+            <FileCheck className="h-5 w-5" />
+            New Assessment
+          </Link>
+          <Link
+            to="/vrac"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-gray-700 font-medium"
+          >
+            <Activity className="h-5 w-5" />
+            Workforce Health
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
 
         {/* Key Features */}
@@ -283,9 +267,8 @@ export default function MonitoringPage() {
                 This platform does not make compliance determinations.
               </p>
               <p className="text-yellow-700 dark:text-yellow-300 text-xs leading-relaxed">
-                Final sourcing decisions and compliance determinations remain the responsibility of buyers and operators. 
-                AgroSoluce™ supports monitoring and due diligence efforts but does not certify outcomes or replace 
-                independent verification.
+                Final sourcing and compliance decisions remain with buyers and operators. This platform supports 
+                monitoring and due diligence; it does not certify outcomes or replace independent verification.
               </p>
             </div>
           </div>

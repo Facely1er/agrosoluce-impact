@@ -5,10 +5,11 @@
 ### Environment Setup
 - [ ] Supabase project created
 - [ ] Database credentials obtained
+- [ ] **Exposed schemas**: In Supabase Dashboard → Project Settings → API → add `agrosoluce` to **Exposed schemas** (so the app can query `agrosoluce.*` tables)
 - [ ] `.env` file created in project root with:
   - [ ] `VITE_SUPABASE_URL`
   - [ ] `VITE_SUPABASE_ANON_KEY`
-  - [ ] `VITE_SUPABASE_SCHEMA=agrosoluce`
+  - [ ] `VITE_SUPABASE_SCHEMA=agrosoluce` (optional; app defaults to `agrosoluce`)
 - [ ] Environment variables tested (can connect to database)
 
 ### Dependencies
@@ -29,7 +30,7 @@
 - [ ] Back up any existing data (if applicable)
 - [ ] Run `ALL_MIGRATIONS.sql` to create complete schema
 - [ ] Verify `agrosoluce` schema exists
-- [ ] Verify all 22+ migrations recorded in `agrosoluce.migrations` table
+- [ ] Verify all migrations recorded in `agrosoluce.migrations` table (run `npm run migrate:check`)
 
 ### Option B: Existing Database (VRAC Only)
 - [ ] Verify base schema exists (migrations 001-021)

@@ -33,6 +33,7 @@ const AssessmentPage = lazy(() => import('./pages/assessment'));
 const MonitoringPage = lazy(() => import('./pages/monitoring/MonitoringPage'));
 const VracAnalysisPage = lazy(() => import('./pages/vrac/VracAnalysisPage'));
 const HouseholdWelfareIndex = lazy(() => import('./pages/hwi/HouseholdWelfareIndex'));
+const AnalyticsDashboardPage = lazy(() => import('./pages/analytics/AnalyticsDashboardPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // Redirect components for deprecated routes
@@ -92,6 +93,7 @@ function App() {
             
             {/* Health & Impact Analysis (Primary Feature) */}
             <Route path="/health-impact" element={<HealthImpactOverview />} />
+            <Route path="/analytics" element={<AnalyticsDashboardPage />} />
             <Route path="/workspace/:coop_id" element={<CooperativeWorkspace />} />
             
             {/* VRAC Health Intelligence / Pharmacy Surveillance */}

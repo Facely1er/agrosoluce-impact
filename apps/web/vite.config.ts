@@ -1,9 +1,38 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
+
+/** SPA fallback for preview: serve index.html for non-asset routes (run after static) */
+function spaPreviewFallback() {
+  return {
+    name: 'spa-preview-fallback',
+    configurePreviewServer(server: any) {
+      return () => {
+        server.middlewares.use((req: any, res: any, next: any) => {
+          const url = (req.url ?? '/').split('?')[0];
+          if (
+            !url.startsWith('/assets/') &&
+            !url.startsWith('/data/') &&
+            !/\.\w+$/.test(url) &&
+            url !== '/'
+          ) {
+            const indexPath = path.join(__dirname, 'build', 'index.html');
+            if (fs.existsSync(indexPath)) {
+              res.setHeader('Content-Type', 'text/html');
+              res.end(fs.readFileSync(indexPath, 'utf-8'));
+              return;
+            }
+          }
+          next();
+        });
+      };
+    },
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), spaPreviewFallback()],
   publicDir: 'public',
   resolve: {
     alias: {

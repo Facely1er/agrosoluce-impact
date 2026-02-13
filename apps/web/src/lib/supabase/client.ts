@@ -1,12 +1,14 @@
 // Supabase client configuration for AgroSoluce
-// Using public schema (Supabase only supports 'public' or 'graphql_public')
+// All app tables live in the agrosoluce schema. Set default schema so .from() resolves correctly.
+// In Supabase Dashboard: Project Settings → API → add "agrosoluce" to Exposed schemas.
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-const defaultSchema = 'public'; // Supabase only allows 'public' or 'graphql_public'
+/** Default schema for data API; must be exposed in Supabase Project Settings → API → Exposed schemas */
+const defaultSchema = 'agrosoluce';
 
 // Validation function to check if Supabase is properly configured
 export const isSupabaseConfigured = (): boolean => {
@@ -41,7 +43,7 @@ if (import.meta.env.DEV) {
   }
 }
 
-// Create Supabase client with public schema
+// Create Supabase client with agrosoluce schema (all app tables live here)
 let supabaseInstance: SupabaseClient | null = null;
 
 try {
@@ -61,7 +63,7 @@ try {
         }
       },
       db: {
-        schema: 'public'
+        schema: defaultSchema
       }
     });
     
@@ -115,23 +117,20 @@ export const getSupabaseClient = (): SupabaseClient => {
 // Export schema manager for future use
 export const schemaManager = {
   default: defaultSchema,
-  
-  // Get the appropriate schema based on context
-  getSchema(context: 'default' | 'organization' | 'user' = 'default'): string {
+
+  getSchema(_context: 'default' | 'organization' | 'user' = 'default'): string {
     return defaultSchema;
   },
-  
-  // Create a client with a specific schema
-  // Note: Supabase only supports 'public' or 'graphql_public' schemas
+
+  /** Create a client targeting a specific schema. Schema must be in Supabase Exposed schemas. */
   createClientWithSchema(schema: string): SupabaseClient | null {
     if (!supabaseUrl || !supabaseAnonKey) {
       return null;
     }
-    // Validate schema - Supabase only allows 'public' or 'graphql_public'
-    const validSchemas = ['public', 'graphql_public'];
-    if (!validSchemas.includes(schema)) {
-      console.warn(`Invalid schema "${schema}". Using 'public' instead. Supabase only supports: ${validSchemas.join(', ')}`);
-      schema = 'public';
+    const allowed = ['agrosoluce', 'public', 'graphql_public'];
+    if (!allowed.includes(schema)) {
+      console.warn(`Schema "${schema}" may not be exposed. Allowed: ${allowed.join(', ')}. Using default.`);
+      schema = defaultSchema;
     }
     return createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
@@ -139,10 +138,8 @@ export const schemaManager = {
         persistSession: true,
         detectSessionInUrl: true,
       },
-      db: {
-        schema: schema
-      }
+      db: { schema },
     });
-  }
+  },
 };
 

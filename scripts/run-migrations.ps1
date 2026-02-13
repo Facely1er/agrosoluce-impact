@@ -36,7 +36,7 @@ Write-Host "=" * 60 -ForegroundColor Cyan
 Write-Host ""
 Write-Host "1. Open your Supabase project dashboard" -ForegroundColor White
 Write-Host "2. Navigate to SQL Editor" -ForegroundColor White
-Write-Host "3. Open the file: database\migrations\ALL_MIGRATIONS.sql" -ForegroundColor White
+Write-Host "3. Open the file: packages\database\migrations\ALL_MIGRATIONS.sql" -ForegroundColor White
 Write-Host "4. Copy all contents and paste into SQL Editor" -ForegroundColor White
 Write-Host "5. Click 'Run' to execute all migrations" -ForegroundColor White
 Write-Host "6. Verify by running: npx tsx scripts/run-migrations.ts --check" -ForegroundColor White

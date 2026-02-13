@@ -91,10 +91,10 @@ export default function HealthImpactOverview() {
             />
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-gray-900 dark:text-white">
-            The Human Health Signal in Agricultural Productivity
+            Health and Agricultural Productivity
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-8">
-            Pharmacy surveillance data reveals workforce health patterns that satellite monitoring misses
+            Pharmacy surveillance (VRAC) in cocoa regions provides a workforce health proxy; a 3–4 week lag to harvest impact is documented in research. Use it alongside satellite and production data for impact analysis.
           </p>
         </div>
 
@@ -112,8 +112,8 @@ export default function HealthImpactOverview() {
                     When malaria surges affect farmers and their families, harvest efficiency drops dramatically.
                   </p>
                   <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                    Traditional satellite monitoring tracks forest cover and land use, but it can't detect the 
-                    human health factors that directly impact production capacity.
+                    Satellite monitoring tracks forest cover and land use; workforce health factors that affect 
+                    production capacity are observed via complementary data such as pharmacy surveillance.
                   </p>
                   <div className="bg-health-50 dark:bg-health-900/30 p-6 rounded-lg border-l-4 border-health-600">
                     <div className="flex items-start gap-3">

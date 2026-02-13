@@ -61,8 +61,9 @@ const migrations = [
   '020_rename_compliance_to_readiness.sql',
   '021_fix_rls_permissive_policies.sql',
   '022_create_vrac_tables.sql',
+  '023_hwi_schema.sql',
   '023_supabase_performance_security_lints.sql',
-  '024_edusoluce_auth_rls_initplan.sql'
+  '024_edusoluce_auth_rls_initplan.sql',
 ];
 
 /**

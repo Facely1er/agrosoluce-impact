@@ -20,6 +20,7 @@ export interface Translations {
     healthImpact: string;
     regionalAnalysis: string;
     healthIntelligence: string;
+    analytics: string;
     complianceTools: string;
     pilotPrograms: string;
     main: string;
@@ -928,6 +929,7 @@ export const translations: Record<Language, Translations> = {
       healthImpact: 'Health & Impact',
       regionalAnalysis: 'Regional Analysis',
       healthIntelligence: 'Health Intelligence',
+      analytics: 'Analytics',
       complianceTools: 'Compliance Tools',
       pilotPrograms: 'Pilot Programs',
       partners: 'Partners & NGOs',
@@ -1004,13 +1006,13 @@ export const translations: Record<Language, Translations> = {
     landing: {
     hero: {
       tagline: 'Health-Agriculture Impact Analysis',
-      title: 'Revealing the Human Health Signal in Agricultural Productivity',
-      subtitle: 'Pharmacy surveillance data that complements satellite monitoring',
-      description: 'Malaria reduces harvest efficiency by 40-60%. We detect these surges weeks before production impact — helping traders, processors, and supply chain managers make informed decisions.',
+      title: 'Health and Agricultural Productivity',
+      subtitle: 'Pharmacy surveillance (VRAC) in cocoa regions complements satellite and production data',
+      description: 'Research indicates malaria reduces harvest efficiency by 40–60%; a 3–4 week lag to harvest impact is documented. Use regional health indicators for due diligence and supply chain risk assessment.',
       ctaCooperatives: 'View Cooperatives',
       ctaHealthData: 'Explore Regional Health Data',
       ctaBuyer: 'Buyer Portal',
-      freeNote: 'Pharmacy surveillance • Academic research • Early warning signals',
+      freeNote: 'Pharmacy surveillance • Research-backed lag • Due diligence',
     },
       stats: {
         productCategories: 'Product Categories',
@@ -1047,7 +1049,7 @@ export const translations: Record<Language, Translations> = {
       value: {
         tagline: 'Value We Bring',
         title: 'Transforming Challenges into Opportunities',
-        subtitle: 'AgroSoluce™ helps cooperatives turn regulatory pressure, environmental risks, and social challenges into pathways for market access, improved documentation, and stronger buyer relationships — all while supporting farmer livelihoods and forest preservation efforts.',
+        subtitle: 'Visibility into documentation, compliance, and workforce health supports due diligence and impact measurement for cooperatives and buyers.',
       },
       outcomes: {
         title: 'Value Delivered',
@@ -1123,7 +1125,7 @@ export const translations: Record<Language, Translations> = {
           feature: 'Monitor community health in cocoa regions via pharmacy sales as a proxy for workforce productivity and supply chain risk',
           outcome1: 'Track antimalarial sales trends across Gontougo, La Mé, and urban regions to detect health surges',
           outcome2: 'Use regional health signals to inform supply chain intelligence and ESG monitoring',
-          outcome3: 'Academic research shows malaria reduces harvest efficiency by 40–60%; our surveillance provides early regional signals',
+          outcome3: 'Research shows malaria reduces harvest efficiency by 40–60%; VRAC pharmacy data gives early regional signals',
           cta: 'View analysis',
         },
       },
@@ -1135,27 +1137,27 @@ export const translations: Record<Language, Translations> = {
       },
       quickLinks: {
         title: 'Learn More',
-        subtitle: 'Explore how AgroSoluce™ supports responsible sourcing for different audiences',
+        subtitle: 'Tools for due diligence, health impact, and cooperative visibility',
         forBuyers: {
           title: 'For Buyers',
-          description: 'Understand what exists, what is missing, and where to focus due diligence',
+          description: 'Directory, health indicators, and compliance coverage for supply chain due diligence',
           learnMore: 'Learn more',
         },
         forPartners: {
           title: 'For NGOs & Partners',
-          description: 'Make farmer-level progress visible without distorting reality',
+          description: 'Pilot-level monitoring, health and compliance indicators, and progress tracking',
           learnMore: 'Learn more',
         },
         whatWeDo: {
           title: 'What We Do',
-          description: 'See how AgroSoluce™ supports responsible sourcing through transparency',
+          description: 'Cooperatives, health surveillance, compliance self-assessments, and documentation visibility',
           learnMore: 'Learn more',
         },
       },
       carousel: {
-        item1: 'AgroSoluce™ helps cooperatives, buyers, and partners make farmer engagement, documentation coverage, and improvement efforts visible',
-        item2: '— without overstating readiness or replacing audits.',
-        item3: 'We start from the farmer, structure reality at the cooperative level, and support credible EUDR-aligned due diligence across agricultural supply chains.',
+        item1: 'Cooperatives, health indicators, compliance coverage, and documentation visibility in one place',
+        item2: 'Self-assessments are non-certifying; final decisions remain with buyers and auditors.',
+        item3: 'Farmer and cooperative-level visibility, health indicators, and documentation coverage for due diligence.',
       },
       heroSubtitle: {
         line1: 'Making Farmer Engagement, Documentation Coverage,',
@@ -1849,6 +1851,7 @@ export const translations: Record<Language, Translations> = {
       healthImpact: 'Santé & Impact',
       regionalAnalysis: 'Analyse Régionale',
       healthIntelligence: 'Intelligence Santé',
+      analytics: 'Analytiques',
       complianceTools: 'Outils de Conformité',
       pilotPrograms: 'Programmes Pilotes',
       partners: 'Partenaires & ONG',

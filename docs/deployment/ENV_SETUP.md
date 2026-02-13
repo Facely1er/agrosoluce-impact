@@ -53,7 +53,7 @@ Since Supabase doesn't allow direct SQL execution via API, you need to run migra
    - Navigate to SQL Editor
 
 3. Copy and execute:
-   - Open `database/migrations/ALL_MIGRATIONS.sql`
+   - Open `packages/database/migrations/ALL_MIGRATIONS.sql`
    - Copy all contents
    - Paste into Supabase SQL Editor
    - Click "Run" to execute

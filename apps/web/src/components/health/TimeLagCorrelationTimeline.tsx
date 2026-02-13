@@ -1,4 +1,9 @@
-import { Calendar, TrendingDown, AlertTriangle } from 'lucide-react';
+import { Calendar, TrendingDown, AlertTriangle, BookOpen } from 'lucide-react';
+import {
+  ANALYTICS_DATA_RANGE,
+  TIME_LAG_CORRELATION,
+  ANALYTICS_REFERENCES,
+} from '@/data/analyticsMethodology';
 
 interface TimelinePhase {
   id: string;
@@ -18,7 +23,7 @@ export function TimeLagCorrelationTimeline() {
       label: 'Malaria Surge Period',
       months: 'August - September',
       description: 'Peak transmission season in cocoa-growing regions',
-      impact: 'Workers experience 5-10 lost workdays per malaria episode',
+      impact: `Workers experience ${TIME_LAG_CORRELATION.lostWorkdaysPerEpisode.min}-${TIME_LAG_CORRELATION.lostWorkdaysPerEpisode.max} lost workdays per malaria episode`,
       color: 'text-red-700',
       bgColor: 'bg-red-50 border-red-300',
       icon: <AlertTriangle className="h-5 w-5 text-red-600" />,
@@ -28,7 +33,7 @@ export function TimeLagCorrelationTimeline() {
       label: 'Harvest Efficiency Impact',
       months: 'October - December',
       description: 'Critical harvest period with reduced workforce capacity',
-      impact: '40-60% reduction in harvest efficiency documented',
+      impact: `${TIME_LAG_CORRELATION.harvestEfficiencyReductionPercent.min}-${TIME_LAG_CORRELATION.harvestEfficiencyReductionPercent.max}% reduction in harvest efficiency documented`,
       color: 'text-amber-700',
       bgColor: 'bg-amber-50 border-amber-300',
       icon: <TrendingDown className="h-5 w-5 text-amber-600" />,
@@ -139,13 +144,35 @@ export function TimeLagCorrelationTimeline() {
         ))}
       </div>
 
-      {/* Research Note */}
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-900">
-          <strong>Academic Foundation:</strong> Time-lag analysis based on peer-reviewed research
-          demonstrating correlation between malaria incidence and agricultural productivity in
-          Sub-Saharan Africa cocoa regions (2020-2024 data).
-        </p>
+      {/* Methodology & substantiation */}
+      <div className="mt-6 space-y-4">
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h4 className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
+            <BookOpen className="h-4 w-4" />
+            Methodology & data
+          </h4>
+          <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+            <li>
+              <strong>Lag window:</strong> {TIME_LAG_CORRELATION.lagWindowMonths.min}–{TIME_LAG_CORRELATION.lagWindowMonths.max} months between health surge and measurable production impact (peer-reviewed evidence).
+            </li>
+            <li>
+              <strong>Data range:</strong> Health proxy from VRAC pharmacy surveillance {ANALYTICS_DATA_RANGE.health.label}; harvest impact from documented studies in cocoa-growing regions.
+            </li>
+            <li>
+              <strong>Limitation:</strong> Quantitative correlation coefficients (e.g. Pearson) would require paired health and harvest time series per site; current narrative is based on regional alignment and literature.
+            </li>
+          </ul>
+        </div>
+        <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <p className="text-xs font-semibold text-gray-700 mb-2">References</p>
+          <ul className="text-xs text-gray-600 space-y-1">
+            {ANALYTICS_REFERENCES.map((ref) => (
+              <li key={ref.id}>
+                <span className="font-medium">{ref.label}:</span> {ref.note}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

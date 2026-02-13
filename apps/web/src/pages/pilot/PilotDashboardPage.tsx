@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Building2, Info, BarChart3, TrendingUp, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { getCanonicalDirectoryRecordsByPilotId } from '@/features/cooperatives/api/canonicalDirectoryApi';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import PageHeader from '@/components/layout/PageHeader';
 import type { CanonicalCooperativeDirectory } from '@/types';
 import { getCoverageMetrics } from '@/features/coverage/api/coverageApi';
 import type { CoverageMetrics } from '@/services/coverageService';
@@ -177,34 +178,16 @@ export default function PilotDashboardPage() {
         {/* Breadcrumbs */}
         <Breadcrumbs items={[
           { label: 'Home', path: '/' },
-          { label: 'Directory', path: '/directory' },
-          { label: `Pilot: ${pilotLabel}` }
+          { label: 'Pilot Programs', path: '/pilot' },
+          { label: pilotLabel }
         ]} />
 
-        {/* Header Section */}
-        <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-500 rounded-xl shadow-lg p-8 mb-6 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent"></div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
-                <BarChart3 className="h-8 w-8 text-white" />
-              </div>
-              <div className="flex-1">
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                  Pilot Due-Diligence Snapshot
-                </h1>
-                <div className="flex flex-wrap items-center gap-4 text-white/90">
-                  <div>
-                    <span className="font-medium">Pilot:</span> {pilotLabel}
-                  </div>
-                  <div>
-                    <span className="font-medium">Cooperatives:</span> {cooperatives.length}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          badge="Pilot Due-Diligence"
+          icon={BarChart3}
+          title="Pilot Due-Diligence Snapshot"
+          subtitle={`Pilot: ${pilotLabel} • ${cooperatives.length} cooperatives`}
+        />
 
         {/* Aggregate Metrics Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-6 border border-gray-100">
